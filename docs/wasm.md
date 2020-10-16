@@ -26,8 +26,6 @@ To build all of the Runnables in the current directory and bundle them all into 
 
 `subo` is under active development alongside [Hive](https://github.com/suborbital/hive) itself.
 
-Copyright Suborbital contributors 2020
-
 ## FFI Runnable API
 Hive provides an API which allows for communication between Wasm runnables and Hive. Full documentation is coming soon. This API currently has:
 - The ability to make HTTP requests from Wasm Runnables (soon with built-in access controls to restrict network activity)
