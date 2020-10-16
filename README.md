@@ -1,4 +1,4 @@
-# subo, the Suborbital CLI
+# Subo, the Suborbital CLI
 
 Subo is the command-line helper for working with the Suborbital Development Platform. Subo is used to build Wasm Runnables, run FaaS servers, generate config files, and more over time.
 
