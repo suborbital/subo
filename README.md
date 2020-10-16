@@ -13,3 +13,5 @@ curl -sf https://gobinaries.com/suborbital/subo/subo | sh
 Full docs are forthcoming, but for now you can learn about building Wasm Runnables [here](docs/wasm.md).
 
 By the way, Subo is (in spirit) a chubby astronaut panda bear (with a retro Mercury-era vibe), and if any designer out there wants to illustrate them, the Suborbital contributors will find some way to compensate you for your time and effort. Also, it's pronounced "soo-bow", the "bow and arrow" kind of bow, not the "bow at the waist" bow. Sooooooobo.
+
+Copyright Suborbital contributors 2020.

@@ -29,7 +29,9 @@ To build all of the Runnables in the current directory and bundle them all into 
 Copyright Suborbital contributors 2020
 
 ## FFI Runnable API
-subo provides an API which allows for communication between Wasm runnables and Hive. This API is currently limited to internal functions used to run jobs and return their results, but in the future this API will expand to include:
-- The ability to make network requests from Wasm Runnables (with built-in access controls to restrict network activity)
+Hive provides an API which allows for communication between Wasm runnables and Hive. Full documentation is coming soon. This API currently has:
+- The ability to make HTTP requests from Wasm Runnables (soon with built-in access controls to restrict network activity)
+
+This API will soon have:
 - The ability to read files from the host machine (with build-in access control)
 - The ability to schedule new Hive jobs and get their results (similar to the Go Runnable API)
