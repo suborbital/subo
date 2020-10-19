@@ -10,6 +10,9 @@ You can also install using [gobinaries](https://gobinaries.com/):
 curl -sf https://gobinaries.com/suborbital/subo/subo | sh
 ```
 
+## Builders
+This repo contains builders for the various languages supported by Hive. A builder is a Docker image that can build Runnables into Wasm modules, and is used internally by `subo` to build your code! See the [builders](./builders/) directory for more.
+
 Full docs are forthcoming, but for now you can learn about building Wasm Runnables [here](docs/wasm.md).
 
 By the way, Subo is (in spirit) a chubby astronaut panda bear (with a retro Mercury-era vibe), and if any designer out there wants to illustrate them, the Suborbital contributors will find some way to compensate you for your time and effort. Also, it's pronounced "soo-bow", the "bow and arrow" kind of bow, not the "bow at the waist" bow. Sooooooobo.
