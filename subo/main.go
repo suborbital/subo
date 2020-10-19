@@ -17,7 +17,6 @@ func main() {
 	rootCmd := rootCommand(bctx)
 
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
-
 		return nil
 	}
 
