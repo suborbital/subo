@@ -1,11 +1,13 @@
 package context
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
 )
 
 var dockerImageForLang = map[string]string{
@@ -35,16 +37,12 @@ type RunnableBundle struct {
 
 // DotHive represents a .hive.yanl file
 type DotHive struct {
+	Name string `yaml:"name"`
 	Lang string `yaml:"lang"`
 }
 
-// CurrentBuildContext returns the current build context
-func CurrentBuildContext() (*BuildContext, error) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get CWD")
-	}
-
+// CurrentBuildContext returns the build context for the provided working directory
+func CurrentBuildContext(cwd string) (*BuildContext, error) {
 	runnables, err := getRunnableDirs(cwd)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to getRunnableDirs")
@@ -95,16 +93,30 @@ func getRunnableDirs(cwd string) ([]RunnableDir, error) {
 			return nil, errors.Wrapf(err, "failed to list files in %s", tf.Name())
 		}
 
-		if containsDotHiveYaml(innerFiles) {
-			dotHive := DotHive{
-				Lang: "rust",
+		if filename, exists := containsDotHiveYaml(innerFiles); exists {
+			dotHiveBytes, err := ioutil.ReadFile(filepath.Join(cwd, tf.Name(), filename))
+			if err != nil {
+				return nil, errors.Wrap(err, "failed to ReadFile .hive yaml")
+			}
+
+			dotHive := DotHive{}
+			if err := yaml.Unmarshal(dotHiveBytes, &dotHive); err != nil {
+				return nil, errors.Wrap(err, "failed to Unmarshal .hive yaml")
 			}
 
 			img := imageForLang(dotHive.Lang)
+			if img == "" {
+				return nil, fmt.Errorf("(%s) %s is not a valid lang", dotHive.Name, dotHive.Lang)
+			}
+
+			absolutePath, err := filepath.Abs(filepath.Join(cwd, tf.Name()))
+			if err != nil {
+				return nil, errors.Wrap(err, "failed to get Abs filepath")
+			}
 
 			runnable := RunnableDir{
 				Name:       tf.Name(),
-				Fullpath:   filepath.Join(cwd, tf.Name()),
+				Fullpath:   absolutePath,
 				DotHive:    dotHive,
 				BuildImage: img,
 			}
@@ -116,14 +128,16 @@ func getRunnableDirs(cwd string) ([]RunnableDir, error) {
 	return runnables, nil
 }
 
-func containsDotHiveYaml(files []os.FileInfo) bool {
+func containsDotHiveYaml(files []os.FileInfo) (string, bool) {
 	for _, f := range files {
-		if f.Name() == ".hive.yaml" || f.Name() == ".hive.yml" {
-			return true
+		if f.Name() == ".hive.yaml" {
+			return ".hive.yaml", true
+		} else if f.Name() == ".hive.yml" {
+			return ".hive.yml", true
 		}
 	}
 
-	return false
+	return "", false
 }
 
 func imageForLang(lang string) string {

@@ -1,3 +1,2 @@
-runnable:
-  name: helloworld-rs
-  language: rust
+name: helloworld-rs
+lang: rust

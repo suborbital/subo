@@ -7,6 +7,8 @@ func ForLang(lang string) (string, string, error) {
 	switch lang {
 	case "rust":
 		return "run.rs", rustTmpl(), nil
+	case "swift":
+		return "run.swift", swiftTmpl(), nil
 	default:
 		return "", "", fmt.Errorf("no template available for lang: %q", lang)
 	}
@@ -20,5 +22,15 @@ pub fn run(input: String) -> Option<String> {
 	
 	return Some(out);
 }`
+	return tmpl
+}
+
+func swiftTmpl() string {
+	tmpl := `
+func run(input: String) -> String {
+
+	return "hello " + input
+}`
+
 	return tmpl
 }
