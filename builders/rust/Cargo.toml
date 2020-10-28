@@ -1,5 +1,5 @@
 [package]
-name = "hivew-rs-builder"
+name = "hive-wasm-rs-builder"
 version = "0.1.0"
 authors = ["cohix <connorjhicks@gmail.com>"]
 edition = "2018"

@@ -14,7 +14,7 @@ import (
 )
 
 // CreateCmd returns the build command
-func CreateCmd(bctx *context.BuildContext) *cobra.Command {
+func CreateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create <name>",
 		Short: "create an empty Wasm runnable",
@@ -22,6 +22,12 @@ func CreateCmd(bctx *context.BuildContext) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0]
+
+			dir, _ := cmd.Flags().GetString("dir")
+			bctx, err := context.CurrentBuildContext(dir)
+			if err != nil {
+				return errors.Wrap(err, "failed to get CurrentBuildContext")
+			}
 
 			if bctx.RunnableExists(name) {
 				return fmt.Errorf("🚫 runnable %s already exists", name)
@@ -44,7 +50,7 @@ func CreateCmd(bctx *context.BuildContext) *cobra.Command {
 				return errors.Wrap(err, "failed to makeRunnableDir")
 			}
 
-			if err := writeDotHive(path, lang); err != nil {
+			if err := writeDotHive(path, name, lang); err != nil {
 				return errors.Wrap(err, "failed to writeDotHive")
 			}
 
@@ -73,8 +79,9 @@ func makeRunnableDir(cwd, name string) (string, error) {
 	return path, nil
 }
 
-func writeDotHive(dir, lang string) error {
+func writeDotHive(dir, name, lang string) error {
 	dotHive := context.DotHive{
+		Name: name,
 		Lang: lang,
 	}
 

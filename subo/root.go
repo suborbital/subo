@@ -3,11 +3,10 @@ package main
 import (
 	"github.com/spf13/cobra"
 	"github.com/suborbital/subo/subo/command"
-	"github.com/suborbital/subo/subo/context"
 	"github.com/suborbital/subo/subo/release"
 )
 
-func rootCommand(bctx *context.BuildContext) *cobra.Command {
+func rootCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "subo",
 		Short:   "Suborbital Development Platform CLI",
@@ -17,8 +16,8 @@ func rootCommand(bctx *context.BuildContext) *cobra.Command {
 
 	cmd.SetVersionTemplate("{{.Version}}\n")
 
-	cmd.AddCommand(command.BuildCmd(bctx))
-	cmd.AddCommand(command.CreateCmd(bctx))
+	cmd.AddCommand(command.BuildCmd())
+	cmd.AddCommand(command.CreateCmd())
 
 	return cmd
 }
