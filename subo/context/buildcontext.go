@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
+	"github.com/suborbital/hive-wasm/directive"
 	"gopkg.in/yaml.v2"
 )
 
@@ -19,6 +20,7 @@ type BuildContext struct {
 	Cwd       string
 	Runnables []RunnableDir
 	Bundle    RunnableBundle
+	Directive *directive.Directive
 }
 
 // RunnableDir represents a directory containing a Runnable
@@ -37,8 +39,9 @@ type RunnableBundle struct {
 
 // DotHive represents a .hive.yanl file
 type DotHive struct {
-	Name string `yaml:"name"`
-	Lang string `yaml:"lang"`
+	Name      string `yaml:"name"`
+	Namespace string `yaml:"namespace"`
+	Lang      string `yaml:"lang"`
 }
 
 // CurrentBuildContext returns the build context for the provided working directory
@@ -53,10 +56,16 @@ func CurrentBuildContext(cwd string) (*BuildContext, error) {
 		return nil, errors.Wrap(err, "failed to bundleIfExists")
 	}
 
+	directive, err := readDirectiveFile(cwd)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to readDirectiveFile")
+	}
+
 	bctx := &BuildContext{
 		Cwd:       cwd,
 		Runnables: runnables,
 		Bundle:    *bundle,
+		Directive: directive,
 	}
 
 	return bctx, nil
@@ -102,6 +111,10 @@ func getRunnableDirs(cwd string) ([]RunnableDir, error) {
 			dotHive := DotHive{}
 			if err := yaml.Unmarshal(dotHiveBytes, &dotHive); err != nil {
 				return nil, errors.Wrap(err, "failed to Unmarshal .hive yaml")
+			}
+
+			if dotHive.Namespace == "" {
+				dotHive.Namespace = "default"
 			}
 
 			img := imageForLang(dotHive.Lang)

@@ -7,6 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/suborbital/hive-wasm/directive"
 	"github.com/suborbital/hive-wasm/wasm"
 	"github.com/suborbital/subo/subo/context"
 	"github.com/suborbital/subo/subo/util"
@@ -15,11 +16,15 @@ import (
 // BuildCmd returns the build command
 func BuildCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "build",
+		Use:   "build [dir]",
 		Short: "build a Wasm runnable",
 		Long:  `build a Wasm runnable from local source files`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			dir, _ := cmd.Flags().GetString("dir")
+			dir := "."
+			if len(args) > 0 {
+				dir = args[0]
+			}
+
 			bctx, err := context.CurrentBuildContext(dir)
 			if err != nil {
 				return errors.Wrap(err, "failed to get CurrentBuildContext")
@@ -47,11 +52,24 @@ func BuildCmd() *cobra.Command {
 
 			}
 
-			shouldBundle, err := cmd.Flags().GetBool("bundle")
-			if err != nil {
-				return errors.Wrap(err, "🚫 failed to get bundle flag")
-			} else if shouldBundle {
-				if err := wasm.WriteBundle(results, bctx.Bundle.Fullpath); err != nil {
+			if shouldBundle, _ := cmd.Flags().GetBool("bundle"); shouldBundle {
+				if bctx.Directive == nil {
+					bctx.Directive = &directive.Directive{
+						Identifier: "com.suborbital.app",
+						// TODO: insert some git smarts here?
+						Version: "v0.0.1",
+					}
+				}
+
+				if err := context.AugmentAndValidateDirectiveFns(bctx.Directive, bctx.Runnables); err != nil {
+					return errors.Wrap(err, "🚫 failed to AugmentAndValidateDirectiveFns")
+				}
+
+				if err := bctx.Directive.Validate(); err != nil {
+					return errors.Wrap(err, "🚫 failed to Validate Directive")
+				}
+
+				if err := wasm.WriteBundle(bctx.Directive, results, bctx.Bundle.Fullpath); err != nil {
 					return errors.Wrap(err, "🚫 failed to WriteBundle")
 				}
 
@@ -62,12 +80,6 @@ func BuildCmd() *cobra.Command {
 		},
 	}
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		cwd = "$HOME"
-	}
-
-	cmd.Flags().String("dir", cwd, "the directory to run the build from")
 	cmd.Flags().Bool("bundle", false, "if true, bundle all resulting runnables into a deployable .wasm.zip bundle")
 
 	return cmd
