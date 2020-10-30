@@ -64,6 +64,12 @@ func CreateCmd() *cobra.Command {
 		},
 	}
 
+	cwd, err := os.Getwd()
+	if err != nil {
+		cwd = "$HOME"
+	}
+
+	cmd.Flags().String("dir", cwd, "the directory to run the build from")
 	cmd.Flags().String("lang", "rust", "the language used for the runnable")
 
 	return cmd
