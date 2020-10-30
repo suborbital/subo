@@ -26,17 +26,14 @@ func CreateCmd() *cobra.Command {
 			dir, _ := cmd.Flags().GetString("dir")
 			bctx, err := context.CurrentBuildContext(dir)
 			if err != nil {
-				return errors.Wrap(err, "failed to get CurrentBuildContext")
+				return errors.Wrap(err, "🚫 failed to get CurrentBuildContext")
 			}
 
 			if bctx.RunnableExists(name) {
 				return fmt.Errorf("🚫 runnable %s already exists", name)
 			}
 
-			lang, err := cmd.Flags().GetString("lang")
-			if err != nil {
-				return errors.Wrap(err, "failed to get lang flag")
-			}
+			lang, _ := cmd.Flags().GetString("lang")
 
 			filename, tmpl, err := template.ForLang(lang)
 			if err != nil {
@@ -50,7 +47,9 @@ func CreateCmd() *cobra.Command {
 				return errors.Wrap(err, "failed to makeRunnableDir")
 			}
 
-			if err := writeDotHive(path, name, lang); err != nil {
+			namespace, _ := cmd.Flags().GetString("namespace")
+
+			if err := writeDotHive(path, name, lang, namespace); err != nil {
 				return errors.Wrap(err, "failed to writeDotHive")
 			}
 
@@ -71,6 +70,7 @@ func CreateCmd() *cobra.Command {
 
 	cmd.Flags().String("dir", cwd, "the directory to run the build from")
 	cmd.Flags().String("lang", "rust", "the language used for the runnable")
+	cmd.Flags().String("namespace", "default", "the namespace for the new runnable")
 
 	return cmd
 }
@@ -85,10 +85,11 @@ func makeRunnableDir(cwd, name string) (string, error) {
 	return path, nil
 }
 
-func writeDotHive(dir, name, lang string) error {
+func writeDotHive(dir, name, lang, namespace string) error {
 	dotHive := context.DotHive{
-		Name: name,
-		Lang: lang,
+		Name:      name,
+		Lang:      lang,
+		Namespace: namespace,
 	}
 
 	bytes, err := yaml.Marshal(dotHive)
