@@ -1,0 +1,9 @@
+identifier: com.suborbital.test
+version: v0.0.1
+
+handlers:
+  - type: request
+    resource: /hello
+    method: GET
+    steps:
+      - fn: helloworld-rs
