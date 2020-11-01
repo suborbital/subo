@@ -6,4 +6,9 @@ handlers:
     resource: /hello
     method: GET
     steps:
-      - fn: helloworld-rs
+      - fn: modify-url
+      - fn: fetch-test
+      # - group:
+      #   - goodbye
+      #   - helloworld-rs
+      #   - fetch-test
