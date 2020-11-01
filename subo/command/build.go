@@ -36,6 +36,8 @@ func BuildCmd() *cobra.Command {
 
 			fmt.Println("✨ START: building runnables in", bctx.Cwd)
 
+			shouldBundle, _ := cmd.Flags().GetBool("bundle")
+
 			results := make([]os.File, len(bctx.Runnables))
 
 			for i, r := range bctx.Runnables {
@@ -43,16 +45,23 @@ func BuildCmd() *cobra.Command {
 
 				file, err := doBuildForRunnable(r)
 				if err != nil {
-					fmt.Println("🚫 FAIL:", errors.Wrapf(err, "failed to doBuild for %s", r.Name))
+					buildErr := errors.Wrapf(err, "🚫 failed to doBuild for %s", r.Name)
+
+					if shouldBundle {
+						return buildErr
+					}
+
+					fmt.Println(buildErr)
 				} else {
 					results[i] = *file
+
 					fullWasmFilepath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
 					fmt.Println(fmt.Sprintf("✨ DONE: %s was built -> %s", r.Name, fullWasmFilepath))
 				}
 
 			}
 
-			if shouldBundle, _ := cmd.Flags().GetBool("bundle"); shouldBundle {
+			if shouldBundle {
 				if bctx.Directive == nil {
 					bctx.Directive = &directive.Directive{
 						Identifier: "com.suborbital.app",
