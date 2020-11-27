@@ -1,0 +1,1 @@
+/Users/cohix-16/Workspaces/suborbital/subo/builders/rust/fetch/target/wasm32-wasi/release/fetch.wasm: /Users/cohix-16/Workspaces/suborbital/subo/builders/rust/fetch/src/lib.rs /Users/cohix-16/Workspaces/suborbital/subo/builders/rust/suborbital/src/lib.rs

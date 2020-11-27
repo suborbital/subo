@@ -6,7 +6,7 @@ builder/rs:
 builder/rs/publish/docker: build/docker
 	docker push $(rs-img)
 
-builder/rs/test/wasm:
+builder/rs/example/wasm:
 	cargo build --target wasm32-wasi --lib --release
 
 builder/rs/test/docker: build/docker

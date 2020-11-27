@@ -1,0 +1,1 @@
+/Users/cohix-16/Workspaces/suborbital/subo/builders/rust/log_example/target/wasm32-wasi/release/liblog_example.rlib: /Users/cohix-16/Workspaces/suborbital/subo/builders/rust/log_example/src/lib.rs /Users/cohix-16/Workspaces/suborbital/subo/builders/rust/suborbital/src/lib.rs
