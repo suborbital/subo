@@ -5,7 +5,7 @@ import "fmt"
 var nativeCommandsForLang = map[string][]string{
 	"rust": {
 		"cargo build --target wasm32-wasi --lib --release",
-		"cp target/wasm32-wasi/release/{{ .UnderscoreName }}.wasm .",
+		"cp target/wasm32-wasi/release/{{ .UnderscoreName }}.wasm ./{{ .Name }}.wasm",
 	},
 	"swift": {
 		"xcrun --toolchain swiftwasm swift build --triple wasm32-unknown-wasi -Xlinker --allow-undefined -Xlinker --export=allocate -Xlinker --export=deallocate -Xlinker --export=run_e",

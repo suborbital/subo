@@ -17,6 +17,7 @@
 # builder data directories
 target
 *.build
+*.wasm
 
 # macOS
 .DS_Store
