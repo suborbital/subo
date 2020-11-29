@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
+	"text/template"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -37,13 +39,23 @@ func BuildCmd() *cobra.Command {
 			fmt.Println("✨ START: building runnables in", bctx.Cwd)
 
 			shouldBundle, _ := cmd.Flags().GetBool("bundle")
+			useNative, _ := cmd.Flags().GetBool("native")
 
 			results := make([]os.File, len(bctx.Runnables))
 
 			for i, r := range bctx.Runnables {
 				fmt.Println(fmt.Sprintf("✨ START: building runnable: %s (%s)", r.Name, r.DotHive.Lang))
 
-				file, err := doBuildForRunnable(r)
+				var file *os.File
+
+				if useNative {
+					fmt.Println("🔗 using native toolchain")
+					file, err = doNativeBuildForRunnable(r)
+				} else {
+					fmt.Println("🐳 using Docker toolchain")
+					file, err = doBuildForRunnable(r)
+				}
+
 				if err != nil {
 					buildErr := errors.Wrapf(err, "🚫 failed to doBuild for %s", r.Name)
 
@@ -89,7 +101,8 @@ func BuildCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().Bool("bundle", false, "if true, bundle all resulting runnables into a deployable .wasm.zip bundle")
+	cmd.Flags().Bool("bundle", false, "if passed, bundle all resulting runnables into a deployable .wasm.zip bundle")
+	cmd.Flags().Bool("native", false, "if passed, build runnables using native toolchain rather than Docker")
 
 	return cmd
 }
@@ -112,6 +125,39 @@ func doBuildForRunnable(r context.RunnableDir) (*os.File, error) {
 
 	targetPath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
 	os.Rename(filepath.Join(cwd, r.Name, "wasm_runner_bg.wasm"), targetPath)
+
+	file, err := os.Open(targetPath)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to open resulting built file %s", targetPath)
+	}
+
+	return file, nil
+}
+
+func doNativeBuildForRunnable(r context.RunnableDir) (*os.File, error) {
+	cmds, err := context.NativeBuildCommands(r.DotHive.Lang)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to NativeBuildCommands")
+	}
+
+	for _, cmd := range cmds {
+		cmdTmpl, err := template.New("cmd").Parse(cmd)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to Parse command template")
+		}
+
+		fullCmd := &strings.Builder{}
+		if err := cmdTmpl.Execute(fullCmd, r); err != nil {
+			return nil, errors.Wrap(err, "failed to Execute command template")
+		}
+
+		_, _, err = util.RunInDir(fullCmd.String(), r.Fullpath)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to RunInDir")
+		}
+	}
+
+	targetPath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
 
 	file, err := os.Open(targetPath)
 	if err != nil {
