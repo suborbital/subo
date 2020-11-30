@@ -13,8 +13,8 @@ import (
 )
 
 var dockerImageForLang = map[string]string{
-	"rust":  "suborbital/builder-rs:1.46.0-3",
-	"swift": "UNSUPPORTED",
+	"rust":  "suborbital/builder-rs:v0.0.3",
+	"swift": "suborbital/builder-swift:v0.0.3",
 }
 
 // BuildContext describes the context under which the tool is being run

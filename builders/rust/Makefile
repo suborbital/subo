@@ -16,4 +16,4 @@ builder/rs/cargo/publish:
 subo/docker:
 	docker build ../../ -t subo:dev
 
-.PHONY: builder/rs builder/rs/docker/publish builder/rs/docker/test builder/rs/cargo/publish
+.PHONY: builder/rs builder/rs/publish builder/rs/test builder/rs/cargo/publish subo/docker
