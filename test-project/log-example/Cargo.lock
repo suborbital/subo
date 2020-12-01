@@ -65,6 +65,8 @@ checksum = "01c1c2ededd95f93b1d65e7f8b5b17670e926bf9cbb55f8b91b26b0bd40d3259"
 [[package]]
 name = "suborbital"
 version = "0.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "95eb412d09c871376c25e6a01b00da53977d906e5e0e56a503124b6bd24a73a1"
 dependencies = [
  "cargo_toml",
  "serde",

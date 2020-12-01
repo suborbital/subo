@@ -13,8 +13,8 @@ import (
 )
 
 var dockerImageForLang = map[string]string{
-	"rust":  "suborbital/hive-rs:1.46.0-3",
-	"swift": "UNSUPPORTED",
+	"rust":  "suborbital/builder-rs:v0.0.3",
+	"swift": "suborbital/builder-swift:v0.0.3",
 }
 
 // BuildContext describes the context under which the tool is being run
@@ -179,8 +179,8 @@ func getRunnableFromFiles(wd string, files []os.FileInfo) (*RunnableDir, error) 
 	}
 
 	runnable := &RunnableDir{
-		Name:           filepath.Base(wd),
-		UnderscoreName: strings.Replace(filepath.Base(wd), "-", "_", -1),
+		Name:           dotHive.Name,
+		UnderscoreName: strings.Replace(dotHive.Name, "-", "_", -1),
 		Fullpath:       absolutePath,
 		DotHive:        dotHive,
 		BuildImage:     img,
