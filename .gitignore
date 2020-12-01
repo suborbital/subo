@@ -14,5 +14,10 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
-examples/runnables.wasm.zip
+# builder data directories
+target
+*.build
+*.wasm
+
+# macOS
 .DS_Store

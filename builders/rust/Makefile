@@ -1,15 +1,19 @@
-rs-img = suborbital/hive-rs:$(shell cat .rs-ver)
+rs-img = suborbital/builder-rs:$(shell cat .rs-ver)
 
-builder/rs:
+builder/rs: subo/docker
 	docker build . -t $(rs-img)
 
-builder/rs/publish/docker: build/docker
+builder/rs/publish: builder/rs
 	docker push $(rs-img)
 
-builder/rs/test/wasm:
-	cargo build --target wasm32-wasi --lib --release
+builder/rs/test: builder/rs
+	docker run -it --mount type=bind,source=$(PWD)/test-project/helloworld,target=/root/runnable $(rs-img)
 
-builder/rs/test/docker: build/docker
-	docker run -it --mount type=bind,source="$(PWD)"/helloworld-rs,target=/root/rs-wasm $(rs-img)
+builder/rs/cargo/publish:
+	cd suborbital
+	cargo publish --target wasm32-wasi
 
-.PHONY: builder/rs builder/rs/publish/docker builder/rs/test/wasm builder/rs/test/docker
+subo/docker:
+	docker build ../../ -t subo:dev
+
+.PHONY: builder/rs builder/rs/publish builder/rs/test builder/rs/cargo/publish subo/docker
