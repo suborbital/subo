@@ -146,8 +146,23 @@ func copyTmpl(cwd, name, templatesPath string, dotHive *context.DotHive) error {
 			return nil
 		}
 
+		targetRelPath := relPath
+		if strings.Contains(relPath, ".tmpl") {
+			tmpl, err := template.New("tmpl").Parse(strings.Replace(relPath, ".tmpl", "", -1))
+			if err != nil {
+				return errors.Wrapf(err, "failed to parse template directory name %s", info.Name())
+			}
+
+			builder := &strings.Builder{}
+			if err := tmpl.Execute(builder, templateData); err != nil {
+				return errors.Wrapf(err, "failed to Execute template for %s", info.Name())
+			}
+
+			targetRelPath = builder.String()
+		}
+
 		if info.IsDir() {
-			return os.Mkdir(filepath.Join(targetPath, relPath), 0755)
+			return os.Mkdir(filepath.Join(targetPath, targetRelPath), 0755)
 		}
 
 		var data, err1 = ioutil.ReadFile(filepath.Join(templatePath, relPath))
@@ -167,10 +182,9 @@ func copyTmpl(cwd, name, templatesPath string, dotHive *context.DotHive) error {
 			}
 
 			data = []byte(builder.String())
-			relPath = strings.Replace(relPath, ".tmpl", "", 1)
 		}
 
-		return ioutil.WriteFile(filepath.Join(targetPath, relPath), data, 0777)
+		return ioutil.WriteFile(filepath.Join(targetPath, targetRelPath), data, 0777)
 	})
 
 	return err
