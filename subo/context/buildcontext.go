@@ -43,9 +43,10 @@ type RunnableBundle struct {
 
 // DotHive represents a .hive.yanl file
 type DotHive struct {
-	Name      string `yaml:"name"`
-	Namespace string `yaml:"namespace"`
-	Lang      string `yaml:"lang"`
+	Name       string `yaml:"name"`
+	Namespace  string `yaml:"namespace"`
+	Lang       string `yaml:"lang"`
+	APIVersion string `yaml:"apiVersion,omitempty"`
 }
 
 // CurrentBuildContext returns the build context for the provided working directory

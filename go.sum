@@ -177,12 +177,8 @@ github.com/suborbital/grav v0.0.11 h1:5S63w/Z/2ZsiekIDhg+CQxiVcxLp0vM0UaREOdul3I
 github.com/suborbital/grav v0.0.11/go.mod h1:fN837ibcYZILUd/nKoSaEbo+oTSGRtTbbm/MiwmM3Pw=
 github.com/suborbital/hive v0.1.3 h1:b29wRkR6Vg1LiPF3H3bfJq+N2xY2AQl0H+fkwC+MJtk=
 github.com/suborbital/hive v0.1.3/go.mod h1:CxEZVgJfnwOzUt/67YYnuw5uunb1t5oAoGpCrtIcPiE=
-github.com/suborbital/hive-wasm v0.0.5 h1:se3PO/LvwUKUbXh2pQB7ZfcGXGtxzfN1/lnpv4TaEHY=
-github.com/suborbital/hive-wasm v0.0.5/go.mod h1:49UbNOxNtysX+rHQjxPWqYwvZY5F7UDQHoieZ9xtPjs=
-github.com/suborbital/hive-wasm v0.1.1 h1:I1oJhFl4NrWuTuXhaprBaewisnLpHvYZbSLCJLLGwG0=
-github.com/suborbital/hive-wasm v0.1.1/go.mod h1:f1NruFpCeghuZ82dTG4lhB/t7dRGmzDT/Gd8/M4GCyk=
-github.com/suborbital/hive-wasm v0.1.2 h1:fxiGzHYpo0rVhAvfb5GEcx/jIn4KG44xlXpjqPP1JZ4=
-github.com/suborbital/hive-wasm v0.1.2/go.mod h1:f1NruFpCeghuZ82dTG4lhB/t7dRGmzDT/Gd8/M4GCyk=
+github.com/suborbital/hive-wasm v0.2.1 h1:Sl8o5LXP6egCVXiFADU+7faVe/oVtIseH3e1TC6ch+Q=
+github.com/suborbital/hive-wasm v0.2.1/go.mod h1:f1NruFpCeghuZ82dTG4lhB/t7dRGmzDT/Gd8/M4GCyk=
 github.com/suborbital/vektor v0.1.1/go.mod h1:tJ4gA2P8NWC4Pdu0TgpSBWZHuZ1Qhp+r5RlsqyIqdyw=
 github.com/suborbital/vektor v0.1.3 h1:rC5ic4FnjmcbizmV/WAQt67QkF6eJ7jHSsuy8IFC2bc=
 github.com/suborbital/vektor v0.1.3/go.mod h1:tJ4gA2P8NWC4Pdu0TgpSBWZHuZ1Qhp+r5RlsqyIqdyw=
@@ -230,6 +226,8 @@ golang.org/x/mod v0.0.0-20190513183733-4bf6d317e70e/go.mod h1:mXi4GBBbnImb6dmsKG
 golang.org/x/mod v0.1.0/go.mod h1:0QHyrYULN0/3qlju5TqG8bIK38QM8yzMo5ekMj3DlcY=
 golang.org/x/mod v0.3.0 h1:RM4zey1++hCTbCVQfnWeKs9/IEsaBLA8vTkd0WVtmH4=
 golang.org/x/mod v0.3.0/go.mod h1:s0Qsj1ACt9ePp/hMypM3fl4fZqREWJwdYDEqhRiZZUA=
+golang.org/x/mod v0.4.0 h1:8pl+sMODzuvGJkmj2W4kZihvVb5mKm8pB/X44PIQHv8=
+golang.org/x/mod v0.4.0/go.mod h1:s0Qsj1ACt9ePp/hMypM3fl4fZqREWJwdYDEqhRiZZUA=
 golang.org/x/net v0.0.0-20180724234803-3673e40ba225/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
 golang.org/x/net v0.0.0-20180826012351-8a410e7b638d/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
 golang.org/x/net v0.0.0-20181023162649-9b4f9f5ad519/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
