@@ -9,8 +9,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/suborbital/hive-wasm/bundle"
 	"github.com/suborbital/hive-wasm/directive"
-	"github.com/suborbital/hive-wasm/wasm"
 	"github.com/suborbital/subo/subo/context"
 	"github.com/suborbital/subo/subo/util"
 )
@@ -90,7 +90,7 @@ func BuildCmd() *cobra.Command {
 					return errors.Wrap(err, "🚫 failed to Validate Directive")
 				}
 
-				if err := wasm.WriteBundle(bctx.Directive, results, bctx.Bundle.Fullpath); err != nil {
+				if err := bundle.Write(bctx.Directive, results, bctx.Bundle.Fullpath); err != nil {
 					return errors.Wrap(err, "🚫 failed to WriteBundle")
 				}
 

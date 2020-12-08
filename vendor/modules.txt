@@ -1,0 +1,20 @@
+# github.com/inconshreveable/mousetrap v1.0.0
+github.com/inconshreveable/mousetrap
+# github.com/pkg/errors v0.9.1
+## explicit
+github.com/pkg/errors
+# github.com/spf13/cobra v1.1.1
+## explicit
+github.com/spf13/cobra
+# github.com/spf13/pflag v1.0.5
+github.com/spf13/pflag
+# github.com/suborbital/hive-wasm v0.2.1
+## explicit
+github.com/suborbital/hive-wasm/bundle
+github.com/suborbital/hive-wasm/directive
+# golang.org/x/mod v0.4.0
+## explicit
+golang.org/x/mod/semver
+# gopkg.in/yaml.v2 v2.4.0
+## explicit
+gopkg.in/yaml.v2

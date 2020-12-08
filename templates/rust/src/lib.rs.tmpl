@@ -12,9 +12,9 @@ impl runnable::Runnable for {{ .NameCamel }} {
 
 
 // initialize the runner, do not edit below //
-static {{ .NameCaps }}: &{{ .NameCamel }} = &{{ .NameCamel }}{};
+static RUNNABLE: &{{ .NameCamel }} = &{{ .NameCamel }}{};
 
 #[no_mangle]
 pub extern fn init() {
-    runnable::set({{ .NameCaps }});
+    runnable::set(RUNNABLE);
 }
