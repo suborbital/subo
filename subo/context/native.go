@@ -12,7 +12,7 @@ var nativeCommandsForLang = map[string]map[string][]string{
 			"cp target/wasm32-wasi/release/{{ .UnderscoreName }}.wasm ./{{ .Name }}.wasm",
 		},
 		"swift": {
-			"xcrun --toolchain swiftwasm swift build --triple wasm32-unknown-wasi -Xlinker --allow-undefined -Xlinker --export=allocate -Xlinker --export=deallocate -Xlinker --export=run_e",
+			"xcrun --toolchain swiftwasm swift build --triple wasm32-unknown-wasi -Xlinker --allow-undefined -Xlinker --export=allocate -Xlinker --export=deallocate -Xlinker --export=run_e -Xlinker --export=init",
 			"cp .build/debug/{{ .Name }}.wasm .",
 		},
 	},
@@ -22,7 +22,7 @@ var nativeCommandsForLang = map[string]map[string][]string{
 			"cp target/wasm32-wasi/release/{{ .UnderscoreName }}.wasm ./{{ .Name }}.wasm",
 		},
 		"swift": {
-			"swift build --triple wasm32-unknown-wasi -Xlinker --allow-undefined -Xlinker --export=allocate -Xlinker --export=deallocate -Xlinker --export=run_e",
+			"swift build --triple wasm32-unknown-wasi -Xlinker --allow-undefined -Xlinker --export=allocate -Xlinker --export=deallocate -Xlinker --export=run_e -Xlinker --export=init",
 			"cp .build/debug/{{ .Name }}.wasm .",
 		},
 	},
