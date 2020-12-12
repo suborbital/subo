@@ -1,6 +1,6 @@
 import Suborbital
 
-class {{ .NameCamel }}Runnable: Suborbital.Runnable {
+class {{ .NameCamel }}: Suborbital.Runnable {
     func run(input: String) -> String {
         return "hello " + input
     }
@@ -8,5 +8,5 @@ class {{ .NameCamel }}Runnable: Suborbital.Runnable {
 
 @_cdecl("init")
 func `init`() {
-    Suborbital.Set(runnable: {{ .NameCamel }}Runnable())
+    Suborbital.Set(runnable: {{ .NameCamel }}())
 }
