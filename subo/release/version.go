@@ -4,4 +4,4 @@ package release
 var SuboDotVersion = "0.0.5"
 
 // FFIVersion is the FFI version used by this version of subo
-var FFIVersion = "0.2.4"
+var FFIVersion = "0.2.5"
