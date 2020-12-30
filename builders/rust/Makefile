@@ -9,11 +9,7 @@ builder/rs/publish: builder/rs
 builder/rs/test: builder/rs
 	docker run -it --mount type=bind,source=$(PWD)/test-project/helloworld,target=/root/runnable $(rs-img)
 
-builder/rs/cargo/publish:
-	cd suborbital
-	cargo publish --target wasm32-wasi
-
 subo/docker:
-	docker build ../../ -t subo:dev
+	docker build ../../ -t subo:dev --no-cache
 
 .PHONY: builder/rs builder/rs/publish builder/rs/test builder/rs/cargo/publish subo/docker

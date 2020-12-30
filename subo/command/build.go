@@ -33,7 +33,7 @@ func BuildCmd() *cobra.Command {
 			}
 
 			if len(bctx.Runnables) == 0 {
-				return errors.New("🚫 no runnables found in current directory (no .hive yaml files found)")
+				return errors.New("🚫 no runnables found in current directory (no .runnable yaml files found)")
 			}
 
 			logStart(fmt.Sprintf("building runnables in %s", bctx.Cwd))
@@ -44,7 +44,7 @@ func BuildCmd() *cobra.Command {
 			results := make([]os.File, len(bctx.Runnables))
 
 			for i, r := range bctx.Runnables {
-				logStart(fmt.Sprintf("building runnable: %s (%s)", r.Name, r.DotHive.Lang))
+				logStart(fmt.Sprintf("building runnable: %s (%s)", r.Name, r.Runnable.Lang))
 
 				var file *os.File
 
@@ -110,7 +110,7 @@ func BuildCmd() *cobra.Command {
 func doBuildForRunnable(r context.RunnableDir) (*os.File, error) {
 	img := r.BuildImage
 	if img == "" {
-		return nil, fmt.Errorf("%q is not a supported language", r.DotHive.Lang)
+		return nil, fmt.Errorf("%q is not a supported language", r.Runnable.Lang)
 	}
 
 	_, _, err := util.Run(fmt.Sprintf("docker run --rm --mount type=bind,source=%s,target=/root/runnable %s", r.Fullpath, img))
@@ -129,7 +129,7 @@ func doBuildForRunnable(r context.RunnableDir) (*os.File, error) {
 }
 
 func doNativeBuildForRunnable(r context.RunnableDir) (*os.File, error) {
-	cmds, err := context.NativeBuildCommands(r.DotHive.Lang)
+	cmds, err := context.NativeBuildCommands(r.Runnable.Lang)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to NativeBuildCommands")
 	}

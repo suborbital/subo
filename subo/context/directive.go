@@ -38,13 +38,13 @@ func readDirectiveFile(cwd string) (*directive.Directive, error) {
 
 // AugmentAndValidateDirectiveFns ensures that all functions referenced in a handler exist
 // in the project and then adds the function list to the provided directive
-func AugmentAndValidateDirectiveFns(dir *directive.Directive, fns []RunnableDir) error {
+func AugmentAndValidateDirectiveFns(dxe *directive.Directive, fns []RunnableDir) error {
 	fnMap := map[string]bool{}
 	for _, fn := range fns {
 		fnMap[fn.Name] = true
 	}
 
-	handlerFns := getHandlerFnList(dir)
+	handlerFns := getHandlerFnList(dxe)
 
 	for _, fn := range handlerFns {
 		if good, exists := fnMap[fn]; !good || !exists {
@@ -52,28 +52,25 @@ func AugmentAndValidateDirectiveFns(dir *directive.Directive, fns []RunnableDir)
 		}
 	}
 
-	dirFns := make([]directive.Function, len(fns))
-	for i, fn := range fns {
-		dirFns[i] = directive.Function{
-			Name:      fn.DotHive.Name,
-			NameSpace: fn.DotHive.Namespace,
-		}
+	dirRunnables := make([]directive.Runnable, len(fns))
+	for i := range fns {
+		dirRunnables[i] = *fns[i].Runnable
 	}
 
-	dir.Functions = dirFns
+	dxe.Runnables = dirRunnables
 
 	return nil
 }
 
 // getHandlerFnList gets a full list of all functions used in the directive's handlers
-func getHandlerFnList(directive *directive.Directive) []string {
+func getHandlerFnList(dxe *directive.Directive) []string {
 	fnMap := map[string]bool{}
 
-	for _, h := range directive.Handlers {
+	for _, h := range dxe.Handlers {
 		for _, step := range h.Steps {
 			if step.Group != nil && len(step.Group) > 0 {
 				for _, fn := range step.Group {
-					fnMap[fn] = true
+					fnMap[fn.Fn] = true
 				}
 			} else {
 				fnMap[step.Fn] = true
