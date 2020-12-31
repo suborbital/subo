@@ -44,7 +44,7 @@ To build your Runnable into a Wasm module for Hive or Atmo, use the build comman
 ```
 > subo build .
 ```
-If the current working directory is a Runnable, subo will build it. If the current directory contains many runnables, subo will build them all. Any directory with a `.hive.yaml` file is considered a Runnable and will be built. Building Runnables is not fully tested on Windows.
+If the current working directory is a Runnable, subo will build it. If the current directory contains many runnables, subo will build them all. Any directory with a `.runnable.yaml` file is considered a Runnable and will be built. Building Runnables is not fully tested on Windows.
 
 ## Bundles
 To build all of the Runnables in the current directory and bundle them all into a single `.wasm.zip` file, run `subo build . --bundle`. Atmo uses Runnable bundles to help you build powerful web services by composing Runnables declaratively.

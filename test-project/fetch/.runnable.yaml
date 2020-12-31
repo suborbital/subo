@@ -1,0 +1,3 @@
+lang: rust
+name: fetch
+namespace: default

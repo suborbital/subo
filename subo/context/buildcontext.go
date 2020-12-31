@@ -13,8 +13,8 @@ import (
 )
 
 var dockerImageForLang = map[string]string{
-	"rust":  "suborbital/builder-rs:v0.0.3",
-	"swift": "suborbital/builder-swift:v0.0.3",
+	"rust":  "suborbital/builder-rs:v0.0.6",
+	"swift": "suborbital/builder-swift:v0.0.6",
 }
 
 // BuildContext describes the context under which the tool is being run
@@ -22,7 +22,7 @@ type BuildContext struct {
 	Cwd           string
 	CwdIsRunnable bool
 	Runnables     []RunnableDir
-	Bundle        RunnableBundle
+	Bundle        BundleRef
 	Directive     *directive.Directive
 }
 
@@ -31,22 +31,14 @@ type RunnableDir struct {
 	Name           string
 	UnderscoreName string
 	Fullpath       string
-	DotHive        DotHive
+	Runnable       *directive.Runnable
 	BuildImage     string
 }
 
-// RunnableBundle contains information about a bundle in the current context
-type RunnableBundle struct {
+// BundleRef contains information about a bundle in the current context
+type BundleRef struct {
 	Exists   bool
 	Fullpath string
-}
-
-// DotHive represents a .hive.yanl file
-type DotHive struct {
-	Name       string `yaml:"name"`
-	Namespace  string `yaml:"namespace"`
-	Lang       string `yaml:"lang"`
-	APIVersion string `yaml:"apiVersion,omitempty"`
 }
 
 // CurrentBuildContext returns the build context for the provided working directory
@@ -114,7 +106,7 @@ func getRunnableDirs(cwd string) ([]RunnableDir, bool, error) {
 
 		dirPath := filepath.Join(cwd, tf.Name())
 
-		// determine if a .hive.yaml exists in that dir
+		// determine if a .runnable file exists in that dir
 		innerFiles, err := ioutil.ReadDir(dirPath)
 		if err != nil {
 			return nil, false, errors.Wrapf(err, "failed to list files in %s", tf.Name())
@@ -133,12 +125,11 @@ func getRunnableDirs(cwd string) ([]RunnableDir, bool, error) {
 	return runnables, false, nil
 }
 
-func containsDotHiveYaml(files []os.FileInfo) (string, bool) {
+// containsRunnableYaml finds any .runnable file in a list of files
+func containsRunnableYaml(files []os.FileInfo) (string, bool) {
 	for _, f := range files {
-		if f.Name() == ".hive.yaml" {
-			return ".hive.yaml", true
-		} else if f.Name() == ".hive.yml" {
-			return ".hive.yml", true
+		if strings.HasPrefix(f.Name(), ".runnable.") {
+			return f.Name(), true
 		}
 	}
 
@@ -146,32 +137,32 @@ func containsDotHiveYaml(files []os.FileInfo) (string, bool) {
 }
 
 func getRunnableFromFiles(wd string, files []os.FileInfo) (*RunnableDir, error) {
-	filename, exists := containsDotHiveYaml(files)
+	filename, exists := containsRunnableYaml(files)
 	if !exists {
 		return nil, nil
 	}
 
-	dotHiveBytes, err := ioutil.ReadFile(filepath.Join(wd, filename))
+	runnableBytes, err := ioutil.ReadFile(filepath.Join(wd, filename))
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to ReadFile .hive yaml")
+		return nil, errors.Wrap(err, "failed to ReadFile .runnable yaml")
 	}
 
-	dotHive := DotHive{}
-	if err := yaml.Unmarshal(dotHiveBytes, &dotHive); err != nil {
-		return nil, errors.Wrap(err, "failed to Unmarshal .hive yaml")
+	runnable := directive.Runnable{}
+	if err := yaml.Unmarshal(runnableBytes, &runnable); err != nil {
+		return nil, errors.Wrap(err, "failed to Unmarshal .runnable yaml")
 	}
 
-	if dotHive.Name == "" {
-		dotHive.Name = filepath.Base(wd)
+	if runnable.Name == "" {
+		runnable.Name = filepath.Base(wd)
 	}
 
-	if dotHive.Namespace == "" {
-		dotHive.Namespace = "default"
+	if runnable.Namespace == "" {
+		runnable.Namespace = "default"
 	}
 
-	img := imageForLang(dotHive.Lang)
+	img := imageForLang(runnable.Lang)
 	if img == "" {
-		return nil, fmt.Errorf("(%s) %s is not a valid lang", dotHive.Name, dotHive.Lang)
+		return nil, fmt.Errorf("(%s) %s is not a valid lang", runnable.Name, runnable.Lang)
 	}
 
 	absolutePath, err := filepath.Abs(wd)
@@ -179,15 +170,15 @@ func getRunnableFromFiles(wd string, files []os.FileInfo) (*RunnableDir, error) 
 		return nil, errors.Wrap(err, "failed to get Abs filepath")
 	}
 
-	runnable := &RunnableDir{
-		Name:           dotHive.Name,
-		UnderscoreName: strings.Replace(dotHive.Name, "-", "_", -1),
+	runnableDir := &RunnableDir{
+		Name:           runnable.Name,
+		UnderscoreName: strings.Replace(runnable.Name, "-", "_", -1),
 		Fullpath:       absolutePath,
-		DotHive:        dotHive,
+		Runnable:       &runnable,
 		BuildImage:     img,
 	}
 
-	return runnable, nil
+	return runnableDir, nil
 }
 
 func imageForLang(lang string) string {
@@ -199,10 +190,10 @@ func imageForLang(lang string) string {
 	return img
 }
 
-func bundleTargetPath(cwd string) (*RunnableBundle, error) {
+func bundleTargetPath(cwd string) (*BundleRef, error) {
 	path := filepath.Join(cwd, "runnables.wasm.zip")
 
-	b := &RunnableBundle{
+	b := &BundleRef{
 		Fullpath: path,
 		Exists:   false,
 	}
@@ -210,7 +201,7 @@ func bundleTargetPath(cwd string) (*RunnableBundle, error) {
 	_, err := os.Stat(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			// do nothing
+			return b, nil
 		} else {
 			return nil, err
 		}

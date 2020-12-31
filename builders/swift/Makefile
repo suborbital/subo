@@ -14,6 +14,6 @@ builder/swift/cargo/publish:
 	cargo publish --target wasm32-wasi
 
 subo/docker:
-	docker build ../../ -t subo:dev
+	docker build ../../ -t subo:dev --no-cache
 
 .PHONY: builder/swift builder/swift/publish builder/swift/test builder/swift/cargo/publish

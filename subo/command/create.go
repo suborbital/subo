@@ -13,6 +13,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/suborbital/hive-wasm/directive"
 	"github.com/suborbital/subo/subo/context"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
@@ -60,7 +61,7 @@ func CreateCmd() *cobra.Command {
 
 			namespace, _ := cmd.Flags().GetString(namespaceFlag)
 
-			dotHive, err := writeDotHive(bctx.Cwd, name, lang, namespace)
+			runnable, err := writeDotHive(bctx.Cwd, name, lang, namespace)
 			if err != nil {
 				return errors.Wrap(err, "🚫 failed to writeDotHive")
 			}
@@ -91,7 +92,7 @@ func CreateCmd() *cobra.Command {
 
 				logDone("templates downloaded")
 
-				if err = copyTmpl(bctx.Cwd, name, tmplPath, dotHive); err != nil {
+				if err = copyTmpl(bctx.Cwd, name, tmplPath, runnable); err != nil {
 					return errors.Wrap(err, "🚫 failed to copyTmpl")
 				}
 
@@ -103,7 +104,7 @@ func CreateCmd() *cobra.Command {
 					return errors.Wrap(err, "failed to updateAndCopy")
 				}
 			} else {
-				if err := copyTmpl(bctx.Cwd, name, tmplPath, dotHive); err != nil {
+				if err := copyTmpl(bctx.Cwd, name, tmplPath, runnable); err != nil {
 					if err == errTemplateMissing {
 						if err := updateAndCopy(); err != nil {
 							return errors.Wrap(err, "failed to updateAndCopy")
@@ -144,36 +145,36 @@ func makeRunnableDir(cwd, name string) (string, error) {
 	return path, nil
 }
 
-func writeDotHive(cwd, name, lang, namespace string) (*context.DotHive, error) {
-	dotHive := &context.DotHive{
+func writeDotHive(cwd, name, lang, namespace string) (*directive.Runnable, error) {
+	runnable := &directive.Runnable{
 		Name:       name,
 		Lang:       lang,
 		Namespace:  namespace,
 		APIVersion: release.FFIVersion,
 	}
 
-	bytes, err := yaml.Marshal(dotHive)
+	bytes, err := yaml.Marshal(runnable)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to Marshal dotHive")
+		return nil, errors.Wrap(err, "failed to Marshal runnable")
 	}
 
-	path := filepath.Join(cwd, name, ".hive.yml")
+	path := filepath.Join(cwd, name, ".runnable.yaml")
 
 	if err := ioutil.WriteFile(path, bytes, 0700); err != nil {
-		return nil, errors.Wrap(err, "failed to WriteFile dotHive")
+		return nil, errors.Wrap(err, "failed to WriteFile runnable")
 	}
 
-	return dotHive, nil
+	return runnable, nil
 }
 
 type tmplData struct {
-	context.DotHive
+	directive.Runnable
 	NameCaps  string
 	NameCamel string
 }
 
-func copyTmpl(cwd, name, templatesPath string, dotHive *context.DotHive) error {
-	templatePath := filepath.Join(templatesPath, dotHive.Lang)
+func copyTmpl(cwd, name, templatesPath string, runnable *directive.Runnable) error {
+	templatePath := filepath.Join(templatesPath, runnable.Lang)
 	targetPath := filepath.Join(cwd, name)
 
 	if _, err := os.Stat(templatePath); err != nil {
@@ -186,15 +187,15 @@ func copyTmpl(cwd, name, templatesPath string, dotHive *context.DotHive) error {
 
 	nameCamel := ""
 
-	nameParts := strings.Split(dotHive.Name, "-")
+	nameParts := strings.Split(runnable.Name, "-")
 	for _, part := range nameParts {
 		nameCamel += strings.ToUpper(string(part[0]))
 		nameCamel += string(part[1:])
 	}
 
 	templateData := tmplData{
-		DotHive:   *dotHive,
-		NameCaps:  strings.ToUpper(strings.Replace(dotHive.Name, "-", "", -1)),
+		Runnable:  *runnable,
+		NameCaps:  strings.ToUpper(strings.Replace(runnable.Name, "-", "", -1)),
 		NameCamel: nameCamel,
 	}
 
