@@ -9,12 +9,13 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/suborbital/hive-wasm/directive"
+	"github.com/suborbital/subo/subo/release"
 	"gopkg.in/yaml.v2"
 )
 
 var dockerImageForLang = map[string]string{
-	"rust":  "suborbital/builder-rs:v0.0.6",
-	"swift": "suborbital/builder-swift:v0.0.6",
+	"rust":  "suborbital/builder-rs",
+	"swift": "suborbital/builder-swift",
 }
 
 // BuildContext describes the context under which the tool is being run
@@ -187,7 +188,7 @@ func imageForLang(lang string) string {
 		return ""
 	}
 
-	return img
+	return fmt.Sprintf("%s:%s", img, release.SuboDotVersion)
 }
 
 func bundleTargetPath(cwd string) (*BundleRef, error) {
