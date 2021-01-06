@@ -188,7 +188,7 @@ func imageForLang(lang string) string {
 		return ""
 	}
 
-	return fmt.Sprintf("%s:%s", img, release.SuboDotVersion)
+	return fmt.Sprintf("%s:v%s", img, release.SuboDotVersion)
 }
 
 func bundleTargetPath(cwd string) (*BundleRef, error) {

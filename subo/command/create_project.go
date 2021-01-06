@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -27,8 +28,12 @@ func CreateProjectCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0]
 
-			dir, _ := cmd.Flags().GetString(dirFlag)
-			bctx, err := context.CurrentBuildContext(dir)
+			cwd, err := os.Getwd()
+			if err != nil {
+				return errors.Wrap(err, "failed to Getwd")
+			}
+
+			bctx, err := context.CurrentBuildContext(cwd)
 			if err != nil {
 				return errors.Wrap(err, "🚫 failed to get CurrentBuildContext")
 			}
