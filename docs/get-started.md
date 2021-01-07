@@ -16,14 +16,30 @@ impl runnable::Runnable for Example {
 ```
 subo will package your Runnable into a Wasm module that can be used by Hive or Atmo and run just like any other Runnable! You can see examples of Runnables in the [test project](../test-project).
 
-## Create a Runnable
-To create a new Runnable, use subo:
-```
-> subo create <name>
-```
-Rust is chosen by default, but if you prefer Swift, just pass `--lang=swift`! You can now use the Runnable API to build your function.
+## Create a project
+To create a new project for Atmo or Hive, use `subo create project <name>`. This will create a new folder which contains a Directive.yaml and an example Runnable.
 
-The full options for `create`:
+Full options for `create project`:
+```
+create a new project for Atmo or Hive
+
+Usage:
+  subo create project <name> [flags]
+
+Flags:
+      --branch string      git branch to download templates from (default "main")
+  -h, --help               help for project
+      --update-templates   update with the newest templates
+```
+
+## Create a Runnable
+To create a new Runnable, use the create runnable command:
+```
+> subo create runnable <name>
+```
+Rust is chosen by default, but if you prefer Swift, just pass `--lang=swift`! You can now use the Runnable API to build your function. A directory is created for each Runnable, and each contains a `.runnable.yaml` file that includes some metadata.
+
+The full options for `create runnable`:
 ```
 Usage:
   subo create <name> [flags]
@@ -73,9 +89,9 @@ If you prefer not to use Docker, you can use the `--native` flag. This will caus
 Hive provides an [API](https://github.com/suborbital/hive-wasm) which gives Wasm Runnables the ability to access resources and communicate with the host application. Full documentation is coming soon. This API currently has:
 - The ability to make HTTP requests from Wasm Runnables (soon with built-in access controls to restrict network activity) (Rust)
 - Logging abilities (Rust, Swift)
+- Access to persistent cache (Rust, Swift)
 
 This API will soon have:
 - The ability to read static files packaged into Runnable bundles
-- The ability to schedule new jobs and get their results (similar to the Go Runnable API)
-- Access a live cache
-- Database access using pre-built queries
+- The ability to render templates
+- Database access

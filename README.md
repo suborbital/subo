@@ -1,6 +1,6 @@
 # Subo, the Suborbital CLI
 
-Subo is the command-line helper for working with the Suborbital Development Platform. Subo is used to build Wasm Runnables, generate config files, and more over time.
+Subo is the command-line helper for working with the Suborbital Development Platform. Subo is used to build Wasm Runnables, generate new projects and config files, and more over time.
 
 ## Installing
 To install `subo`, clone this repo and run `make subo`. A version of Go that supports Modules is required. Package manager installations will be available soon.
