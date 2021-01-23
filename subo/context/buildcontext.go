@@ -25,6 +25,7 @@ type BuildContext struct {
 	Runnables     []RunnableDir
 	Bundle        BundleRef
 	Directive     *directive.Directive
+	AtmoVersion   string
 }
 
 // RunnableDir represents a directory containing a Runnable
@@ -65,6 +66,10 @@ func CurrentBuildContext(cwd string) (*BuildContext, error) {
 		Runnables:     runnables,
 		Bundle:        *bundle,
 		Directive:     directive,
+	}
+
+	if directive != nil {
+		bctx.AtmoVersion = directive.AtmoVersion
 	}
 
 	return bctx, nil

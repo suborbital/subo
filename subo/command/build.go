@@ -12,6 +12,7 @@ import (
 	"github.com/suborbital/hive-wasm/bundle"
 	"github.com/suborbital/hive-wasm/directive"
 	"github.com/suborbital/subo/subo/context"
+	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
 )
 
@@ -78,7 +79,8 @@ func BuildCmd() *cobra.Command {
 					bctx.Directive = &directive.Directive{
 						Identifier: "com.suborbital.app",
 						// TODO: insert some git smarts here?
-						Version: "v0.0.1",
+						AppVersion:  "v0.0.1",
+						AtmoVersion: fmt.Sprintf("v%s", release.AtmoVersion),
 					}
 				}
 
