@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/suborbital/hive-wasm.git",
         "state": {
           "branch": null,
-          "revision": "c8d923454ea09bc5e8f5219b1c31116a176fa8cb",
-          "version": "0.2.4"
+          "revision": "0f34e80ce4b21e95951c22e08cbe771c8b1cc978",
+          "version": "0.4.3"
         }
       }
     ]

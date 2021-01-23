@@ -1,5 +1,5 @@
 use suborbital::runnable;
-use suborbital::net;
+use suborbital::http;
 
 struct Fetch{}
 
@@ -7,7 +7,7 @@ impl runnable::Runnable for Fetch {
     fn run(&self, input: Vec<u8>) -> Option<Vec<u8>> {
         let in_string = String::from_utf8(input).unwrap();
     
-        let result = net::fetch(in_string.as_str());
+        let result = http::get(in_string.as_str());
         let result_string = String::from_utf8(result).unwrap();
     
         Some(result_string.as_bytes().to_vec())
