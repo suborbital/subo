@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	"github.com/suborbital/hive-wasm/directive"
+	"github.com/suborbital/reactr/directive"
 )
 
 // readDirectiveFile finds a Directive from disk but does not validate it

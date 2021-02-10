@@ -11,7 +11,7 @@ import (
 	"text/template"
 
 	"github.com/pkg/errors"
-	"github.com/suborbital/hive-wasm/directive"
+	"github.com/suborbital/reactr/directive"
 )
 
 // ErrTemplateMissing and others are template related errors
