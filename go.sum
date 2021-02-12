@@ -178,6 +178,8 @@ github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/suborbital/grav v0.3.0/go.mod h1:PapJ62PtT9dPmW37WaCD+UMhoZiNPp0N9E3nUfEujC4=
 github.com/suborbital/reactr v0.6.1-0.20210210135314-a6edd20bbb9a h1:21FL3aMqjUWuiPkeTI6F5fl5aqBn0Hzw1DPYBzr+nlU=
 github.com/suborbital/reactr v0.6.1-0.20210210135314-a6edd20bbb9a/go.mod h1:McE3oPiDDXte2A0hrPiebNPb5738jeWtdmbN+hLklwM=
+github.com/suborbital/reactr v0.6.1 h1:pw/VK0SL6vpeOiE1dJWIplLZiJGBpld/3gsutgyq8ck=
+github.com/suborbital/reactr v0.6.1/go.mod h1:McE3oPiDDXte2A0hrPiebNPb5738jeWtdmbN+hLklwM=
 github.com/suborbital/vektor v0.2.2 h1:x3yit9RMXcP8LirkKb1f/psNev/G/iTIHo6eL/f1OBI=
 github.com/suborbital/vektor v0.2.2/go.mod h1:6YQE7r6t1JcVs3twpqjXDftsLUaTNUk5YorRKHcDamI=
 github.com/suborbital/vektor v0.2.3/go.mod h1:6YQE7r6t1JcVs3twpqjXDftsLUaTNUk5YorRKHcDamI=

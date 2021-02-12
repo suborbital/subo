@@ -8,7 +8,7 @@ github.com/pkg/errors
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
 github.com/spf13/pflag
-# github.com/suborbital/reactr v0.6.1-0.20210210135314-a6edd20bbb9a
+# github.com/suborbital/reactr v0.6.1
 ## explicit
 github.com/suborbital/reactr/bundle
 github.com/suborbital/reactr/directive
