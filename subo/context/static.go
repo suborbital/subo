@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/suborbital/reactr/bundle"
 )
 
 // CollectStaticFiles collects all of the files in the `static/` directory relative to cwd
@@ -36,9 +37,10 @@ func CollectStaticFiles(cwd string) (map[string]os.File, error) {
 			return errors.Wrap(err, "failed to Open file: "+path)
 		}
 
-		relativePath := strings.TrimPrefix(path, staticDir+"/") // don't want to leave the leading slash
+		relativePath := strings.TrimPrefix(path, staticDir)
+		fileName := bundle.NormalizeStaticFilename(relativePath)
 
-		files[relativePath] = *file
+		files[fileName] = *file
 
 		return nil
 	})
