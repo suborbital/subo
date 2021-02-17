@@ -14,8 +14,9 @@ import (
 )
 
 type projectData struct {
-	Name       string
-	APIVersion string
+	Name        string
+	APIVersion  string
+	AtmoVersion string
 }
 
 // CreateProjectCmd returns the build command
@@ -51,8 +52,9 @@ func CreateProjectCmd() *cobra.Command {
 			}
 
 			data := projectData{
-				Name:       name,
-				APIVersion: release.FFIVersion,
+				Name:        name,
+				APIVersion:  release.FFIVersion,
+				AtmoVersion: release.AtmoVersion,
 			}
 
 			branch, _ := cmd.Flags().GetString(branchFlag)

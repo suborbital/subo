@@ -9,8 +9,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"github.com/suborbital/hive-wasm/bundle"
-	"github.com/suborbital/hive-wasm/directive"
+	"github.com/suborbital/reactr/bundle"
+	"github.com/suborbital/reactr/directive"
 	"github.com/suborbital/subo/subo/context"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
@@ -92,7 +92,16 @@ func BuildCmd() *cobra.Command {
 					return errors.Wrap(err, "🚫 failed to Validate Directive")
 				}
 
-				if err := bundle.Write(bctx.Directive, results, bctx.Bundle.Fullpath); err != nil {
+				static, err := context.CollectStaticFiles(bctx.Cwd)
+				if err != nil {
+					return errors.Wrap(err, "failed to CollectStaticFiles")
+				}
+
+				if static != nil {
+					logInfo("ℹ️  adding static files to bundle")
+				}
+
+				if err := bundle.Write(bctx.Directive, results, static, bctx.Bundle.Fullpath); err != nil {
 					return errors.Wrap(err, "🚫 failed to WriteBundle")
 				}
 
