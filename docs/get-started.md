@@ -2,7 +2,7 @@
 
 Subo includes the WebAssembly toolchain for Suborbital projects.
 
-The Suborbital Development Platform aims for Wasm to be a first-class citizen. `subo` is the toolchain for building Wasm Runnables for [Hive](https://github.com/suborbital/hive) and [Atmo](https://github.com/suborbital/atmo). The `subo` CLI can build Wasm Runnables, and can package several Wasm Runnables into a deployable bundle.
+The Suborbital Development Platform aims for Wasm to be a first-class citizen. `subo` is the toolchain for building Wasm Runnables for [Reactr](https://github.com/suborbital/reactr) and [Atmo](https://github.com/suborbital/atmo). The `subo` CLI can build Wasm Runnables, and can package several Wasm Runnables into a deployable bundle.
 
 Building a Runnable in languages other than Go is designed to be simple and powerful:
 ```rust
@@ -14,14 +14,14 @@ impl runnable::Runnable for Example {
     }
 }
 ```
-subo will package your Runnable into a Wasm module that can be used by Hive or Atmo and run just like any other Runnable! You can see examples of Runnables in the [test project](../test-project).
+subo will package your Runnable into a Wasm module that can be used by Reactr or Atmo and run just like any other Runnable! You can see examples of Runnables in the [test project](../test-project).
 
 ## Create a project
-To create a new project for Atmo or Hive, use `subo create project <name>`. This will create a new folder which contains a Directive.yaml and an example Runnable.
+To create a new project for Atmo or Reactr, use `subo create project <name>`. This will create a new folder which contains a Directive.yaml and an example Runnable.
 
 Full options for `create project`:
 ```
-create a new project for Atmo or Hive
+create a new project for Atmo or Reactr
 
 Usage:
   subo create project <name> [flags]
@@ -56,7 +56,7 @@ Flags:
 ## Building Wasm Runnables
 **It is reccomended that Docker be installed to build Wasm Runnables. See below if you do not have Docker installed.**
  
-To build your Runnable into a Wasm module for Hive or Atmo, use the build command:
+To build your Runnable into a Wasm module for Reactr or Atmo, use the build command:
 ```
 > subo build .
 ```
@@ -65,7 +65,7 @@ If the current working directory is a Runnable, subo will build it. If the curre
 ## Bundles
 To build all of the Runnables in the current directory and bundle them all into a single `.wasm.zip` file, run `subo build . --bundle`. Atmo uses Runnable bundles to help you build powerful web services by composing Runnables declaratively.
 
-The resulting bundle can also be used with a Hive instance by calling `h.HandleBundle({path/to/bundle})`. See the [hive Wasm instructions](https://github.com/suborbital/hive/blob/master/Wasm.md) for details.
+The resulting bundle can also be used with a Reactr instance by calling `h.HandleBundle({path/to/bundle})`. See the [Reactr Wasm instructions](https://github.com/suborbital/reactr/blob/master/docs/wasm.md) for details.
 
 The full options for `build`:
 ```
@@ -83,15 +83,16 @@ If you prefer not to use Docker, you can use the `--native` flag. This will caus
 - Rust: Install the latest Rust toolchain and the additional `wasm32-wasi` target.
 - Swift: Install the [SwiftWasm](https://book.swiftwasm.org/getting-started/setup.html) toolchain. If using macOS, ensure XCode developer tools are installed (xcrun is required).
 
-`subo` is continually evolving alongside [Hive](https://github.com/suborbital/hive) and [Atmo](https://github.com/suborbital/atmo).
+`subo` is continually evolving alongside [Reactr](https://github.com/suborbital/reactr) and [Atmo](https://github.com/suborbital/atmo).
 
 ## Suborbital Runnable API
-Hive provides an [API](https://github.com/suborbital/hive-wasm) which gives Wasm Runnables the ability to access resources and communicate with the host application. Full documentation is coming soon. This API currently has:
-- The ability to make HTTP requests from Wasm Runnables (soon with built-in access controls to restrict network activity) (Rust)
-- Logging abilities (Rust, Swift)
-- Access to persistent cache (Rust, Swift)
+Reactr and Atmo provide an [API](https://atmo.suborbital.dev/runnable-api/introduction) which gives Wasm Runnables the ability to access resources and communicate with the host application. This API currently has capabilities such as:
+- The ability to make HTTP requests
+- Structured logging
+- Access to persistent cache
+- Access to a static filesystem
 
 This API will soon have:
-- The ability to read static files packaged into Runnable bundles
 - The ability to render templates
 - Database access
+- Access to blob storage
