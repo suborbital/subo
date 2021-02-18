@@ -22,4 +22,4 @@ Please read the [contributing guide](./CONTRIBUTING.md) to learn about how you c
 
 By the way, Subo is (in spirit) a chubby astronaut panda bear (with a retro Mercury-era vibe), and if any designer out there wants to illustrate them, the Suborbital contributors will find some way to compensate you for your time and effort. Also, it's pronounced Sooooobo.
 
-Copyright Suborbital contributors 2020.
+Copyright Suborbital contributors 2021.
