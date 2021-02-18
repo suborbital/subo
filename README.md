@@ -16,6 +16,10 @@ curl -sf https://gobinaries.com/suborbital/subo/subo | sh
 ## Builders
 This repo contains builders for the various languages supported by Wasm Runnables. A builder is a Docker image that can build Runnables into Wasm modules, and is used internally by `subo` to build your code! See the [builders](./builders/) directory for more.
 
+## Contributing
+
+Please read the [contributing guide](./CONTRIBUTING.md) to learn about how you can contribute to Subo! We welcome all types of contribution.
+
 By the way, Subo is (in spirit) a chubby astronaut panda bear (with a retro Mercury-era vibe), and if any designer out there wants to illustrate them, the Suborbital contributors will find some way to compensate you for your time and effort. Also, it's pronounced Sooooobo.
 
 Copyright Suborbital contributors 2020.

@@ -16,7 +16,7 @@ func CollectStaticFiles(cwd string) (map[string]os.File, error) {
 
 	stat, err := os.Stat(staticDir)
 	if err != nil {
-		if err == os.ErrNotExist {
+		if errors.Is(err, os.ErrNotExist) {
 			return nil, nil
 		}
 
