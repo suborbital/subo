@@ -7,9 +7,15 @@ Subo is the command-line helper for working with the Suborbital Development Plat
 ## Installing
 To install `subo`, clone this repo and run `make subo`. A version of Go that supports Modules is required. Package manager installations will be available soon.
 
-You can also install using [gobinaries](https://gobinaries.com/) (does not support Apple Silicon):
+You can also install with cURL (does not support Apple Silicon):
 ```
-curl -sf https://gobinaries.com/suborbital/subo/subo | sh
+curl -Ls https://subo.suborbital.dev | sh
+```
+(uses [gobinaries](https://gobinaries.com))
+
+Verify subo was installed:
+```
+subo --help
 ```
 
 ## Getting started
