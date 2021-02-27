@@ -10,16 +10,20 @@ func rootCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "subo",
 		Short:   "Suborbital Development Platform CLI",
-		Long:    `subo includes a full toolchain for using and managing Suborbital Development Platform tools, including building Wasm Runnables and Atmo projects.`,
 		Version: release.SuboDotVersion,
+		Long: `
+Subo is the full toolchain for using and managing Suborbital Development Platform tools,
+including building WebAssembly Runnables and Atmo projects.
+
+Explore the available commands by running 'subo --help'`,
 	}
 
-	cmd.SetVersionTemplate("{{.Version}}\n")
+	cmd.SetVersionTemplate("Subo CLI v{{.Version}}\n")
 
 	create := &cobra.Command{
 		Use:     "create",
-		Short:   "create an element",
-		Long:    `create an element such as a new project or runnable`,
+		Short:   "create a runnable or project",
+		Long:    `create a new Atmo project or WebAssembly runnable`,
 		Version: release.SuboDotVersion,
 	}
 
