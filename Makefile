@@ -16,4 +16,6 @@ builder/swift:
 builder/swift/%:
 	@$(MAKE) --no-print-directory -C builders/swift $@
 
+builders/publish: builder/rs/publish builder/swift/publish
+
 .PHONY: subo subo/docker

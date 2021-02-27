@@ -2,10 +2,12 @@
 
 Subo is the command-line helper for working with the Suborbital Development Platform. Subo is used to build Wasm Runnables, generate new projects and config files, and more over time.
 
+**You do not need to install language-specific tools to get started with WebAssembly and Subo!** A Docker toolchain is supported (see below) that can build your Runnables without needing to install language toolchains.
+
 ## Installing
 To install `subo`, clone this repo and run `make subo`. A version of Go that supports Modules is required. Package manager installations will be available soon.
 
-You can also install using [gobinaries](https://gobinaries.com/):
+You can also install using [gobinaries](https://gobinaries.com/) (does not support Apple Silicon):
 ```
 curl -sf https://gobinaries.com/suborbital/subo/subo | sh
 ```
@@ -15,6 +17,20 @@ curl -sf https://gobinaries.com/suborbital/subo/subo | sh
 
 ## Builders
 This repo contains builders for the various languages supported by Wasm Runnables. A builder is a Docker image that can build Runnables into Wasm modules, and is used internally by `subo` to build your code! See the [builders](./builders/) directory for more.
+
+## Platforms
+The `subo` tool supports the following platforms and operating systems:
+|  | x86_64 | arm64
+| --- | --- | --- |
+| Mac | ✅ | ✅ |
+| Linux | ✅ | ✅ |
+| Windows | 🚫 | 🚫 |
+ 
+The language toolchains used by `subo` support the following platforms:
+| | x86_64 | arm64 | Docker |
+| --- | --- | --- | --- |
+| Rust | ✅ | ✅ | ✅ |
+| Swift | ✅ | 🚫 | 🟡 (no arm64) |
 
 ## Contributing
 
