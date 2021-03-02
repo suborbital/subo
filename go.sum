@@ -180,12 +180,15 @@ github.com/suborbital/reactr v0.6.3 h1:eKpdTEgtEYXMp5JmARZIqyf61cGy50iEhvHLgs0N5
 github.com/suborbital/reactr v0.6.3/go.mod h1:McE3oPiDDXte2A0hrPiebNPb5738jeWtdmbN+hLklwM=
 github.com/suborbital/reactr v0.7.1-0.20210227224730-5dda9ebf4b90 h1:RBgOpa0rzliEIBqzu/txVRrH6GuWUXMfT+bAVnF2Ki4=
 github.com/suborbital/reactr v0.7.1-0.20210227224730-5dda9ebf4b90/go.mod h1:McE3oPiDDXte2A0hrPiebNPb5738jeWtdmbN+hLklwM=
+github.com/suborbital/reactr v0.7.1-0.20210302005752-062063525672 h1:DkoUO69NmDFwjo+Kcl1+Sy457IFklKDMIDwpm/b6f7g=
+github.com/suborbital/reactr v0.7.1-0.20210302005752-062063525672/go.mod h1:5arEv/OCrzC08bb1x5nbkQ2qnKyU6C9nziSZu/nmi9w=
 github.com/suborbital/vektor v0.2.2 h1:x3yit9RMXcP8LirkKb1f/psNev/G/iTIHo6eL/f1OBI=
 github.com/suborbital/vektor v0.2.2/go.mod h1:6YQE7r6t1JcVs3twpqjXDftsLUaTNUk5YorRKHcDamI=
 github.com/suborbital/vektor v0.2.3/go.mod h1:6YQE7r6t1JcVs3twpqjXDftsLUaTNUk5YorRKHcDamI=
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/wasmerio/wasmer-go v1.0.1/go.mod h1:0gzVdSfg6pysA6QVp6iVRPTagC6Wq9pOE8J86WKb2Fk=
+github.com/wasmerio/wasmer-go v1.0.3/go.mod h1:0gzVdSfg6pysA6QVp6iVRPTagC6Wq9pOE8J86WKb2Fk=
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
