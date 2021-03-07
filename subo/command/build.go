@@ -42,7 +42,7 @@ func BuildCmd() *cobra.Command {
 			shouldBundle, _ := cmd.Flags().GetBool("bundle")
 			useNative, _ := cmd.Flags().GetBool("native")
 
-			results := make([]os.File, len(bctx.Runnables))
+			modules := make([]os.File, len(bctx.Runnables))
 
 			for i, r := range bctx.Runnables {
 				logStart(fmt.Sprintf("building runnable: %s (%s)", r.Name, r.Runnable.Lang))
@@ -58,20 +58,13 @@ func BuildCmd() *cobra.Command {
 				}
 
 				if err != nil {
-					buildErr := errors.Wrapf(err, "🚫 failed to doBuild for %s", r.Name)
-
-					if shouldBundle {
-						return buildErr
-					}
-
-					fmt.Println(buildErr)
-				} else {
-					results[i] = *file
-
-					fullWasmFilepath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
-					logDone(fmt.Sprintf("%s was built -> %s", r.Name, fullWasmFilepath))
+					return errors.Wrapf(err, "🚫 failed to doBuild for %s", r.Name)
 				}
 
+				modules[i] = *file
+
+				fullWasmFilepath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
+				logDone(fmt.Sprintf("%s was built -> %s", r.Name, fullWasmFilepath))
 			}
 
 			if shouldBundle {
@@ -101,7 +94,7 @@ func BuildCmd() *cobra.Command {
 					logInfo("ℹ️  adding static files to bundle")
 				}
 
-				if err := bundle.Write(bctx.Directive, results, static, bctx.Bundle.Fullpath); err != nil {
+				if err := bundle.Write(bctx.Directive, modules, static, bctx.Bundle.Fullpath); err != nil {
 					return errors.Wrap(err, "🚫 failed to WriteBundle")
 				}
 
