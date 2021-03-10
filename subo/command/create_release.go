@@ -40,14 +40,29 @@ func CreateReleaseCmd() *cobra.Command {
 			newVersion := args[0]
 			releaseName := args[1]
 
+			// ensure the version entered is sane
 			if err := validateVersion(newVersion); err != nil {
 				return errors.Wrap(err, "failed to validateVersion")
 			}
 
+			// ensure the git repo is clean, no untracked or uncommitted changes
 			if err := checkGitCleanliness(); err != nil {
 				return errors.Wrap(err, "failed to checkGitCleanliness")
 			}
 
+			// ensure the current git branch is an rc branch
+			expectedBranch := fmt.Sprintf("rc-%s", newVersion)
+
+			branch, _, err := util.Run("git branch --show-current")
+			if err != nil {
+				return errors.Wrap(err, "failed to Run git branch")
+			}
+
+			if strings.TrimSpace(branch) != expectedBranch {
+				return errors.New("release must be created on an 'rc-*' branch, currently on " + branch + ", expected " + expectedBranch)
+			}
+
+			// ensure a .subo.yml file is present and valid
 			dotSubo, err := findDotSubo(cwd)
 			if err != nil {
 				return errors.Wrap(err, "failed to findDotSubo")
@@ -55,12 +70,14 @@ func CreateReleaseCmd() *cobra.Command {
 				return errors.New(".subo.yml file is missing")
 			}
 
+			// ensure a changelog exists for the relase
 			changelogFilePath := filepath.Join(cwd, "changelogs", fmt.Sprintf("%s.md", newVersion))
 
 			if err := checkChangelogFileExists(changelogFilePath); err != nil {
 				return errors.Wrap(err, "failed to checkChangelogFileExists")
 			}
 
+			// ensure each of the vesionFiles contains the string of the new version
 			for _, f := range dotSubo.DotVersionFiles {
 				filePath := filepath.Join(cwd, f)
 
@@ -76,6 +93,7 @@ func CreateReleaseCmd() *cobra.Command {
 			logDone("release is ready to go")
 			logStart("running pre-make targets")
 
+			// run all of the pre-release make targets
 			for _, target := range dotSubo.PreMakeTargets {
 				if _, _, err := util.Run(fmt.Sprintf("make %s", target)); err != nil {
 					return errors.Wrapf(err, "failed to run preMakeTarget %s", target)
@@ -85,6 +103,7 @@ func CreateReleaseCmd() *cobra.Command {
 			logDone("pre-make targets complete")
 			logStart("creating release")
 
+			// ensure the local changes are pushed, create the release, and then pull down the new tag
 			if _, _, err := util.Run("git push"); err != nil {
 				return errors.Wrap(err, "failed to Run git push")
 			}
@@ -105,6 +124,7 @@ func CreateReleaseCmd() *cobra.Command {
 			logDone("release created!")
 			logStart("running post-make targets")
 
+			// run all of the post-release make targets
 			for _, target := range dotSubo.PostMakeTargets {
 				if _, _, err := util.Run(fmt.Sprintf("make %s", target)); err != nil {
 					return errors.Wrapf(err, "failed to run postMakeTarget %s", target)
