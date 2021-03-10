@@ -51,15 +51,8 @@ func CreateReleaseCmd() *cobra.Command {
 			}
 
 			// ensure the current git branch is an rc branch
-			expectedBranch := fmt.Sprintf("rc-%s", newVersion)
-
-			branch, _, err := util.Run("git branch --show-current")
-			if err != nil {
-				return errors.Wrap(err, "failed to Run git branch")
-			}
-
-			if strings.TrimSpace(branch) != expectedBranch {
-				return errors.New("release must be created on an 'rc-*' branch, currently on " + branch + ", expected " + expectedBranch)
+			if err := ensureCorrectGitBranch(newVersion); err != nil {
+				return errors.Wrap(err, "failed to ensureCorrectGitBranch")
 			}
 
 			// ensure a .subo.yml file is present and valid
@@ -187,6 +180,21 @@ func checkGitCleanliness() error {
 		return errors.Wrap(err, "failed to git ls-files")
 	} else if out != "" {
 		return errors.New("project has untracked files")
+	}
+
+	return nil
+}
+
+func ensureCorrectGitBranch(version string) error {
+	expectedBranch := fmt.Sprintf("rc-%s", version)
+
+	branch, _, err := util.Run("git branch --show-current")
+	if err != nil {
+		return errors.Wrap(err, "failed to Run git branch")
+	}
+
+	if strings.TrimSpace(branch) != expectedBranch {
+		return errors.New("release must be created on an 'rc-*' branch, currently on " + branch + ", expected " + expectedBranch)
 	}
 
 	return nil
