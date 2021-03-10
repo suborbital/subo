@@ -1,6 +1,9 @@
 subo:
 	go install ./subo
 
+subo/dev:
+	go install -tags=development ./subo
+
 subo/docker:
 	docker build . -t subo:dev
 
