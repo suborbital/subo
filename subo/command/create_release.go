@@ -16,6 +16,7 @@ import (
 
 const (
 	preReleaseFlag = "prerelease"
+	dryRunFlag     = "dryrun"
 )
 
 // DotSuboFile describes a .subo file for controlling releases
@@ -94,6 +95,12 @@ func CreateReleaseCmd() *cobra.Command {
 			}
 
 			logDone("pre-make targets complete")
+
+			if shouldDryRun, _ := cmd.Flags().GetBool(dryRunFlag); shouldDryRun {
+				logDone("release conditions verified, terminating for dry run")
+				return nil
+			}
+
 			logStart("creating release")
 
 			// ensure the local changes are pushed, create the release, and then pull down the new tag
@@ -137,6 +144,7 @@ func CreateReleaseCmd() *cobra.Command {
 
 	cmd.Flags().String(dirFlag, cwd, "the directory to create the release for")
 	cmd.Flags().Bool(preReleaseFlag, false, "pass --prelease to mark the release as such")
+	cmd.Flags().Bool(dryRunFlag, false, "pass --dryrun to run release condition checks and pre-make targets, but don't create the release")
 
 	return cmd
 }
