@@ -1,0 +1,8 @@
+dotVersionFiles:
+  - subo/release/version.go
+
+preMakeTargets:
+  - subo/docker
+
+postMakeTargets:
+  - builders/publish
