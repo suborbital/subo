@@ -178,6 +178,8 @@ github.com/suborbital/reactr v0.7.2-0.20210307042934-9cb8a49ff9aa h1:aESPgc50Rpo
 github.com/suborbital/reactr v0.7.2-0.20210307042934-9cb8a49ff9aa/go.mod h1:5arEv/OCrzC08bb1x5nbkQ2qnKyU6C9nziSZu/nmi9w=
 github.com/suborbital/reactr v0.7.2-0.20210309004447-577a36aed4c4 h1:gpTZmxkQZg3iYkCeUOylPfOyPuPlCJ9D8k07yi344o0=
 github.com/suborbital/reactr v0.7.2-0.20210309004447-577a36aed4c4/go.mod h1:5arEv/OCrzC08bb1x5nbkQ2qnKyU6C9nziSZu/nmi9w=
+github.com/suborbital/reactr v0.8.0 h1:EeYG6bxwr94DPTGTNcAx8YzKq5XCvAatcO/VLLCt90M=
+github.com/suborbital/reactr v0.8.0/go.mod h1:5arEv/OCrzC08bb1x5nbkQ2qnKyU6C9nziSZu/nmi9w=
 github.com/suborbital/vektor v0.2.2/go.mod h1:6YQE7r6t1JcVs3twpqjXDftsLUaTNUk5YorRKHcDamI=
 github.com/suborbital/vektor v0.2.3/go.mod h1:6YQE7r6t1JcVs3twpqjXDftsLUaTNUk5YorRKHcDamI=
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
