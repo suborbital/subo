@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/spf13/cobra"
 	"github.com/suborbital/subo/subo/command"
+	"github.com/suborbital/subo/subo/features"
 	"github.com/suborbital/subo/subo/release"
 )
 
@@ -25,6 +26,10 @@ Explore the available commands by running 'subo --help'`,
 		Short:   "create a runnable or project",
 		Long:    `create a new Atmo project or WebAssembly runnable`,
 		Version: release.SuboDotVersion,
+	}
+
+	if features.EnableReleaseCommands {
+		create.AddCommand(command.CreateReleaseCmd())
 	}
 
 	create.AddCommand(command.CreateProjectCmd())
