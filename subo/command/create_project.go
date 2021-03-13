@@ -103,10 +103,18 @@ func CreateProjectCmd() *cobra.Command {
 
 			logDone(path)
 
+			logStart("initializing Git repo")
+
+			if _, _, err := util.Run(fmt.Sprintf("git init ./%s", name)); err != nil {
+				return errors.Wrap(err, "🚫 failed to initialize Git repo")
+			}
+
+			logDone("initialized Git repo")
+
 			return nil
 		},
 	}
-
+	logStart("start working")
 	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
 	cmd.Flags().Bool(updateTemplatesFlag, false, "update with the newest templates")
 
