@@ -114,7 +114,6 @@ func CreateProjectCmd() *cobra.Command {
 			return nil
 		},
 	}
-	logStart("start working")
 	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
 	cmd.Flags().Bool(updateTemplatesFlag, false, "update with the newest templates")
 
