@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/suborbital/reactr/directive"
+	"github.com/suborbital/atmo/directive"
 	"github.com/suborbital/subo/subo/release"
 	"gopkg.in/yaml.v2"
 )
