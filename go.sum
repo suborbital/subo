@@ -185,6 +185,8 @@ github.com/suborbital/atmo v0.1.1-0.20210313222446-a2108923b2fd h1:c9KKmPhOD7jab
 github.com/suborbital/atmo v0.1.1-0.20210313222446-a2108923b2fd/go.mod h1:pUmfGo+TNrKO1r+LG4njMmrB+FHTyUsqB99Ow64xZ08=
 github.com/suborbital/atmo v0.1.1-0.20210313223623-162dac20b852 h1:ZaWzrkNNJSZYtb/00CgAF8Ir9xMujeGfOFg2ibLgVvw=
 github.com/suborbital/atmo v0.1.1-0.20210313223623-162dac20b852/go.mod h1:pUmfGo+TNrKO1r+LG4njMmrB+FHTyUsqB99Ow64xZ08=
+github.com/suborbital/atmo v0.1.1-0.20210315130520-7ecaa1080b5c h1:6/w5ewXj+Ch0XuqkFSKf9Tzc0Szn6LIlXwYrFAbLciA=
+github.com/suborbital/atmo v0.1.1-0.20210315130520-7ecaa1080b5c/go.mod h1:pUmfGo+TNrKO1r+LG4njMmrB+FHTyUsqB99Ow64xZ08=
 github.com/suborbital/grav v0.3.0/go.mod h1:PapJ62PtT9dPmW37WaCD+UMhoZiNPp0N9E3nUfEujC4=
 github.com/suborbital/grav v0.3.2 h1:5k3zb5kHBI8/RbD4YA+QHmMo6oovRWASta9rrNIJEUg=
 github.com/suborbital/grav v0.3.2/go.mod h1:PapJ62PtT9dPmW37WaCD+UMhoZiNPp0N9E3nUfEujC4=
@@ -230,6 +232,8 @@ golang.org/x/crypto v0.0.0-20201217014255-9d1352758620/go.mod h1:jdWPYTVW3xRLrWP
 golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad/go.mod h1:jdWPYTVW3xRLrWPugEBEK3UY2ZEsg3UU495nc5E+M+I=
 golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83 h1:/ZScEX8SfEmUGRHs0gxpqteO5nfNW6axyZbBdw9A12g=
 golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83/go.mod h1:jdWPYTVW3xRLrWPugEBEK3UY2ZEsg3UU495nc5E+M+I=
+golang.org/x/crypto v0.0.0-20210314154223-e6e6c4f2bb5b h1:wSOdpTq0/eI46Ez/LkDwIsAKA71YP2SRKBODiRWM0as=
+golang.org/x/crypto v0.0.0-20210314154223-e6e6c4f2bb5b/go.mod h1:T9bdIzuCu7OtxOm1hfPfRQxPLYneinmdGuTeoZ9dtd4=
 golang.org/x/exp v0.0.0-20190121172915-509febef88a4/go.mod h1:CJ0aWSM057203Lf6IL+f9T1iT9GByDxfZKAQTCR3kQA=
 golang.org/x/exp v0.0.0-20190306152737-a1d7652674e8/go.mod h1:CJ0aWSM057203Lf6IL+f9T1iT9GByDxfZKAQTCR3kQA=
 golang.org/x/exp v0.0.0-20190510132918-efd6b22b2522/go.mod h1:ZjyILWgesfNpC6sMxTJOJm9Kp84zZh5NQWvqDGG3Qr8=

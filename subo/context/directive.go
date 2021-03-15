@@ -75,7 +75,7 @@ func getHandlerFnList(dxe *directive.Directive) []string {
 					fnMap[fn.Fn] = true
 				}
 			} else if step.IsForEach() {
-				fnMap[step.ForEach.Fn.Fn] = true
+				fnMap[step.ForEach.Fn] = true
 			}
 		}
 	}
