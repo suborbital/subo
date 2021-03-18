@@ -9,8 +9,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/suborbital/atmo/directive"
 	"github.com/suborbital/reactr/bundle"
-	"github.com/suborbital/reactr/directive"
 	"github.com/suborbital/subo/subo/context"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
@@ -94,7 +94,12 @@ func BuildCmd() *cobra.Command {
 					logInfo("ℹ️  adding static files to bundle")
 				}
 
-				if err := bundle.Write(bctx.Directive, modules, static, bctx.Bundle.Fullpath); err != nil {
+				directiveBytes, err := bctx.Directive.Marshal()
+				if err != nil {
+					return errors.Wrap(err, "failed to Directive.Marshal")
+				}
+
+				if err := bundle.Write(directiveBytes, modules, static, bctx.Bundle.Fullpath); err != nil {
 					return errors.Wrap(err, "🚫 failed to WriteBundle")
 				}
 

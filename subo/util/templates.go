@@ -11,7 +11,7 @@ import (
 	"text/template"
 
 	"github.com/pkg/errors"
-	"github.com/suborbital/reactr/directive"
+	"github.com/suborbital/atmo/directive"
 )
 
 // ErrTemplateMissing and others are template related errors
