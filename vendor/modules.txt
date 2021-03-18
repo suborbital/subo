@@ -14,7 +14,7 @@ github.com/sethvargo/go-envconfig
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
 github.com/spf13/pflag
-# github.com/suborbital/atmo v0.1.1-0.20210317235115-9915685bb3ac
+# github.com/suborbital/atmo v0.1.1-0.20210318124745-3506afdf8f1a
 ## explicit
 github.com/suborbital/atmo/directive
 # github.com/suborbital/grav v0.3.2
