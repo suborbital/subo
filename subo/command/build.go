@@ -94,7 +94,12 @@ func BuildCmd() *cobra.Command {
 					logInfo("ℹ️  adding static files to bundle")
 				}
 
-				if err := bundle.Write(bctx.Directive, modules, static, bctx.Bundle.Fullpath); err != nil {
+				directiveBytes, err := bctx.Directive.Marshal()
+				if err != nil {
+					return errors.Wrap(err, "failed to Directive.Marshal")
+				}
+
+				if err := bundle.Write(directiveBytes, modules, static, bctx.Bundle.Fullpath); err != nil {
 					return errors.Wrap(err, "🚫 failed to WriteBundle")
 				}
 
