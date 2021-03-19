@@ -2,12 +2,14 @@ package command
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
+	"regexp"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/suborbital/subo/subo/context"
-	"github.com/suborbital/subo/subo/util"
 )
 
 //CleanCmd  removes all of the target/.build folders for Runnables and deletes the .wasm files.
@@ -32,30 +34,29 @@ func CleanCmd() *cobra.Command {
 			}
 			logStart(fmt.Sprintf("cleaning in %s", bctx.Cwd))
 
-			//remove  target folder
-
-			if outStr, _, _ := util.Run(fmt.Sprintf("find . -type d -name target")); outStr != "" {
-				if _, _, err := util.Run(fmt.Sprintf("rm -r ./target")); err != nil {
-					return errors.Wrap(err, "🚫 failed to remove target folder")
+			//delete target or .build folder
+			dirs, _ := ioutil.ReadDir(".")
+			for _, dir := range dirs {
+				if dir.IsDir() {
+					if dir.Name() == "target" || dir.Name() == ".build" {
+						if rErr := os.RemoveAll(dir.Name()); rErr != nil {
+							logInfo(rErr.Error())
+						}
+						logDone(fmt.Sprintf("removed %s", dir.Name()))
+					}
 				}
-				logDone("removed target folder")
 			}
 
-			//remove  .build folder
-			if outStr, _, _ := util.Run(fmt.Sprintf("find . -type d -name .build")); outStr != "" {
-				if _, _, err := util.Run(fmt.Sprintf("rm -r ./.build")); err != nil {
-					return errors.Wrap(err, "🚫 failed to remove target folder")
-				}
-				logDone("removed .build folder")
-			}
+			//delete all .wasm files
+			fileRegEx, _ := regexp.Compile("^.+\\.wasm")
 
-			//find all .wasm files
-			if outStr, _, _ := util.Run(fmt.Sprintf("find . -type f -name *.wasm")); outStr != "" {
-				if _, _, err := util.Run(fmt.Sprintf("find . -type f -name *.wasm -delete")); err != nil {
-					return errors.Wrap(err, "🚫 failed to delete .wasm files")
+			filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+				if err == nil && fileRegEx.MatchString(info.Name()) {
+					os.Remove(path)
+					logDone(fmt.Sprintf("removed %s", path))
 				}
-				logDone("removed all .wasm")
-			}
+				return nil
+			})
 
 			logDone("cleaned")
 			return nil
