@@ -39,7 +39,9 @@ func BuildCmd() *cobra.Command {
 
 			logStart(fmt.Sprintf("building runnables in %s", bctx.Cwd))
 
-			shouldBundle, _ := cmd.Flags().GetBool("bundle")
+			noBundle, _ := cmd.Flags().GetBool("no-bundle")
+			shouldBundle := !noBundle
+
 			useNative, _ := cmd.Flags().GetBool("native")
 			shouldDockerBuild, _ := cmd.Flags().GetBool("docker")
 
@@ -108,6 +110,8 @@ func BuildCmd() *cobra.Command {
 			}
 
 			if shouldDockerBuild {
+				os.Setenv("DOCKER_BUILDKIT", "0")
+
 				if _, _, err := util.Run(fmt.Sprintf("docker build . -t=%s:%s", bctx.Directive.Identifier, bctx.Directive.AppVersion)); err != nil {
 					return errors.Wrap(err, "🚫 failed to build Docker image")
 				}
@@ -119,7 +123,7 @@ func BuildCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().Bool("bundle", false, "if passed, bundle all resulting runnables into a deployable .wasm.zip bundle")
+	cmd.Flags().Bool("no-bundle", false, "if passed, a .wasm.zip bundle will not be generated")
 	cmd.Flags().Bool("native", false, "if passed, build runnables using native toolchain rather than Docker")
 	cmd.Flags().Bool("docker", false, "pass --docker to automatically build a Docker image based on your project's Dockerfile. It will be tagged with the 'identifier' and 'appVersion' from your Directive")
 
