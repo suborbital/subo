@@ -90,7 +90,9 @@ func CreateReleaseCmd() *cobra.Command {
 
 			// run all of the pre-release make targets
 			for _, target := range dotSubo.PreMakeTargets {
-				if _, _, err := util.Run(fmt.Sprintf("make %s", target)); err != nil {
+				targetWithVersion := strings.Replace(target, "{{ .Version }}", newVersion, -1)
+
+				if _, _, err := util.Run(fmt.Sprintf("make %s", targetWithVersion)); err != nil {
 					return errors.Wrapf(err, "failed to run preMakeTarget %s", target)
 				}
 			}
@@ -127,7 +129,9 @@ func CreateReleaseCmd() *cobra.Command {
 
 			// run all of the post-release make targets
 			for _, target := range dotSubo.PostMakeTargets {
-				if _, _, err := util.Run(fmt.Sprintf("make %s", target)); err != nil {
+				targetWithVersion := strings.Replace(target, "{{ .Version }}", newVersion, -1)
+
+				if _, _, err := util.Run(fmt.Sprintf("make %s", targetWithVersion)); err != nil {
 					return errors.Wrapf(err, "failed to run postMakeTarget %s", target)
 				}
 			}

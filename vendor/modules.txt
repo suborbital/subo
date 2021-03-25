@@ -14,20 +14,18 @@ github.com/sethvargo/go-envconfig
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
 github.com/spf13/pflag
-# github.com/suborbital/atmo v0.1.1-0.20210317235115-9915685bb3ac
+# github.com/suborbital/atmo v0.2.0
 ## explicit
 github.com/suborbital/atmo/directive
 # github.com/suborbital/grav v0.3.2
 github.com/suborbital/grav/grav
-# github.com/suborbital/hive-wasm v0.5.0
-## explicit
-# github.com/suborbital/reactr v0.8.3-0.20210317132129-0a7be3ca8a2d
+# github.com/suborbital/reactr v0.9.1
 ## explicit
 github.com/suborbital/reactr/bundle
 github.com/suborbital/reactr/request
 github.com/suborbital/reactr/rt
 github.com/suborbital/reactr/rwasm
-# github.com/suborbital/vektor v0.2.5-0.20210317234701-42e37f72c3d2
+# github.com/suborbital/vektor v0.2.5
 github.com/suborbital/vektor/vk
 github.com/suborbital/vektor/vlog
 # github.com/wasmerio/wasmer-go v1.0.3
