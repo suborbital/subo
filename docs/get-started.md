@@ -63,7 +63,7 @@ To build your Runnable into a Wasm module for Reactr or Atmo, use the build comm
 If the current working directory is a Runnable, subo will build it. If the current directory contains many runnables, subo will build them all. Any directory with a `.runnable.yaml` file is considered a Runnable and will be built. Building Runnables is not fully tested on Windows.
 
 ## Bundles
-To build all of the Runnables in the current directory and bundle them all into a single `.wasm.zip` file, run `subo build . --bundle`. Atmo uses Runnable bundles to help you build powerful web services by composing Runnables declaratively.
+By default, subo will write all of the Runnables in the current directory into a bundle. Atmo uses Runnable bundles to help you build powerful web services by composing Runnables declaratively. If you want to skip bundling, you can pass `--no-bundle` to `subo build`
 
 The resulting bundle can also be used with a Reactr instance by calling `h.HandleBundle({path/to/bundle})`. See the [Reactr Wasm instructions](https://github.com/suborbital/reactr/blob/master/docs/wasm.md) for details.
 
@@ -73,9 +73,10 @@ Usage:
   subo build [dir] [flags]
 
 Flags:
-      --bundle   if passed, bundle all resulting runnables into a deployable .wasm.zip bundle
-  -h, --help     help for build
-      --native   if passed, build runnables using native toolchain rather than Docker
+      --docker      pass --docker to automatically build a Docker image based on your project's Dockerfile. It will be tagged with the 'identifier' and 'appVersion' from your Directive
+  -h, --help        help for build
+      --native      if passed, build runnables using native toolchain rather than Docker
+      --no-bundle   if passed, a .wasm.zip bundle will not be generated
 ```
 
 ## Building without Docker

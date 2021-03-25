@@ -182,10 +182,8 @@ github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5Cc
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/suborbital/atmo v0.1.1-0.20210313181308-bc6c9bd4aa04/go.mod h1:JY4mFIOLMi50+5dxTcjuDGcmyEjgnNX6cxKJfX0gWHY=
 github.com/suborbital/atmo v0.1.1-0.20210315231600-21e248dacd0f/go.mod h1:pUmfGo+TNrKO1r+LG4njMmrB+FHTyUsqB99Ow64xZ08=
-github.com/suborbital/atmo v0.1.1-0.20210324125634-c5d4e9024770 h1:uYc6ZbdAymirKPf+GIjTMqjQeM6FSsXA7y7ARgvdHsc=
-github.com/suborbital/atmo v0.1.1-0.20210324125634-c5d4e9024770/go.mod h1:40PRH9TeQ+9zd/8qULbjP56hiaW+dgQcunC6jwFGvuw=
-github.com/suborbital/atmo v0.1.1-0.20210325002519-b041bf57457e h1:Ht/HB16ZJQ3dB9ddKY+MZkNdGaHKWctYvJNEln2O7n0=
-github.com/suborbital/atmo v0.1.1-0.20210325002519-b041bf57457e/go.mod h1:40PRH9TeQ+9zd/8qULbjP56hiaW+dgQcunC6jwFGvuw=
+github.com/suborbital/atmo v0.2.0 h1:OM1ZRAiISMa6UWxSOZ7+WcgXSmGP147u7vv8cITls+Q=
+github.com/suborbital/atmo v0.2.0/go.mod h1:40PRH9TeQ+9zd/8qULbjP56hiaW+dgQcunC6jwFGvuw=
 github.com/suborbital/grav v0.3.0/go.mod h1:PapJ62PtT9dPmW37WaCD+UMhoZiNPp0N9E3nUfEujC4=
 github.com/suborbital/grav v0.3.2 h1:5k3zb5kHBI8/RbD4YA+QHmMo6oovRWASta9rrNIJEUg=
 github.com/suborbital/grav v0.3.2/go.mod h1:PapJ62PtT9dPmW37WaCD+UMhoZiNPp0N9E3nUfEujC4=
