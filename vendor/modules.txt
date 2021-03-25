@@ -1,5 +1,3 @@
-# github.com/google/go-cmp v0.5.5
-## explicit
 # github.com/google/uuid v1.2.0
 github.com/google/uuid
 # github.com/inconshreveable/mousetrap v1.0.0
@@ -16,21 +14,18 @@ github.com/sethvargo/go-envconfig
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
 github.com/spf13/pflag
-# github.com/suborbital/atmo v0.1.1-0.20210320194821-28fe503b061b
+# github.com/suborbital/atmo v0.1.1-0.20210325002519-b041bf57457e
 ## explicit
 github.com/suborbital/atmo/directive
 # github.com/suborbital/grav v0.3.2
 github.com/suborbital/grav/grav
-# github.com/suborbital/hive-wasm v0.5.0
-## explicit
-# github.com/suborbital/reactr v0.9.0
+# github.com/suborbital/reactr v0.9.1
 ## explicit
 github.com/suborbital/reactr/bundle
 github.com/suborbital/reactr/request
 github.com/suborbital/reactr/rt
 github.com/suborbital/reactr/rwasm
 # github.com/suborbital/vektor v0.2.5
-## explicit
 github.com/suborbital/vektor/vk
 github.com/suborbital/vektor/vlog
 # github.com/wasmerio/wasmer-go v1.0.3
@@ -55,8 +50,6 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-# gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15
-## explicit
 # gopkg.in/yaml.v2 v2.4.0
 ## explicit
 gopkg.in/yaml.v2
