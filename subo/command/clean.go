@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"regexp"
 
 	"github.com/pkg/errors"
@@ -34,29 +33,27 @@ func CleanCmd() *cobra.Command {
 			}
 			logStart(fmt.Sprintf("cleaning in %s", bctx.Cwd))
 
-			//delete target or .build folder
-			dirs, _ := ioutil.ReadDir(".")
-			for _, dir := range dirs {
-				if dir.IsDir() {
-					if dir.Name() == "target" || dir.Name() == ".build" {
-						if rErr := os.RemoveAll(dir.Name()); rErr != nil {
-							logInfo(rErr.Error())
+			//regex to find .wasm files
+			fileRegEx, _ := regexp.Compile("^.+\\.wasm")
+
+			for i := 0; i < len(bctx.Runnables); i++ {
+				//delete target or .build folder
+				dirs, _ := ioutil.ReadDir(".")
+				for _, dir := range dirs {
+					if dir.IsDir() {
+						if dir.Name() == "target" || dir.Name() == ".build" {
+							if rErr := os.RemoveAll(dir.Name()); rErr != nil {
+								logInfo(rErr.Error())
+							}
+							logDone(fmt.Sprintf("removed %s", dir.Name()))
 						}
-						logDone(fmt.Sprintf("removed %s", dir.Name()))
+					} else {
+						if fileRegEx.MatchString(dir.Name()) {
+							os.Remove(dir.Name())
+						}
 					}
 				}
 			}
-
-			//delete all .wasm files
-			fileRegEx, _ := regexp.Compile("^.+\\.wasm")
-
-			filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
-				if err == nil && fileRegEx.MatchString(info.Name()) {
-					os.Remove(path)
-					logDone(fmt.Sprintf("removed %s", path))
-				}
-				return nil
-			})
 
 			logDone("cleaned")
 			return nil
