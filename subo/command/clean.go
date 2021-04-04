@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"regexp"
+	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -33,12 +33,9 @@ func CleanCmd() *cobra.Command {
 			}
 			logStart(fmt.Sprintf("cleaning in %s", bctx.Cwd))
 
-			//regex to find .wasm files
-			fileRegEx, _ := regexp.Compile("^.+\\.wasm")
-
-			for i := 0; i < len(bctx.Runnables); i++ {
+			for _, r := range bctx.Runnables {
 				//delete target or .build folder
-				dirs, _ := ioutil.ReadDir(".")
+				dirs, _ := ioutil.ReadDir(r.Fullpath)
 				for _, dir := range dirs {
 					if dir.IsDir() {
 						if dir.Name() == "target" || dir.Name() == ".build" {
@@ -48,8 +45,9 @@ func CleanCmd() *cobra.Command {
 							logDone(fmt.Sprintf("removed %s", dir.Name()))
 						}
 					} else {
-						if fileRegEx.MatchString(dir.Name()) {
+						if strings.HasSuffix(dir.Name(), ".wasm") {
 							os.Remove(dir.Name())
+							logDone(fmt.Sprintf("removed %s", dir.Name()))
 						}
 					}
 				}
