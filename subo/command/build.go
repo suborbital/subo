@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -35,6 +36,15 @@ func BuildCmd() *cobra.Command {
 
 			if len(bctx.Runnables) == 0 {
 				return errors.New("🚫 no runnables found in current directory (no .runnable yaml files found)")
+			}
+
+			innerFiles, err := ioutil.ReadDir(bctx.Cwd)
+			if err != nil {
+				return errors.Wrapf(err, "Failed to list files in %s", bctx.Cwd)
+			}
+			fileName, _ := context.ContainsRunnableYaml(innerFiles)
+			if fileName == ".runnable.yaml" {
+				return errors.New("🚫 Cannot build inside a Runnable directory. Please run from project root.")
 			}
 
 			logStart(fmt.Sprintf("building runnables in %s", bctx.Cwd))
