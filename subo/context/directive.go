@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	"github.com/suborbital/reactr/directive"
+	"github.com/suborbital/atmo/directive"
 )
 
 // readDirectiveFile finds a Directive from disk but does not validate it
@@ -68,12 +68,14 @@ func getHandlerFnList(dxe *directive.Directive) []string {
 
 	for _, h := range dxe.Handlers {
 		for _, step := range h.Steps {
-			if step.Group != nil && len(step.Group) > 0 {
+			if step.IsFn() {
+				fnMap[step.Fn] = true
+			} else if step.IsGroup() {
 				for _, fn := range step.Group {
 					fnMap[fn.Fn] = true
 				}
-			} else {
-				fnMap[step.Fn] = true
+			} else if step.IsForEach() {
+				fnMap[step.ForEach.Fn] = true
 			}
 		}
 	}

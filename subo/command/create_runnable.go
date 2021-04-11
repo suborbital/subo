@@ -9,7 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"github.com/suborbital/reactr/directive"
+	"github.com/suborbital/atmo/directive"
 	"github.com/suborbital/subo/subo/context"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"

@@ -52,7 +52,8 @@ func CreateReleaseCmd() *cobra.Command {
 			}
 
 			// ensure the current git branch is an rc branch
-			if err := ensureCorrectGitBranch(newVersion); err != nil {
+			branch, err := ensureCorrectGitBranch(newVersion)
+			if err != nil {
 				return errors.Wrap(err, "failed to ensureCorrectGitBranch")
 			}
 
@@ -89,7 +90,9 @@ func CreateReleaseCmd() *cobra.Command {
 
 			// run all of the pre-release make targets
 			for _, target := range dotSubo.PreMakeTargets {
-				if _, _, err := util.Run(fmt.Sprintf("make %s", target)); err != nil {
+				targetWithVersion := strings.Replace(target, "{{ .Version }}", newVersion, -1)
+
+				if _, _, err := util.Run(fmt.Sprintf("make %s", targetWithVersion)); err != nil {
 					return errors.Wrapf(err, "failed to run preMakeTarget %s", target)
 				}
 			}
@@ -108,7 +111,7 @@ func CreateReleaseCmd() *cobra.Command {
 				return errors.Wrap(err, "failed to Run git push")
 			}
 
-			ghCommand := fmt.Sprintf("gh release create %s --title=%s --notes-file=%s", newVersion, releaseName, changelogFilePath)
+			ghCommand := fmt.Sprintf("gh release create %s --title=%s --target=%s --notes-file=%s", newVersion, releaseName, branch, changelogFilePath)
 			if preRelease, _ := cmd.Flags().GetBool(preReleaseFlag); preRelease {
 				ghCommand += " --prerelease"
 			}
@@ -126,7 +129,9 @@ func CreateReleaseCmd() *cobra.Command {
 
 			// run all of the post-release make targets
 			for _, target := range dotSubo.PostMakeTargets {
-				if _, _, err := util.Run(fmt.Sprintf("make %s", target)); err != nil {
+				targetWithVersion := strings.Replace(target, "{{ .Version }}", newVersion, -1)
+
+				if _, _, err := util.Run(fmt.Sprintf("make %s", targetWithVersion)); err != nil {
 					return errors.Wrapf(err, "failed to run postMakeTarget %s", target)
 				}
 			}
@@ -193,19 +198,19 @@ func checkGitCleanliness() error {
 	return nil
 }
 
-func ensureCorrectGitBranch(version string) error {
+func ensureCorrectGitBranch(version string) (string, error) {
 	expectedBranch := fmt.Sprintf("rc-%s", version)
 
 	branch, _, err := util.Run("git branch --show-current")
 	if err != nil {
-		return errors.Wrap(err, "failed to Run git branch")
+		return "", errors.Wrap(err, "failed to Run git branch")
 	}
 
 	if strings.TrimSpace(branch) != expectedBranch {
-		return errors.New("release must be created on an 'rc-*' branch, currently on " + branch + ", expected " + expectedBranch)
+		return "", errors.New("release must be created on an 'rc-*' branch, currently on " + branch + ", expected " + expectedBranch)
 	}
 
-	return nil
+	return strings.TrimSpace(branch), nil
 }
 
 func validateVersion(version string) error {

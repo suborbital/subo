@@ -1,12 +1,12 @@
-use suborbital::runnable;
+use suborbital::runnable::*;
 
 struct {{ .NameCamel }}{}
 
-impl runnable::Runnable for {{ .NameCamel }} {
-    fn run(&self, input: Vec<u8>) -> Option<Vec<u8>> {
+impl Runnable for {{ .NameCamel }} {
+    fn run(&self, input: Vec<u8>) -> Result<Vec<u8>, RunErr> {
         let in_string = String::from_utf8(input).unwrap();
     
-        Some(String::from(format!("hello {}", in_string)).as_bytes().to_vec())
+        Ok(String::from(format!("hello {}", in_string)).as_bytes().to_vec())
     }
 }
 
@@ -16,5 +16,5 @@ static RUNNABLE: &{{ .NameCamel }} = &{{ .NameCamel }}{};
 
 #[no_mangle]
 pub extern fn init() {
-    runnable::set(RUNNABLE);
+    use_runnable(RUNNABLE);
 }
