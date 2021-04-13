@@ -42,9 +42,8 @@ func BuildCmd() *cobra.Command {
 			if err != nil {
 				return errors.Wrapf(err, "Failed to list files in %s", bctx.Cwd)
 			}
-			fileName, _ := context.ContainsRunnableYaml(innerFiles)
-			if fileName == ".runnable.yaml" {
-				return errors.New("🚫 Cannot build inside a Runnable directory. Please run from project root.")
+			if _, exists := context.ContainsRunnableYaml(innerFiles); exists {
+				logInfo("Building a single Runnable. Cannot create bundle inside a Runnable directory. Please run from project root to create a bundle.\n")
 			}
 
 			logStart(fmt.Sprintf("building runnables in %s", bctx.Cwd))
