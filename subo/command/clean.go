@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -36,17 +37,26 @@ func CleanCmd() *cobra.Command {
 			for _, r := range bctx.Runnables {
 				//delete target or .build folder
 				dirs, _ := ioutil.ReadDir(r.Fullpath)
+
 				for _, dir := range dirs {
+					fullPath := filepath.Join(r.Fullpath, dir.Name())
 					if dir.IsDir() {
 						if dir.Name() == "target" || dir.Name() == ".build" {
-							if rErr := os.RemoveAll(dir.Name()); rErr != nil {
-								logInfo(rErr.Error())
+							if rErr := os.RemoveAll(fullPath); rErr != nil {
+								logInfo(errors.Wrap(rErr, "🚫 failed to RemoveAll").Error())
+								continue
 							}
+
 							logDone(fmt.Sprintf("removed %s", dir.Name()))
 						}
 					} else {
-						if strings.HasSuffix(dir.Name(), ".wasm") {
-							os.Remove(dir.Name())
+						if strings.HasSuffix(dir.Name(), ".wasm") || strings.HasSuffix(dir.Name(), ".wasm.zip") {
+							logInfo(dir.Name())
+							if err := os.Remove(fullPath); err != nil {
+								logInfo(errors.Wrap(err, "🚫 failed to Remove").Error())
+								continue
+							}
+
 							logDone(fmt.Sprintf("removed %s", dir.Name()))
 						}
 					}
