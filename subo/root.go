@@ -38,6 +38,7 @@ Explore the available commands by running 'subo --help'`,
 
 	cmd.AddCommand(command.BuildCmd())
 	cmd.AddCommand(command.DevCmd())
+	cmd.AddCommand(command.CleanCmd())
 
 	return cmd
 }
