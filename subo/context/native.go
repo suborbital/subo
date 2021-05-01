@@ -15,6 +15,9 @@ var nativeCommandsForLang = map[string]map[string][]string{
 			"xcrun --toolchain swiftwasm swift build --triple wasm32-unknown-wasi -Xlinker --allow-undefined -Xlinker --export=allocate -Xlinker --export=deallocate -Xlinker --export=run_e -Xlinker --export=init",
 			"cp .build/debug/{{ .Name }}.wasm .",
 		},
+		"assemblyscript": {
+			"npm run asbuild",
+		},
 	},
 	"linux": {
 		"rust": {
@@ -24,6 +27,9 @@ var nativeCommandsForLang = map[string]map[string][]string{
 		"swift": {
 			"swift build --triple wasm32-unknown-wasi -Xlinker --allow-undefined -Xlinker --export=allocate -Xlinker --export=deallocate -Xlinker --export=run_e -Xlinker --export=init",
 			"cp .build/debug/{{ .Name }}.wasm .",
+		},
+		"assemblyscript": {
+			"npm run asbuild",
 		},
 	},
 }

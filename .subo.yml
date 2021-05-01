@@ -1,7 +1,6 @@
 dotVersionFiles:
   - subo/release/version.go
-  - builders/rust/.rs-ver
-  - builders/swift/.swift-ver
+  - builders/.builder-ver
 
 preMakeTargets:
   - subo/docker

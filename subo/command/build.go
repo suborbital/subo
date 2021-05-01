@@ -2,7 +2,6 @@ package command
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -38,18 +37,14 @@ func BuildCmd() *cobra.Command {
 				return errors.New("🚫 no runnables found in current directory (no .runnable yaml files found)")
 			}
 
-			innerFiles, err := ioutil.ReadDir(bctx.Cwd)
-			if err != nil {
-				return errors.Wrapf(err, "Failed to list files in %s", bctx.Cwd)
+			if bctx.CwdIsRunnable {
+				logInfo("ℹ️  building single Runnable (run from project root to create bundle)")
+			} else {
+				logStart(fmt.Sprintf("building runnables in %s", bctx.Cwd))
 			}
-			if _, exists := context.ContainsRunnableYaml(innerFiles); exists {
-				logInfo("Building a single Runnable. Cannot create bundle inside a Runnable directory. Please run from project root to create a bundle.\n")
-			}
-
-			logStart(fmt.Sprintf("building runnables in %s", bctx.Cwd))
 
 			noBundle, _ := cmd.Flags().GetBool("no-bundle")
-			shouldBundle := !noBundle
+			shouldBundle := !noBundle && !bctx.CwdIsRunnable
 
 			useNative, _ := cmd.Flags().GetBool("native")
 			shouldDockerBuild, _ := cmd.Flags().GetBool("docker")
@@ -134,7 +129,7 @@ func BuildCmd() *cobra.Command {
 
 	cmd.Flags().Bool("no-bundle", false, "if passed, a .wasm.zip bundle will not be generated")
 	cmd.Flags().Bool("native", false, "if passed, build runnables using native toolchain rather than Docker")
-	cmd.Flags().Bool("docker", false, "pass --docker to automatically build a Docker image based on your project's Dockerfile. It will be tagged with the 'identifier' and 'appVersion' from your Directive")
+	cmd.Flags().Bool("docker", false, "if passed, build your project's Dockerfile. It will be tagged {identifier}:{appVersion}")
 
 	return cmd
 }
