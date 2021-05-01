@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -46,7 +45,7 @@ func CreateRunnableCmd() *cobra.Command {
 
 			lang, _ := cmd.Flags().GetString(langFlag)
 
-			logStart(fmt.Sprintf("creating runnable %s", name))
+			util.LogStart(fmt.Sprintf("creating runnable %s", name))
 
 			path, err := util.Mkdir(bctx.Cwd, name)
 			if err != nil {
@@ -60,56 +59,30 @@ func CreateRunnableCmd() *cobra.Command {
 				return errors.Wrap(err, "🚫 failed to writeDotHive")
 			}
 
-			templateRootPath, err := util.TemplateDir()
+			branch, _ := cmd.Flags().GetString(branchFlag)
+
+			templatesPath, err := util.TemplateFullPath(branch)
 			if err != nil {
 				return errors.Wrap(err, "failed to TemplateDir")
 			}
 
-			branch, _ := cmd.Flags().GetString(branchFlag)
-			branchDirName := fmt.Sprintf("subo-%s", strings.ReplaceAll(branch, "/", "-"))
-			tmplPath := filepath.Join(templateRootPath, branchDirName, "templates")
-
-			// encapsulate this in a function so it can be called if updates are requested or if the first attempt to copy fails
-			updateAndCopy := func() error {
-				logStart("downloading runnable templates")
-
-				filepath, err := util.DownloadZip(branch, templateRootPath)
-				if err != nil {
-					return errors.Wrap(err, "🚫 failed to downloadZip for templates")
-				}
-
-				// tmplPath may be different than the default if a custom URL was provided
-				tmplPath, err = util.ExtractZip(filepath, templateRootPath, branchDirName)
-				if err != nil {
-					return errors.Wrap(err, "🚫 failed to extractZip for templates")
-				}
-
-				logDone("templates downloaded")
-
-				if err = util.CopyRunnableTmpl(bctx.Cwd, name, tmplPath, runnable); err != nil {
-					return errors.Wrap(err, "🚫 failed to copyTmpl")
-				}
-
-				return nil
-			}
-
-			if update, _ := cmd.Flags().GetBool(updateTemplatesFlag); update {
-				if err := updateAndCopy(); err != nil {
-					return errors.Wrap(err, "failed to updateAndCopy")
-				}
-			} else {
-				if err := util.CopyRunnableTmpl(bctx.Cwd, name, tmplPath, runnable); err != nil {
-					if err == util.ErrTemplateMissing {
-						if err := updateAndCopy(); err != nil {
-							return errors.Wrap(err, "failed to updateAndCopy")
-						}
-					} else {
-						return errors.Wrap(err, "🚫 failed to copyTmpl")
+			if err := util.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, runnable); err != nil {
+				// if the templates are missing, try updating them and exec again
+				if err == util.ErrTemplateMissing {
+					templatesPath, err = util.UpdateTemplates(bctx, name, branch)
+					if err != nil {
+						return errors.Wrap(err, "🚫 failed to UpdateTemplates")
 					}
+
+					if err := util.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, runnable); err != nil {
+						return errors.Wrap(err, "🚫 failed to ExecTmplDir")
+					}
+				} else {
+					return errors.Wrap(err, "🚫 failed to ExecTmplDir")
 				}
 			}
 
-			logDone(path)
+			util.LogDone(path)
 
 			return nil
 		},
