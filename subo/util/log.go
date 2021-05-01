@@ -8,7 +8,7 @@ import (
 // LogInfo logs information
 func LogInfo(msg string) {
 	if _, exists := os.LookupEnv("SUBO_DOCKER"); !exists {
-		fmt.Println(msg)
+		fmt.Println(fmt.Sprintf("ℹ️  %s", msg))
 	}
 }
 

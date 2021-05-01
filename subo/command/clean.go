@@ -38,28 +38,27 @@ func CleanCmd() *cobra.Command {
 
 			for _, r := range bctx.Runnables {
 				//delete target or .build folder
-				dirs, _ := ioutil.ReadDir(r.Fullpath)
+				files, _ := ioutil.ReadDir(r.Fullpath)
 
-				for _, dir := range dirs {
-					fullPath := filepath.Join(r.Fullpath, dir.Name())
-					if dir.IsDir() {
-						if dir.Name() == "target" || dir.Name() == ".build" {
+				for _, file := range files {
+					fullPath := filepath.Join(r.Fullpath, file.Name())
+					if file.IsDir() {
+						if file.Name() == "target" || file.Name() == ".build" {
 							if rErr := os.RemoveAll(fullPath); rErr != nil {
-								util.LogInfo(errors.Wrap(rErr, "🚫 failed to RemoveAll").Error())
+								util.LogFail(errors.Wrap(rErr, "failed to RemoveAll").Error())
 								continue
 							}
 
-							util.LogDone(fmt.Sprintf("removed %s", dir.Name()))
+							util.LogDone(fmt.Sprintf("removed %s", file.Name()))
 						}
 					} else {
-						if strings.HasSuffix(dir.Name(), ".wasm") || strings.HasSuffix(dir.Name(), ".wasm.zip") {
-							util.LogInfo(dir.Name())
+						if strings.HasSuffix(file.Name(), ".wasm") || strings.HasSuffix(file.Name(), ".wasm.zip") {
 							if err := os.Remove(fullPath); err != nil {
 								util.LogInfo(errors.Wrap(err, "🚫 failed to Remove").Error())
 								continue
 							}
 
-							util.LogDone(fmt.Sprintf("removed %s", dir.Name()))
+							util.LogDone(fmt.Sprintf("removed %s", file.Name()))
 						}
 					}
 				}
