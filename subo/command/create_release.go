@@ -35,7 +35,7 @@ func CreateReleaseCmd() *cobra.Command {
 		Long:  `tag a new version and create a new GitHub release, configured using the .subo.yml file.`,
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			logStart("checking release conditions")
+			util.LogStart("checking release conditions")
 			cwd, _ := cmd.Flags().GetString("dir")
 
 			newVersion := args[0]
@@ -85,8 +85,8 @@ func CreateReleaseCmd() *cobra.Command {
 				}
 			}
 
-			logDone("release is ready to go")
-			logStart("running pre-make targets")
+			util.LogDone("release is ready to go")
+			util.LogStart("running pre-make targets")
 
 			// run all of the pre-release make targets
 			for _, target := range dotSubo.PreMakeTargets {
@@ -97,14 +97,14 @@ func CreateReleaseCmd() *cobra.Command {
 				}
 			}
 
-			logDone("pre-make targets complete")
+			util.LogDone("pre-make targets complete")
 
 			if shouldDryRun, _ := cmd.Flags().GetBool(dryRunFlag); shouldDryRun {
-				logDone("release conditions verified, terminating for dry run")
+				util.LogDone("release conditions verified, terminating for dry run")
 				return nil
 			}
 
-			logStart("creating release")
+			util.LogStart("creating release")
 
 			// ensure the local changes are pushed, create the release, and then pull down the new tag
 			if _, _, err := util.Run("git push"); err != nil {
@@ -124,8 +124,8 @@ func CreateReleaseCmd() *cobra.Command {
 				return errors.Wrap(err, "failed to Run git pull command")
 			}
 
-			logDone("release created!")
-			logStart("running post-make targets")
+			util.LogDone("release created!")
+			util.LogStart("running post-make targets")
 
 			// run all of the post-release make targets
 			for _, target := range dotSubo.PostMakeTargets {
@@ -136,7 +136,7 @@ func CreateReleaseCmd() *cobra.Command {
 				}
 			}
 
-			logDone("post-make targets complete")
+			util.LogDone("post-make targets complete")
 
 			return nil
 		},
