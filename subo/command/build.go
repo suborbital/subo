@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"text/template"
 
@@ -38,13 +39,13 @@ func BuildCmd() *cobra.Command {
 			}
 
 			if bctx.CwdIsRunnable {
-				util.LogInfo("ℹ️  building single Runnable (run from project root to create bundle)")
+				util.LogInfo("building single Runnable (run from project root to create bundle)")
 			} else {
 				util.LogStart(fmt.Sprintf("building runnables in %s", bctx.Cwd))
 			}
 
 			noBundle, _ := cmd.Flags().GetBool("no-bundle")
-			shouldBundle := !noBundle
+			shouldBundle := !noBundle && !bctx.CwdIsRunnable
 
 			useNative, _ := cmd.Flags().GetBool("native")
 			shouldDockerBuild, _ := cmd.Flags().GetBool("docker")
@@ -58,6 +59,10 @@ func BuildCmd() *cobra.Command {
 
 				if useNative {
 					util.LogInfo("🔗 using native toolchain")
+					if err := checkAndRunPreReqs(r); err != nil {
+						return errors.Wrap(err, "🚫 failed to checkAndRunPreReqs")
+					}
+
 					file, err = doNativeBuildForRunnable(r)
 				} else {
 					util.LogInfo("🐳 using Docker toolchain")
@@ -98,7 +103,7 @@ func BuildCmd() *cobra.Command {
 				}
 
 				if static != nil {
-					util.LogInfo("ℹ️  adding static files to bundle")
+					util.LogInfo("adding static files to bundle")
 				}
 
 				directiveBytes, err := bctx.Directive.Marshal()
@@ -129,7 +134,7 @@ func BuildCmd() *cobra.Command {
 
 	cmd.Flags().Bool("no-bundle", false, "if passed, a .wasm.zip bundle will not be generated")
 	cmd.Flags().Bool("native", false, "if passed, build runnables using native toolchain rather than Docker")
-	cmd.Flags().Bool("docker", false, "pass --docker to automatically build a Docker image based on your project's Dockerfile. It will be tagged with the 'identifier' and 'appVersion' from your Directive")
+	cmd.Flags().Bool("docker", false, "if passed, build your project's Dockerfile. It will be tagged {identifier}:{appVersion}")
 
 	return cmd
 }
@@ -186,4 +191,35 @@ func doNativeBuildForRunnable(r context.RunnableDir) (*os.File, error) {
 	}
 
 	return file, nil
+}
+
+func checkAndRunPreReqs(runnable context.RunnableDir) error {
+	preReqLangs, ok := context.PreRequisiteCommands[runtime.GOOS]
+	if !ok {
+		return fmt.Errorf("unsupported OS: %s", runtime.GOOS)
+	}
+
+	preReqs, ok := preReqLangs[runnable.Runnable.Lang]
+	if !ok {
+		return fmt.Errorf("unsupported language: %s", runnable.Runnable.Lang)
+	}
+
+	for _, p := range preReqs {
+		filepath := filepath.Join(runnable.Fullpath, p.File)
+
+		if _, err := os.Stat(filepath); err != nil {
+			if errors.Is(err, os.ErrNotExist) {
+				util.LogStart(fmt.Sprintf("missing %s, fixing...", p.File))
+
+				_, _, err := util.RunInDir(p.Command, runnable.Fullpath)
+				if err != nil {
+					return errors.Wrapf(err, "failed to Run prerequisite: %s", p.Command)
+				}
+
+				util.LogDone("fixed!")
+			}
+		}
+	}
+
+	return nil
 }
