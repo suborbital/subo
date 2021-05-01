@@ -191,8 +191,10 @@ func extractZip(filePath, destPath, branchDirName string) (string, error) {
 	escapedFilepath := strings.ReplaceAll(filePath, " ", "\\ ")
 	escapedDestPath := strings.ReplaceAll(destPath, " ", "\\ ") + string(filepath.Separator)
 
-	if _, err := os.Stat(escapedDestPath); err != nil {
-		if err := os.RemoveAll(escapedDestPath); err != nil {
+	existingPath := filepath.Join(destPath, branchDirName)
+
+	if _, err := os.Stat(existingPath); err == nil {
+		if err := os.RemoveAll(existingPath); err != nil {
 			return "", errors.Wrap(err, "failed to RemoveAll old templates")
 		}
 	}
@@ -201,16 +203,5 @@ func extractZip(filePath, destPath, branchDirName string) (string, error) {
 		return "", errors.Wrap(err, "failed to Run unzip")
 	}
 
-	files, err := ioutil.ReadDir(destPath)
-	if err != nil {
-		return "", errors.Wrap(err, "failed to ReadDir")
-	}
-
-	for _, f := range files {
-		if f.IsDir() && f.Name() == branchDirName {
-			return filepath.Join(destPath, f.Name(), "templates"), nil
-		}
-	}
-
-	return "", errors.New("templates not availale")
+	return filepath.Join(existingPath, "templates"), nil
 }
