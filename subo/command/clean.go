@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/suborbital/subo/subo/context"
+	"github.com/suborbital/subo/subo/util"
 )
 
 //CleanCmd  removes all of the target/.build folders for Runnables and deletes the .wasm files.
@@ -32,7 +33,8 @@ func CleanCmd() *cobra.Command {
 			if len(bctx.Runnables) == 0 {
 				return errors.New("🚫 no runnables found in current directory (no .runnable yaml files found)")
 			}
-			logStart(fmt.Sprintf("cleaning in %s", bctx.Cwd))
+
+			util.LogStart(fmt.Sprintf("cleaning in %s", bctx.Cwd))
 
 			for _, r := range bctx.Runnables {
 				//delete target or .build folder
@@ -43,27 +45,27 @@ func CleanCmd() *cobra.Command {
 					if dir.IsDir() {
 						if dir.Name() == "target" || dir.Name() == ".build" {
 							if rErr := os.RemoveAll(fullPath); rErr != nil {
-								logInfo(errors.Wrap(rErr, "🚫 failed to RemoveAll").Error())
+								util.LogInfo(errors.Wrap(rErr, "🚫 failed to RemoveAll").Error())
 								continue
 							}
 
-							logDone(fmt.Sprintf("removed %s", dir.Name()))
+							util.LogDone(fmt.Sprintf("removed %s", dir.Name()))
 						}
 					} else {
 						if strings.HasSuffix(dir.Name(), ".wasm") || strings.HasSuffix(dir.Name(), ".wasm.zip") {
-							logInfo(dir.Name())
+							util.LogInfo(dir.Name())
 							if err := os.Remove(fullPath); err != nil {
-								logInfo(errors.Wrap(err, "🚫 failed to Remove").Error())
+								util.LogInfo(errors.Wrap(err, "🚫 failed to Remove").Error())
 								continue
 							}
 
-							logDone(fmt.Sprintf("removed %s", dir.Name()))
+							util.LogDone(fmt.Sprintf("removed %s", dir.Name()))
 						}
 					}
 				}
 			}
 
-			logDone("cleaned")
+			util.LogDone("cleaned")
 			return nil
 		},
 	}

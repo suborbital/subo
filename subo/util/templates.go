@@ -12,6 +12,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/suborbital/atmo/directive"
+	"github.com/suborbital/subo/subo/context"
 )
 
 // ErrTemplateMissing and others are template related errors
@@ -34,8 +35,34 @@ type tmplData struct {
 	NameCamel string
 }
 
-// CopyRunnableTmpl copies a template
-func CopyRunnableTmpl(cwd, name, templatesPath string, runnable *directive.Runnable) error {
+func UpdateTemplates(bctx *context.BuildContext, name, branch string) (string, error) {
+	LogStart("downloading templates")
+
+	branchDirName := fmt.Sprintf("subo-%s", strings.ReplaceAll(branch, "/", "-"))
+
+	templateRootPath, err := TemplateRootDir()
+	if err != nil {
+		return "", errors.Wrap(err, "failed to TemplateDir")
+	}
+
+	filepath, err := downloadZip(branch, templateRootPath)
+	if err != nil {
+		return "", errors.Wrap(err, "🚫 failed to downloadZip for templates")
+	}
+
+	// tmplPath may be different than the default if a custom URL was provided
+	tmplPath, err := extractZip(filepath, templateRootPath, branchDirName)
+	if err != nil {
+		return "", errors.Wrap(err, "🚫 failed to extractZip for templates")
+	}
+
+	LogDone("templates downloaded")
+
+	return tmplPath, nil
+}
+
+// ExecRunnableTmpl copies a template
+func ExecRunnableTmpl(cwd, name, templatesPath string, runnable *directive.Runnable) error {
 	nameCamel := ""
 	nameParts := strings.Split(runnable.Name, "-")
 	for _, part := range nameParts {
@@ -115,8 +142,8 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 	return err
 }
 
-// DownloadZip downloads a ZIP from a particular branch of the Subo repo
-func DownloadZip(branch, targetPath string) (string, error) {
+// downloadZip downloads a ZIP from a particular branch of the Subo repo
+func downloadZip(branch, targetPath string) (string, error) {
 	url := fmt.Sprintf("https://github.com/suborbital/subo/archive/%s.zip", branch)
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -159,25 +186,22 @@ func DownloadZip(branch, targetPath string) (string, error) {
 	return filePath, nil
 }
 
-// ExtractZip extracts a ZIP file
-func ExtractZip(filePath, destPath, branchDirName string) (string, error) {
+// extractZip extracts a ZIP file
+func extractZip(filePath, destPath, branchDirName string) (string, error) {
 	escapedFilepath := strings.ReplaceAll(filePath, " ", "\\ ")
-	escapedDestpath := strings.ReplaceAll(destPath, " ", "\\ ") + string(filepath.Separator)
+	escapedDestPath := strings.ReplaceAll(destPath, " ", "\\ ") + string(filepath.Separator)
 
-	if _, _, err := Run(fmt.Sprintf("unzip -q %s -d %s", escapedFilepath, escapedDestpath)); err != nil {
-		return "", errors.Wrap(err, "failed to Run unzip")
-	}
+	existingPath := filepath.Join(destPath, branchDirName)
 
-	files, err := ioutil.ReadDir(destPath)
-	if err != nil {
-		return "", errors.Wrap(err, "failed to ReadDir")
-	}
-
-	for _, f := range files {
-		if f.IsDir() && f.Name() == branchDirName {
-			return filepath.Join(destPath, f.Name(), "templates"), nil
+	if _, err := os.Stat(existingPath); err == nil {
+		if err := os.RemoveAll(existingPath); err != nil {
+			return "", errors.Wrap(err, "failed to RemoveAll old templates")
 		}
 	}
 
-	return "", errors.New("templates not availale")
+	if _, _, err := Run(fmt.Sprintf("unzip -q %s -d %s", escapedFilepath, escapedDestPath)); err != nil {
+		return "", errors.Wrap(err, "failed to Run unzip")
+	}
+
+	return filepath.Join(existingPath, "templates"), nil
 }

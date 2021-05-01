@@ -1,14 +1,25 @@
 package util
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 )
 
-// TemplateDir gets the template directory for subo and ensures it exists
-func TemplateDir() (string, error) {
+func TemplateFullPath(branch string) (string, error) {
+	root, err := TemplateRootDir()
+	if err != nil {
+		return "", errors.Wrap(err, "failed to TemplateRootDir")
+	}
+
+	return filepath.Join(root, fmt.Sprintf("subo-%s", strings.ReplaceAll(branch, "/", "-")), "templates"), nil
+}
+
+// TemplateRootDir gets the template directory for subo and ensures it exists
+func TemplateRootDir() (string, error) {
 	config, err := os.UserConfigDir()
 	if err != nil {
 		return "", errors.Wrap(err, "failed to get UserConfigDir")

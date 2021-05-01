@@ -38,9 +38,9 @@ func BuildCmd() *cobra.Command {
 			}
 
 			if bctx.CwdIsRunnable {
-				logInfo("ℹ️  building single Runnable (run from project root to create bundle)")
+				util.LogInfo("ℹ️  building single Runnable (run from project root to create bundle)")
 			} else {
-				logStart(fmt.Sprintf("building runnables in %s", bctx.Cwd))
+				util.LogStart(fmt.Sprintf("building runnables in %s", bctx.Cwd))
 			}
 
 			noBundle, _ := cmd.Flags().GetBool("no-bundle")
@@ -52,15 +52,15 @@ func BuildCmd() *cobra.Command {
 			modules := make([]os.File, len(bctx.Runnables))
 
 			for i, r := range bctx.Runnables {
-				logStart(fmt.Sprintf("building runnable: %s (%s)", r.Name, r.Runnable.Lang))
+				util.LogStart(fmt.Sprintf("building runnable: %s (%s)", r.Name, r.Runnable.Lang))
 
 				var file *os.File
 
 				if useNative {
-					logInfo("🔗 using native toolchain")
+					util.LogInfo("🔗 using native toolchain")
 					file, err = doNativeBuildForRunnable(r)
 				} else {
-					logInfo("🐳 using Docker toolchain")
+					util.LogInfo("🐳 using Docker toolchain")
 					file, err = doBuildForRunnable(r)
 				}
 
@@ -71,7 +71,7 @@ func BuildCmd() *cobra.Command {
 				modules[i] = *file
 
 				fullWasmFilepath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
-				logDone(fmt.Sprintf("%s was built -> %s", r.Name, fullWasmFilepath))
+				util.LogDone(fmt.Sprintf("%s was built -> %s", r.Name, fullWasmFilepath))
 			}
 
 			if shouldBundle {
@@ -98,7 +98,7 @@ func BuildCmd() *cobra.Command {
 				}
 
 				if static != nil {
-					logInfo("ℹ️  adding static files to bundle")
+					util.LogInfo("ℹ️  adding static files to bundle")
 				}
 
 				directiveBytes, err := bctx.Directive.Marshal()
@@ -110,7 +110,7 @@ func BuildCmd() *cobra.Command {
 					return errors.Wrap(err, "🚫 failed to WriteBundle")
 				}
 
-				defer logDone(fmt.Sprintf("bundle was created -> %s", bctx.Bundle.Fullpath))
+				defer util.LogDone(fmt.Sprintf("bundle was created -> %s", bctx.Bundle.Fullpath))
 			}
 
 			if shouldDockerBuild {
@@ -120,7 +120,7 @@ func BuildCmd() *cobra.Command {
 					return errors.Wrap(err, "🚫 failed to build Docker image")
 				}
 
-				logDone(fmt.Sprintf("built Docker image -> %s:%s", bctx.Directive.Identifier, bctx.Directive.AppVersion))
+				util.LogDone(fmt.Sprintf("built Docker image -> %s:%s", bctx.Directive.Identifier, bctx.Directive.AppVersion))
 			}
 
 			return nil
@@ -186,22 +186,4 @@ func doNativeBuildForRunnable(r context.RunnableDir) (*os.File, error) {
 	}
 
 	return file, nil
-}
-
-func logInfo(msg string) {
-	if _, exists := os.LookupEnv("SUBO_DOCKER"); !exists {
-		fmt.Println(msg)
-	}
-}
-
-func logStart(msg string) {
-	if _, exists := os.LookupEnv("SUBO_DOCKER"); !exists {
-		fmt.Println(fmt.Sprintf("⏩ START: %s", msg))
-	}
-}
-
-func logDone(msg string) {
-	if _, exists := os.LookupEnv("SUBO_DOCKER"); !exists {
-		fmt.Println(fmt.Sprintf("✅ DONE: %s", msg))
-	}
 }
