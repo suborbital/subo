@@ -21,11 +21,11 @@ Explore the available commands by running 'subo --help'`,
 
 	cmd.SetVersionTemplate("Subo CLI v{{.Version}}\n")
 
+	// create commands
 	create := &cobra.Command{
-		Use:     "create",
-		Short:   "create a runnable or project",
-		Long:    `create a new Atmo project or WebAssembly runnable`,
-		Version: release.SuboDotVersion,
+		Use:   "create",
+		Short: "create a runnable or project",
+		Long:  `create a new Atmo project or WebAssembly runnable`,
 	}
 
 	if features.EnableReleaseCommands {
@@ -34,11 +34,35 @@ Explore the available commands by running 'subo --help'`,
 
 	create.AddCommand(command.CreateProjectCmd())
 	create.AddCommand(command.CreateRunnableCmd())
-	cmd.AddCommand(create)
 
+	// compute network related commands
+	cmd.AddCommand(computeCommand())
+
+	// add top-level commands to root
+	cmd.AddCommand(create)
 	cmd.AddCommand(command.BuildCmd())
 	cmd.AddCommand(command.DevCmd())
 	cmd.AddCommand(command.CleanCmd())
 
 	return cmd
+}
+
+func computeCommand() *cobra.Command {
+	compute := &cobra.Command{
+		Use:   "compute",
+		Short: "compute network related resources",
+		Long:  `manage Suborbital Compute Network resources`,
+	}
+
+	create := &cobra.Command{
+		Use:   "create",
+		Short: "create compute network resources",
+		Long:  `create Suborbital Compute Network resources`,
+	}
+
+	create.AddCommand(command.ComputeCreateTokenCommand())
+
+	compute.AddCommand(create)
+
+	return compute
 }
