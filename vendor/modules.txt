@@ -8,12 +8,12 @@ github.com/pkg/errors
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
 github.com/spf13/pflag
-# github.com/suborbital/atmo v0.2.0
+# github.com/suborbital/atmo v0.2.3-0.20210521151945-bc9b42cd29c6 => /Users/cohix-so/Workspaces/suborbital/atmo
 ## explicit
+github.com/suborbital/atmo/bundle
 github.com/suborbital/atmo/directive
-# github.com/suborbital/reactr v0.9.2-0.20210325013125-99e2f803d536
-## explicit
-github.com/suborbital/reactr/bundle
+github.com/suborbital/atmo/fqfn
+# github.com/suborbital/reactr v0.9.3-0.20210529212058-25492f1ccb63
 github.com/suborbital/reactr/rwasm/moduleref
 # golang.org/x/mod v0.4.2
 ## explicit
@@ -21,3 +21,4 @@ golang.org/x/mod/semver
 # gopkg.in/yaml.v2 v2.4.0
 ## explicit
 gopkg.in/yaml.v2
+# github.com/suborbital/atmo => /Users/cohix-so/Workspaces/suborbital/atmo

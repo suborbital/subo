@@ -1,9 +1,12 @@
 # the Directive is a complete description of your application, including all of its business logic.
 
 # replace 'suborbital' with your organization name, and ensure the version is updated for each deploy!
-identifier: com.suborbital.{{ .Name }}
+identifier: {{ .Environment }}.{{ .Name }}
 appVersion: v0.0.1
 atmoVersion: v{{ .AtmoVersion }}
+{{ if .Headless }}
+headless: true
+{{ end }}
 
 handlers:
   - type: request

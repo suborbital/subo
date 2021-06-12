@@ -10,8 +10,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/suborbital/atmo/bundle"
 	"github.com/suborbital/atmo/directive"
-	"github.com/suborbital/reactr/bundle"
 	"github.com/suborbital/subo/subo/context"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"

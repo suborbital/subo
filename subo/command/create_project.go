@@ -13,6 +13,8 @@ import (
 
 type projectData struct {
 	Name        string
+	Environment string
+	Headless    bool
 	APIVersion  string
 	AtmoVersion string
 }
@@ -45,6 +47,8 @@ func CreateProjectCmd() *cobra.Command {
 			}
 
 			branch, _ := cmd.Flags().GetString(branchFlag)
+			environment, _ := cmd.Flags().GetString(environmentFlag)
+			headless, _ := cmd.Flags().GetBool(headlessFlag)
 
 			templatesPath, err := util.TemplateFullPath(branch)
 			if err != nil {
@@ -60,8 +64,10 @@ func CreateProjectCmd() *cobra.Command {
 
 			data := projectData{
 				Name:        name,
+				Environment: environment,
 				APIVersion:  release.FFIVersion,
 				AtmoVersion: release.AtmoVersion,
+				Headless:    headless,
 			}
 
 			if err := util.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data); err != nil {
@@ -91,6 +97,8 @@ func CreateProjectCmd() *cobra.Command {
 	}
 
 	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
+	cmd.Flags().String(environmentFlag, "com.suborbital", "project environment name (your company's reverse domain")
+	cmd.Flags().Bool(headlessFlag, false, "use 'headless mode' for this project")
 	cmd.Flags().Bool(updateTemplatesFlag, false, "update with the newest templates")
 
 	return cmd

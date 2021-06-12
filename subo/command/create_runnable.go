@@ -20,7 +20,9 @@ const (
 	dirFlag             = "dir"
 	namespaceFlag       = "namespace"
 	branchFlag          = "branch"
+	environmentFlag     = "environment"
 	updateTemplatesFlag = "update-templates"
+	headlessFlag        = "headless"
 )
 
 // CreateRunnableCmd returns the build command
