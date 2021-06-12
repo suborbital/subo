@@ -4,13 +4,12 @@
 identifier: {{ .Environment }}.{{ .Name }}
 appVersion: v0.0.1
 atmoVersion: v{{ .AtmoVersion }}
-{{ if .Headless }}
-headless: true
-{{ end }}
-
+{{ if .Headless }}headless: true{{ end }}
+{{ if not .Headless }}
 handlers:
   - type: request
     resource: /hello
     method: POST
     steps:
       - fn: helloworld
+{{ end }}
