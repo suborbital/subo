@@ -41,6 +41,14 @@ func BuildCmd() *cobra.Command {
 
 			shouldBundle, _ := cmd.Flags().GetBool("bundle")
 			useNative, _ := cmd.Flags().GetBool("native")
+			makeStr, _ := cmd.Flags().GetString("make")
+
+			logStart(fmt.Sprintf("make %s", makeStr))
+			_, _, err = util.Run(fmt.Sprintf("make %s", makeStr))
+
+			if err != nil {
+				return errors.Wrapf(err, "🚫 failed to make %s", makeStr)
+			}
 
 			modules := make([]os.File, len(bctx.Runnables))
 
@@ -107,6 +115,7 @@ func BuildCmd() *cobra.Command {
 
 	cmd.Flags().Bool("bundle", false, "if passed, bundle all resulting runnables into a deployable .wasm.zip bundle")
 	cmd.Flags().Bool("native", false, "if passed, build runnables using native toolchain rather than Docker")
+	cmd.Flags().String("make", "", "if passed, execute Make targets as part of a build.")
 
 	return cmd
 }
