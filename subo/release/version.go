@@ -8,4 +8,4 @@ var SuboDotVersion = "0.0.15"
 var FFIVersion = "0.9.1"
 
 // AtmoVersion is the default version of Atmo that will be used for new projects
-var AtmoVersion = "0.2.0"
+var AtmoVersion = "0.2.2"
