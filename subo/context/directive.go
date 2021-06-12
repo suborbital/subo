@@ -2,12 +2,14 @@ package context
 
 import (
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
 	"github.com/pkg/errors"
 	"github.com/suborbital/atmo/directive"
+	"gopkg.in/yaml.v2"
 )
 
 // readDirectiveFile finds a Directive from disk but does not validate it
@@ -34,6 +36,22 @@ func readDirectiveFile(cwd string) (*directive.Directive, error) {
 	}
 
 	return directive, nil
+}
+
+// WriteDirective writes a Directive to disk
+func WriteDirective(cwd string, directive *directive.Directive) error {
+	filePath := filepath.Join(cwd, "Directive.yaml")
+
+	directiveBytes, err := yaml.Marshal(directive)
+	if err != nil {
+		return errors.Wrap(err, "failed to Marshal")
+	}
+
+	if err := ioutil.WriteFile(filePath, directiveBytes, fs.FileMode(os.O_WRONLY)); err != nil {
+		return errors.Wrap(err, "failed to WriteFile")
+	}
+
+	return nil
 }
 
 // AugmentAndValidateDirectiveFns ensures that all functions referenced in a handler exist

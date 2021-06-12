@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -15,6 +16,7 @@ import (
 	"github.com/suborbital/subo/subo/context"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
+	"golang.org/x/mod/semver"
 )
 
 // BuildCmd returns the build command
@@ -126,6 +128,17 @@ func BuildCmd() *cobra.Command {
 				}
 
 				util.LogDone(fmt.Sprintf("built Docker image -> %s:%s", bctx.Directive.Identifier, bctx.Directive.AppVersion))
+			}
+
+			if bctx.Directive.Headless {
+				major, _ := strconv.Atoi(semver.Major(bctx.Directive.AppVersion))
+				new := fmt.Sprintf("v%d.0.0", major+1)
+
+				bctx.Directive.AppVersion = new
+
+				if err := context.WriteDirective(bctx.Cwd, bctx.Directive); err != nil {
+					return errors.Wrap(err, "failed to WriteDirective")
+				}
 			}
 
 			return nil

@@ -3,12 +3,14 @@ github.com/inconshreveable/mousetrap
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
+# github.com/sethvargo/go-envconfig v0.3.5
+## explicit
 # github.com/spf13/cobra v1.1.3
 ## explicit
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
 github.com/spf13/pflag
-# github.com/suborbital/atmo v0.2.3-0.20210521151945-bc9b42cd29c6 => /Users/cohix-so/Workspaces/suborbital/atmo
+# github.com/suborbital/atmo v0.2.3-0.20210612160203-f809a67f53ea
 ## explicit
 github.com/suborbital/atmo/bundle
 github.com/suborbital/atmo/directive
@@ -18,7 +20,8 @@ github.com/suborbital/reactr/rwasm/moduleref
 # golang.org/x/mod v0.4.2
 ## explicit
 golang.org/x/mod/semver
+# golang.org/x/net v0.0.0-20210610132358-84b48f89b13b
+## explicit
 # gopkg.in/yaml.v2 v2.4.0
 ## explicit
 gopkg.in/yaml.v2
-# github.com/suborbital/atmo => /Users/cohix-so/Workspaces/suborbital/atmo

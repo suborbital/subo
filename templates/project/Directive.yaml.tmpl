@@ -3,7 +3,7 @@
 # atmoVersion declares which version of Atmo is used for the `subo dev` command.
 
 identifier: {{ .Environment }}.{{ .Name }}
-appVersion: v0.0.1
+appVersion: v0.1.0
 atmoVersion: v{{ .AtmoVersion }}
 {{ if .Headless }}headless: true{{ end }}
 {{ if not .Headless }}
