@@ -131,12 +131,21 @@ func BuildCmd() *cobra.Command {
 			}
 
 			if bctx.Directive.Headless {
-				major, _ := strconv.Atoi(semver.Major(bctx.Directive.AppVersion))
+				util.LogInfo("updateing Directive")
+
+				directive := *bctx.Directive
+				directive.Runnables = nil
+
+				// bump the appVersion since we're in headless mode
+				majorStr := strings.TrimPrefix(semver.Major(directive.AppVersion), "v")
+				major, _ := strconv.Atoi(majorStr)
 				new := fmt.Sprintf("v%d.0.0", major+1)
 
-				bctx.Directive.AppVersion = new
+				fmt.Println(majorStr, major, new)
 
-				if err := context.WriteDirective(bctx.Cwd, bctx.Directive); err != nil {
+				directive.AppVersion = new
+
+				if err := context.WriteDirective(bctx.Cwd, &directive); err != nil {
 					return errors.Wrap(err, "failed to WriteDirective")
 				}
 			}
