@@ -35,7 +35,7 @@ func CreateReleaseCmd() *cobra.Command {
 		Long:  `tag a new version and create a new GitHub release, configured using the .subo.yml file.`,
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			logStart("checking release conditions")
+			util.LogStart("checking release conditions")
 			cwd, _ := cmd.Flags().GetString("dir")
 
 			newVersion := args[0]
@@ -52,7 +52,8 @@ func CreateReleaseCmd() *cobra.Command {
 			}
 
 			// ensure the current git branch is an rc branch
-			if err := ensureCorrectGitBranch(newVersion); err != nil {
+			branch, err := ensureCorrectGitBranch(newVersion)
+			if err != nil {
 				return errors.Wrap(err, "failed to ensureCorrectGitBranch")
 			}
 
@@ -84,31 +85,33 @@ func CreateReleaseCmd() *cobra.Command {
 				}
 			}
 
-			logDone("release is ready to go")
-			logStart("running pre-make targets")
+			util.LogDone("release is ready to go")
+			util.LogStart("running pre-make targets")
 
 			// run all of the pre-release make targets
 			for _, target := range dotSubo.PreMakeTargets {
-				if _, _, err := util.Run(fmt.Sprintf("make %s", target)); err != nil {
+				targetWithVersion := strings.Replace(target, "{{ .Version }}", newVersion, -1)
+
+				if _, _, err := util.Run(fmt.Sprintf("make %s", targetWithVersion)); err != nil {
 					return errors.Wrapf(err, "failed to run preMakeTarget %s", target)
 				}
 			}
 
-			logDone("pre-make targets complete")
+			util.LogDone("pre-make targets complete")
 
 			if shouldDryRun, _ := cmd.Flags().GetBool(dryRunFlag); shouldDryRun {
-				logDone("release conditions verified, terminating for dry run")
+				util.LogDone("release conditions verified, terminating for dry run")
 				return nil
 			}
 
-			logStart("creating release")
+			util.LogStart("creating release")
 
 			// ensure the local changes are pushed, create the release, and then pull down the new tag
 			if _, _, err := util.Run("git push"); err != nil {
 				return errors.Wrap(err, "failed to Run git push")
 			}
 
-			ghCommand := fmt.Sprintf("gh release create %s --title=%s --notes-file=%s", newVersion, releaseName, changelogFilePath)
+			ghCommand := fmt.Sprintf("gh release create %s --title=%s --target=%s --notes-file=%s", newVersion, releaseName, branch, changelogFilePath)
 			if preRelease, _ := cmd.Flags().GetBool(preReleaseFlag); preRelease {
 				ghCommand += " --prerelease"
 			}
@@ -121,17 +124,19 @@ func CreateReleaseCmd() *cobra.Command {
 				return errors.Wrap(err, "failed to Run git pull command")
 			}
 
-			logDone("release created!")
-			logStart("running post-make targets")
+			util.LogDone("release created!")
+			util.LogStart("running post-make targets")
 
 			// run all of the post-release make targets
 			for _, target := range dotSubo.PostMakeTargets {
-				if _, _, err := util.Run(fmt.Sprintf("make %s", target)); err != nil {
+				targetWithVersion := strings.Replace(target, "{{ .Version }}", newVersion, -1)
+
+				if _, _, err := util.Run(fmt.Sprintf("make %s", targetWithVersion)); err != nil {
 					return errors.Wrapf(err, "failed to run postMakeTarget %s", target)
 				}
 			}
 
-			logDone("post-make targets complete")
+			util.LogDone("post-make targets complete")
 
 			return nil
 		},
@@ -193,19 +198,19 @@ func checkGitCleanliness() error {
 	return nil
 }
 
-func ensureCorrectGitBranch(version string) error {
+func ensureCorrectGitBranch(version string) (string, error) {
 	expectedBranch := fmt.Sprintf("rc-%s", version)
 
 	branch, _, err := util.Run("git branch --show-current")
 	if err != nil {
-		return errors.Wrap(err, "failed to Run git branch")
+		return "", errors.Wrap(err, "failed to Run git branch")
 	}
 
 	if strings.TrimSpace(branch) != expectedBranch {
-		return errors.New("release must be created on an 'rc-*' branch, currently on " + branch + ", expected " + expectedBranch)
+		return "", errors.New("release must be created on an 'rc-*' branch, currently on " + branch + ", expected " + expectedBranch)
 	}
 
-	return nil
+	return strings.TrimSpace(branch), nil
 }
 
 func validateVersion(version string) error {

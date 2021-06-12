@@ -8,14 +8,15 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/suborbital/reactr/directive"
+	"github.com/suborbital/atmo/directive"
 	"github.com/suborbital/subo/subo/release"
 	"gopkg.in/yaml.v2"
 )
 
 var dockerImageForLang = map[string]string{
-	"rust":  "suborbital/builder-rs",
-	"swift": "suborbital/builder-swift",
+	"rust":           "suborbital/builder-rs",
+	"swift":          "suborbital/builder-swift",
+	"assemblyscript": "suborbital/builder-as",
 }
 
 // BuildContext describes the context under which the tool is being run
@@ -132,7 +133,7 @@ func getRunnableDirs(cwd string) ([]RunnableDir, bool, error) {
 }
 
 // containsRunnableYaml finds any .runnable file in a list of files
-func containsRunnableYaml(files []os.FileInfo) (string, bool) {
+func ContainsRunnableYaml(files []os.FileInfo) (string, bool) {
 	for _, f := range files {
 		if strings.HasPrefix(f.Name(), ".runnable.") {
 			return f.Name(), true
@@ -143,7 +144,7 @@ func containsRunnableYaml(files []os.FileInfo) (string, bool) {
 }
 
 func getRunnableFromFiles(wd string, files []os.FileInfo) (*RunnableDir, error) {
-	filename, exists := containsRunnableYaml(files)
+	filename, exists := ContainsRunnableYaml(files)
 	if !exists {
 		return nil, nil
 	}

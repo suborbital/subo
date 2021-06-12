@@ -3,8 +3,6 @@ package command
 import (
 	"fmt"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -39,16 +37,25 @@ func CreateProjectCmd() *cobra.Command {
 				return errors.Wrap(err, "🚫 failed to get CurrentBuildContext")
 			}
 
-			logStart(fmt.Sprintf("creating project %s", name))
+			util.LogStart(fmt.Sprintf("creating project %s", name))
 
 			path, err := util.Mkdir(bctx.Cwd, name)
 			if err != nil {
 				return errors.Wrap(err, "🚫 failed to Mkdir")
 			}
 
-			templateRootPath, err := util.TemplateDir()
+			branch, _ := cmd.Flags().GetString(branchFlag)
+
+			templatesPath, err := util.TemplateFullPath(branch)
 			if err != nil {
-				return errors.Wrap(err, "failed to TemplateDir")
+				return errors.Wrap(err, "🚫 failed to TemplateFullPath")
+			}
+
+			if update, _ := cmd.Flags().GetBool(updateTemplatesFlag); update {
+				templatesPath, err = util.UpdateTemplates(bctx, name, branch)
+				if err != nil {
+					return errors.Wrap(err, "🚫 failed to UpdateTemplates")
+				}
 			}
 
 			data := projectData{
@@ -57,63 +64,32 @@ func CreateProjectCmd() *cobra.Command {
 				AtmoVersion: release.AtmoVersion,
 			}
 
-			branch, _ := cmd.Flags().GetString(branchFlag)
-			branchDirName := fmt.Sprintf("subo-%s", strings.ReplaceAll(branch, "/", "-"))
-			tmplPath := filepath.Join(templateRootPath, branchDirName, "templates")
-
-			// encapsulate this in a function so it can be called if updates are requested or if the first attempt to copy fails
-			updateAndCopy := func() error {
-				logStart("downloading templates")
-
-				filepath, err := util.DownloadZip(branch, templateRootPath)
-				if err != nil {
-					return errors.Wrap(err, "🚫 failed to downloadZip for templates")
-				}
-
-				// tmplPath may be different than the default if a custom URL was provided
-				tmplPath, err = util.ExtractZip(filepath, templateRootPath, branchDirName)
-				if err != nil {
-					return errors.Wrap(err, "🚫 failed to extractZip for templates")
-				}
-
-				logDone("templates downloaded")
-
-				if err = util.ExecTmplDir(bctx.Cwd, name, tmplPath, "project", data); err != nil {
-					return errors.Wrap(err, "🚫 failed to copyTmpl")
-				}
-
-				return nil
-			}
-
-			if update, _ := cmd.Flags().GetBool(updateTemplatesFlag); update {
-				if err := updateAndCopy(); err != nil {
-					return errors.Wrap(err, "failed to updateAndCopy")
-				}
-			} else {
-				if err := util.ExecTmplDir(bctx.Cwd, name, tmplPath, "project", data); err != nil {
-					if err == util.ErrTemplateMissing {
-						if err := updateAndCopy(); err != nil {
-							return errors.Wrap(err, "failed to updateAndCopy")
-						}
-					} else {
-						return errors.Wrap(err, "🚫 failed to copyTmpl")
+			if err := util.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data); err != nil {
+				// if the templates are missing, try updating them and exec again
+				if err == util.ErrTemplateMissing {
+					templatesPath, err = util.UpdateTemplates(bctx, name, branch)
+					if err != nil {
+						return errors.Wrap(err, "🚫 failed to UpdateTemplates")
 					}
+
+					if err := util.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data); err != nil {
+						return errors.Wrap(err, "🚫 failed to ExecTmplDir")
+					}
+				} else {
+					return errors.Wrap(err, "🚫 failed to ExecTmplDir")
 				}
 			}
 
-			logDone(path)
-
-			logStart("initializing Git repo")
+			util.LogDone(path)
 
 			if _, _, err := util.Run(fmt.Sprintf("git init ./%s", name)); err != nil {
-				return errors.Wrap(err, "🚫 failed to initialize Git repo")
+				return errors.Wrap(err, "🚫 failed to initialize Run git init")
 			}
-
-			logDone("initialized Git repo")
 
 			return nil
 		},
 	}
+
 	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
 	cmd.Flags().Bool(updateTemplatesFlag, false, "update with the newest templates")
 

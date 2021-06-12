@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"text/template"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/suborbital/atmo/directive"
 	"github.com/suborbital/reactr/bundle"
-	"github.com/suborbital/reactr/directive"
 	"github.com/suborbital/subo/subo/context"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
@@ -37,31 +38,42 @@ func BuildCmd() *cobra.Command {
 				return errors.New("🚫 no runnables found in current directory (no .runnable yaml files found)")
 			}
 
-			logStart(fmt.Sprintf("building runnables in %s", bctx.Cwd))
+			if bctx.CwdIsRunnable {
+				util.LogInfo("building single Runnable (run from project root to create bundle)")
+			} else {
+				util.LogStart(fmt.Sprintf("building runnables in %s", bctx.Cwd))
+			}
 
-			shouldBundle, _ := cmd.Flags().GetBool("bundle")
+			noBundle, _ := cmd.Flags().GetBool("no-bundle")
+			shouldBundle := !noBundle && !bctx.CwdIsRunnable
+
 			useNative, _ := cmd.Flags().GetBool("native")
 			makeStr, _ := cmd.Flags().GetString("make")
 
-			logStart(fmt.Sprintf("make %s", makeStr))
+			util.LogStart(fmt.Sprintf("make %s", makeStr))
 			_, _, err = util.Run(fmt.Sprintf("make %s", makeStr))
 
 			if err != nil {
 				return errors.Wrapf(err, "🚫 failed to make %s", makeStr)
 			}
+			shouldDockerBuild, _ := cmd.Flags().GetBool("docker")
 
 			modules := make([]os.File, len(bctx.Runnables))
 
 			for i, r := range bctx.Runnables {
-				logStart(fmt.Sprintf("building runnable: %s (%s)", r.Name, r.Runnable.Lang))
+				util.LogStart(fmt.Sprintf("building runnable: %s (%s)", r.Name, r.Runnable.Lang))
 
 				var file *os.File
 
 				if useNative {
-					logInfo("🔗 using native toolchain")
+					util.LogInfo("🔗 using native toolchain")
+					if err := checkAndRunPreReqs(r); err != nil {
+						return errors.Wrap(err, "🚫 failed to checkAndRunPreReqs")
+					}
+
 					file, err = doNativeBuildForRunnable(r)
 				} else {
-					logInfo("🐳 using Docker toolchain")
+					util.LogInfo("🐳 using Docker toolchain")
 					file, err = doBuildForRunnable(r)
 				}
 
@@ -72,7 +84,7 @@ func BuildCmd() *cobra.Command {
 				modules[i] = *file
 
 				fullWasmFilepath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
-				logDone(fmt.Sprintf("%s was built -> %s", r.Name, fullWasmFilepath))
+				util.LogDone(fmt.Sprintf("%s was built -> %s", r.Name, fullWasmFilepath))
 			}
 
 			if shouldBundle {
@@ -99,23 +111,39 @@ func BuildCmd() *cobra.Command {
 				}
 
 				if static != nil {
-					logInfo("ℹ️  adding static files to bundle")
+					util.LogInfo("adding static files to bundle")
 				}
 
-				if err := bundle.Write(bctx.Directive, modules, static, bctx.Bundle.Fullpath); err != nil {
+				directiveBytes, err := bctx.Directive.Marshal()
+				if err != nil {
+					return errors.Wrap(err, "failed to Directive.Marshal")
+				}
+
+				if err := bundle.Write(directiveBytes, modules, static, bctx.Bundle.Fullpath); err != nil {
 					return errors.Wrap(err, "🚫 failed to WriteBundle")
 				}
 
-				logDone(fmt.Sprintf("bundle was created -> %s", bctx.Bundle.Fullpath))
+				defer util.LogDone(fmt.Sprintf("bundle was created -> %s", bctx.Bundle.Fullpath))
+			}
+
+			if shouldDockerBuild {
+				os.Setenv("DOCKER_BUILDKIT", "0")
+
+				if _, _, err := util.Run(fmt.Sprintf("docker build . -t=%s:%s", bctx.Directive.Identifier, bctx.Directive.AppVersion)); err != nil {
+					return errors.Wrap(err, "🚫 failed to build Docker image")
+				}
+
+				util.LogDone(fmt.Sprintf("built Docker image -> %s:%s", bctx.Directive.Identifier, bctx.Directive.AppVersion))
 			}
 
 			return nil
 		},
 	}
 
-	cmd.Flags().Bool("bundle", false, "if passed, bundle all resulting runnables into a deployable .wasm.zip bundle")
+	cmd.Flags().Bool("no-bundle", false, "if passed, a .wasm.zip bundle will not be generated")
 	cmd.Flags().Bool("native", false, "if passed, build runnables using native toolchain rather than Docker")
 	cmd.Flags().String("make", "", "if passed, execute Make targets as part of a build.")
+	cmd.Flags().Bool("docker", false, "if passed, build your project's Dockerfile. It will be tagged {identifier}:{appVersion}")
 
 	return cmd
 }
@@ -174,20 +202,33 @@ func doNativeBuildForRunnable(r context.RunnableDir) (*os.File, error) {
 	return file, nil
 }
 
-func logInfo(msg string) {
-	if _, exists := os.LookupEnv("SUBO_DOCKER"); !exists {
-		fmt.Println(msg)
+func checkAndRunPreReqs(runnable context.RunnableDir) error {
+	preReqLangs, ok := context.PreRequisiteCommands[runtime.GOOS]
+	if !ok {
+		return fmt.Errorf("unsupported OS: %s", runtime.GOOS)
 	}
-}
 
-func logStart(msg string) {
-	if _, exists := os.LookupEnv("SUBO_DOCKER"); !exists {
-		fmt.Println(fmt.Sprintf("⏩ START: %s", msg))
+	preReqs, ok := preReqLangs[runnable.Runnable.Lang]
+	if !ok {
+		return fmt.Errorf("unsupported language: %s", runnable.Runnable.Lang)
 	}
-}
 
-func logDone(msg string) {
-	if _, exists := os.LookupEnv("SUBO_DOCKER"); !exists {
-		fmt.Println(fmt.Sprintf("✅ DONE: %s", msg))
+	for _, p := range preReqs {
+		filepath := filepath.Join(runnable.Fullpath, p.File)
+
+		if _, err := os.Stat(filepath); err != nil {
+			if errors.Is(err, os.ErrNotExist) {
+				util.LogStart(fmt.Sprintf("missing %s, fixing...", p.File))
+
+				_, _, err := util.RunInDir(p.Command, runnable.Fullpath)
+				if err != nil {
+					return errors.Wrapf(err, "failed to Run prerequisite: %s", p.Command)
+				}
+
+				util.LogDone("fixed!")
+			}
+		}
 	}
+
+	return nil
 }

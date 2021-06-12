@@ -1,5 +1,6 @@
 dotVersionFiles:
   - subo/release/version.go
+  - builders/.builder-ver
 
 preMakeTargets:
   - subo/docker
