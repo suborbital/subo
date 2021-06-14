@@ -48,14 +48,14 @@ func BuildCmd() *cobra.Command {
 			shouldBundle := !noBundle && !bctx.CwdIsRunnable
 
 			useNative, _ := cmd.Flags().GetBool("native")
-			makeStr, _ := cmd.Flags().GetString("make")
+			makeTarget, _ := cmd.Flags().GetString("make")
 
-			util.LogStart(fmt.Sprintf("make %s", makeStr))
-			_, _, err = util.Run(fmt.Sprintf("make %s", makeStr))
-
+			util.LogStart(fmt.Sprintf("make %s", makeTarget))
+			_, _, err = util.Run(fmt.Sprintf("make %s", makeTarget))
 			if err != nil {
-				return errors.Wrapf(err, "🚫 failed to make %s", makeStr)
+				return errors.Wrapf(err, "🚫 failed to make %s", makeTarget)
 			}
+
 			shouldDockerBuild, _ := cmd.Flags().GetBool("docker")
 
 			modules := make([]os.File, len(bctx.Runnables))
