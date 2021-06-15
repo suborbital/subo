@@ -1,4 +1,4 @@
-swift-img = suborbital/builder-swift:$(shell cat ../builder-ver)
+swift-img = suborbital/builder-swift:$(shell cat ../.builder-ver)
 
 builder/swift:
 	docker build ../../ -f ./Dockerfile -t $(swift-img)
