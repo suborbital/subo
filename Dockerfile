@@ -1,4 +1,4 @@
-FROM golang:1.15 as builder
+FROM golang:1.16 as builder
 
 RUN mkdir -p /root/github.com/suborbital/subo
 WORKDIR /root/github.com/suborbital/subo

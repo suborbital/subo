@@ -1,4 +1,4 @@
-rs-img = suborbital/builder-rs:$(shell cat ../builder-ver)
+rs-img = suborbital/builder-rs:$(shell cat ../.builder-ver)
 
 builder/rs: subo/docker
 	docker build ../../ -f ./Dockerfile -t $(rs-img)
