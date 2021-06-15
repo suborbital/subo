@@ -48,9 +48,14 @@ func BuildCmd() *cobra.Command {
 
 			noBundle, _ := cmd.Flags().GetBool("no-bundle")
 			shouldBundle := !noBundle && !bctx.CwdIsRunnable
+			shouldDockerBuild, _ := cmd.Flags().GetBool("docker")
 
 			useNative, _ := cmd.Flags().GetBool("native")
-			shouldDockerBuild, _ := cmd.Flags().GetBool("docker")
+			if useNative {
+				util.LogInfo("🔗 using native toolchain")
+			} else {
+				util.LogInfo("🐳 using Docker toolchain")
+			}
 
 			modules := make([]os.File, len(bctx.Runnables))
 
@@ -60,14 +65,12 @@ func BuildCmd() *cobra.Command {
 				var file *os.File
 
 				if useNative {
-					util.LogInfo("🔗 using native toolchain")
 					if err := checkAndRunPreReqs(r); err != nil {
 						return errors.Wrap(err, "🚫 failed to checkAndRunPreReqs")
 					}
 
 					file, err = doNativeBuildForRunnable(r)
 				} else {
-					util.LogInfo("🐳 using Docker toolchain")
 					file, err = doBuildForRunnable(r)
 				}
 
