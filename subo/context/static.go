@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/suborbital/reactr/bundle"
+	"github.com/suborbital/atmo/bundle"
 )
 
 // CollectStaticFiles collects all of the files in the `static/` directory relative to cwd

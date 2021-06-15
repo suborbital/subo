@@ -5,16 +5,18 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"text/template"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/suborbital/atmo/bundle"
 	"github.com/suborbital/atmo/directive"
-	"github.com/suborbital/reactr/bundle"
 	"github.com/suborbital/subo/subo/context"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
+	"golang.org/x/mod/semver"
 )
 
 // BuildCmd returns the build command
@@ -46,6 +48,7 @@ func BuildCmd() *cobra.Command {
 
 			noBundle, _ := cmd.Flags().GetBool("no-bundle")
 			shouldBundle := !noBundle && !bctx.CwdIsRunnable
+			shouldDockerBuild, _ := cmd.Flags().GetBool("docker")
 
 			useNative, _ := cmd.Flags().GetBool("native")
 			makeTarget, _ := cmd.Flags().GetString("make")
@@ -56,7 +59,11 @@ func BuildCmd() *cobra.Command {
 				return errors.Wrapf(err, "🚫 failed to make %s", makeTarget)
 			}
 
-			shouldDockerBuild, _ := cmd.Flags().GetBool("docker")
+			if useNative {
+				util.LogInfo("🔗 using native toolchain")
+			} else {
+				util.LogInfo("🐳 using Docker toolchain")
+			}
 
 			modules := make([]os.File, len(bctx.Runnables))
 
@@ -66,14 +73,12 @@ func BuildCmd() *cobra.Command {
 				var file *os.File
 
 				if useNative {
-					util.LogInfo("🔗 using native toolchain")
 					if err := checkAndRunPreReqs(r); err != nil {
 						return errors.Wrap(err, "🚫 failed to checkAndRunPreReqs")
 					}
 
 					file, err = doNativeBuildForRunnable(r)
 				} else {
-					util.LogInfo("🐳 using Docker toolchain")
 					file, err = doBuildForRunnable(r)
 				}
 
@@ -94,6 +99,19 @@ func BuildCmd() *cobra.Command {
 						// TODO: insert some git smarts here?
 						AppVersion:  "v0.0.1",
 						AtmoVersion: fmt.Sprintf("v%s", release.AtmoVersion),
+					}
+				} else if bctx.Directive.Headless {
+					util.LogInfo("updating Directive")
+
+					// bump the appVersion since we're in headless mode
+					majorStr := strings.TrimPrefix(semver.Major(bctx.Directive.AppVersion), "v")
+					major, _ := strconv.Atoi(majorStr)
+					new := fmt.Sprintf("v%d.0.0", major+1)
+
+					bctx.Directive.AppVersion = new
+
+					if err := context.WriteDirective(bctx.Cwd, bctx.Directive); err != nil {
+						return errors.Wrap(err, "failed to WriteDirective")
 					}
 				}
 
@@ -123,7 +141,7 @@ func BuildCmd() *cobra.Command {
 					return errors.Wrap(err, "🚫 failed to WriteBundle")
 				}
 
-				defer util.LogDone(fmt.Sprintf("bundle was created -> %s", bctx.Bundle.Fullpath))
+				defer util.LogDone(fmt.Sprintf("bundle was created -> %s @ %s", bctx.Bundle.Fullpath, bctx.Directive.AppVersion))
 			}
 
 			if shouldDockerBuild {
