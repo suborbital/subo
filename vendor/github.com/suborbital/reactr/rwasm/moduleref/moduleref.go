@@ -8,16 +8,18 @@ import (
 
 // WasmModuleRef is a reference to a Wasm module (either its filepath or its bytes)
 type WasmModuleRef struct {
-	Filepath string
-	Name     string
-	data     []byte
+	Filepath string `json:"filepath"`
+	Name     string `json:"name"`
+	FQFN     string `json:"fqfn"`
+	Data     []byte `json:"data"`
 }
 
 // RefWithData returns a module ref from module bytes
-func RefWithData(name string, data []byte) *WasmModuleRef {
+func RefWithData(name, fqfn string, data []byte) *WasmModuleRef {
 	ref := &WasmModuleRef{
 		Name: name,
-		data: data,
+		FQFN: fqfn,
+		Data: data,
 	}
 
 	return ref
@@ -25,7 +27,7 @@ func RefWithData(name string, data []byte) *WasmModuleRef {
 
 // Bytes returns the bytes for the module
 func (w *WasmModuleRef) Bytes() ([]byte, error) {
-	if w.data == nil {
+	if w.Data == nil {
 		if w.Filepath == "" {
 			return nil, errors.New("missing Wasm module filepath in ref")
 		}
@@ -35,8 +37,8 @@ func (w *WasmModuleRef) Bytes() ([]byte, error) {
 			return nil, errors.Wrap(err, "failed to ReadFile for Wasm module")
 		}
 
-		w.data = bytes
+		w.Data = bytes
 	}
 
-	return w.data, nil
+	return w.Data, nil
 }

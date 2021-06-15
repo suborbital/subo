@@ -27,4 +27,7 @@ builder/as/%:
 
 builders/publish: builder/rs/publish builder/swift/publish builder/as/publish
 
+mod/replace/atmo:
+	go mod edit -replace github.com/suborbital/atmo=$(HOME)/Workspaces/suborbital/atmo
+
 .PHONY: subo subo/docker

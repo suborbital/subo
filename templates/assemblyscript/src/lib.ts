@@ -5,5 +5,7 @@ export function run(input: ArrayBuffer): ArrayBuffer {
   
 	let out = "hello, " + inStr
 
+	logInfo(out)
+
 	return String.UTF8.encode(out)
 }

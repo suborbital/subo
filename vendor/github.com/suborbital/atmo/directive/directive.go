@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/suborbital/atmo/fqfn"
 	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v2"
 )
@@ -13,112 +14,126 @@ const (
 	InputTypeRequest = "request"
 )
 
-// NamespaceDefault and others represent conts for namespaces
-const (
-	NamespaceDefault = "default"
-)
-
 // Directive describes a set of functions and a set of handlers
 // that take an input, and compose a set of functions to handle it
 type Directive struct {
 	Identifier  string     `yaml:"identifier"`
 	AppVersion  string     `yaml:"appVersion"`
 	AtmoVersion string     `yaml:"atmoVersion"`
+	Headless    bool       `yaml:"headless,omitempty"`
 	Runnables   []Runnable `yaml:"runnables"`
 	Handlers    []Handler  `yaml:"handlers,omitempty"`
 	Schedules   []Schedule `yaml:"schedules,omitempty"`
-
-	// "fully qualified function names"
-	fqfns map[string]string `yaml:"-"`
 }
 
 // Handler represents the mapping between an input and a composition of functions
 type Handler struct {
-	Input    Input        `yaml:"input,inline"`
-	Steps    []Executable `yaml:"steps"`
-	Response string       `yaml:"response,omitempty"`
+	Input    Input        `yaml:"input,inline" json:"input"`
+	Steps    []Executable `yaml:"steps" json:"steps"`
+	Response string       `yaml:"response,omitempty" json:"response,omitempty"`
 }
 
 // Schedule represents the mapping between an input and a composition of functions
 type Schedule struct {
-	Name  string            `yaml:"name"`
-	Every ScheduleEvery     `yaml:"every"`
-	State map[string]string `yaml:"state,omitempty"`
-	Steps []Executable      `yaml:"steps"`
+	Name  string            `yaml:"name" json:"name"`
+	Every ScheduleEvery     `yaml:"every" json:"every"`
+	State map[string]string `yaml:"state,omitempty" json:"state,omitempty"`
+	Steps []Executable      `yaml:"steps" json:"steps"`
 }
 
 // ScheduleEvery represents the 'every' value for a schedule
 type ScheduleEvery struct {
-	Seconds int `yaml:"seconds,omitempty"`
-	Minutes int `yaml:"minutes,omitempty"`
-	Hours   int `yaml:"hours,omitempty"`
-	Days    int `yaml:"days,omitempty"`
+	Seconds int `yaml:"seconds,omitempty" json:"seconds,omitempty"`
+	Minutes int `yaml:"minutes,omitempty" json:"minutes,omitempty"`
+	Hours   int `yaml:"hours,omitempty" json:"hours,omitempty"`
+	Days    int `yaml:"days,omitempty" json:"days,omitempty"`
 }
 
 // Input represents an input source
 type Input struct {
-	Type     string
-	Method   string
-	Resource string
+	Type     string `yaml:"type" json:"type"`
+	Method   string `yaml:"method" json:"method"`
+	Resource string `yaml:"resource" json:"resource"`
 }
 
 // Executable represents an executable step in a handler
 type Executable struct {
-	CallableFn `yaml:"callableFn,inline"`
-	Group      []CallableFn `yaml:"group,omitempty"`
-	ForEach    *ForEach     `yaml:"forEach,omitempty"`
+	CallableFn `yaml:"callableFn,inline" json:"callableFn"`
+	Group      []CallableFn `yaml:"group,omitempty" json:"group,omitempty"`
+	ForEach    *ForEach     `yaml:"forEach,omitempty" json:"forEach,omitempty"`
 }
 
 // CallableFn is a fn along with its "variable name" and "args"
 type CallableFn struct {
-	Fn    string            `yaml:"fn,omitempty"`
-	As    string            `yaml:"as,omitempty"`
-	With  map[string]string `yaml:"with,omitempty"`
-	OnErr *FnOnErr          `yaml:"onErr,omitempty"`
+	Fn    string            `yaml:"fn,omitempty" json:"fn,omitempty"`
+	As    string            `yaml:"as,omitempty" json:"as,omitempty"`
+	With  map[string]string `yaml:"with,omitempty" json:"with,omitempty"`
+	OnErr *FnOnErr          `yaml:"onErr,omitempty" json:"onErr,omitempty"`
+	FQFN  string            `yaml:"-" json:"fqfn"` // calculated during Validate
 }
 
 // FnOnErr describes how to handle an error from a function call
 type FnOnErr struct {
-	Code  map[int]string `yaml:"code,omitempty"`
-	Any   string         `yaml:"any,omitempty"`
-	Other string         `yaml:"other,omitempty"`
+	Code  map[int]string `yaml:"code,omitempty" json:"code,omitempty"`
+	Any   string         `yaml:"any,omitempty" json:"any,omitempty"`
+	Other string         `yaml:"other,omitempty" json:"other,omitempty"`
 }
 
 type ForEach struct {
-	In    string   `yaml:"in"`
-	Fn    string   `yaml:"fn"`
-	As    string   `yaml:"as"`
-	OnErr *FnOnErr `yaml:"onErr,omitempty"`
+	In         string     `yaml:"in" json:"in"`
+	Fn         string     `yaml:"fn" json:"fn"`
+	As         string     `yaml:"as" json:"as"`
+	OnErr      *FnOnErr   `yaml:"onErr,omitempty" json:"onErr,omitempty"`
+	CallableFn CallableFn `yaml:"-" json:"callableFn"` // calculated during Validate
+}
+
+func (d *Directive) FindRunnable(name string) *Runnable {
+	// if this is an FQFN, parse the identifier and bail out
+	// if it doesn't match this Directive
+
+	FQFN := fqfn.Parse(name)
+
+	if FQFN.Identifier != "" && FQFN.Identifier != d.Identifier {
+		return nil
+	}
+
+	if FQFN.Version != "" && FQFN.Version != d.AppVersion {
+		return nil
+	}
+
+	for i, r := range d.Runnables {
+		if r.Name == FQFN.Fn && r.Namespace == FQFN.Namespace {
+			return &d.Runnables[i]
+		}
+	}
+
+	return nil
 }
 
 // Marshal outputs the YAML bytes of the Directive
 func (d *Directive) Marshal() ([]byte, error) {
+	d.calculateFQFNs()
+
 	return yaml.Marshal(d)
 }
 
 // Unmarshal unmarshals YAML bytes into a Directive struct
 // it also calculates a map of FQFNs for later use
 func (d *Directive) Unmarshal(in []byte) error {
-	return yaml.Unmarshal(in, d)
-}
-
-// FQFN returns the FQFN for a given function in the directive
-func (d *Directive) FQFN(fn string) (string, error) {
-	if d.fqfns == nil {
-		d.calculateFQFNs()
+	if err := yaml.Unmarshal(in, d); err != nil {
+		return err
 	}
 
-	fqfn, exists := d.fqfns[fn]
-	if !exists {
-		return "", fmt.Errorf("fn %s does not exist", fn)
-	}
+	d.calculateFQFNs()
 
-	return fqfn, nil
+	return nil
 }
 
 // Validate validates a directive
 func (d *Directive) Validate() error {
 	problems := &problems{}
+
+	d.calculateFQFNs()
 
 	if d.Identifier == "" {
 		problems.add(errors.New("identifier is missing"))
@@ -139,7 +154,7 @@ func (d *Directive) Validate() error {
 	fns := map[string]bool{}
 
 	for i, f := range d.Runnables {
-		namespaced := fmt.Sprintf("%s#%s", f.Namespace, f.Name)
+		namespaced := fmt.Sprintf("%s::%s", f.Namespace, f.Name)
 
 		if _, exists := fns[namespaced]; exists {
 			problems.add(fmt.Errorf("duplicate fn %s found", namespaced))
@@ -155,12 +170,13 @@ func (d *Directive) Validate() error {
 			problems.add(fmt.Errorf("function at position %d missing name", i))
 			continue
 		}
+
 		if f.Namespace == "" {
 			problems.add(fmt.Errorf("function at position %d missing namespace", i))
 		}
 
 		// if the fn is in the default namespace, let it exist "naked" and namespaced
-		if f.Namespace == NamespaceDefault {
+		if f.Namespace == fqfn.NamespaceDefault {
 			fns[f.Name] = true
 			fns[namespaced] = true
 		} else {
@@ -187,7 +203,7 @@ func (d *Directive) Validate() error {
 		}
 
 		name := fmt.Sprintf("%s %s", h.Input.Method, h.Input.Resource)
-		fullState := validateSteps(executableTypeHandler, name, h.Steps, map[string]bool{}, fns, problems)
+		fullState := d.validateSteps(executableTypeHandler, name, h.Steps, map[string]bool{}, problems)
 
 		lastStep := h.Steps[len(h.Steps)-1]
 		if h.Response == "" && lastStep.IsGroup() {
@@ -220,7 +236,7 @@ func (d *Directive) Validate() error {
 			initialState[k] = true
 		}
 
-		validateSteps(executableTypeSchedule, s.Name, s.Steps, initialState, fns, problems)
+		d.validateSteps(executableTypeSchedule, s.Name, s.Steps, initialState, problems)
 	}
 
 	return problems.render()
@@ -233,7 +249,7 @@ const (
 	executableTypeSchedule = executableType("schedule")
 )
 
-func validateSteps(exType executableType, name string, steps []Executable, initialState map[string]bool, fns map[string]bool, problems *problems) map[string]bool {
+func (d *Directive) validateSteps(exType executableType, name string, steps []Executable, initialState map[string]bool, problems *problems) map[string]bool {
 	// keep track of the functions that have run so far at each step
 	fullState := initialState
 
@@ -244,9 +260,14 @@ func validateSteps(exType executableType, name string, steps []Executable, initi
 			problems.add(fmt.Errorf("step at position %d for %s %s isn't an Fn, Group, or ForEach", j, exType, name))
 		}
 
-		validateFn := func(fn CallableFn) {
-			if _, exists := fns[fn.Fn]; !exists {
+		// this function is key as it compartmentalizes 'step validation', and importantly it
+		// ensures that a Runnable is available to handle it and binds it by setting the FQFN field
+		validateFn := func(fn *CallableFn) {
+			runnable := d.FindRunnable(fn.Fn)
+			if runnable == nil {
 				problems.add(fmt.Errorf("%s for %s lists fn at step %d that does not exist: %s (did you forget a namespace?)", exType, name, j, fn.Fn))
+			} else {
+				fn.FQFN = runnable.FQFN
 			}
 
 			for _, key := range fn.With {
@@ -289,11 +310,12 @@ func validateSteps(exType executableType, name string, steps []Executable, initi
 			fnsToAdd = append(fnsToAdd, key)
 		}
 
+		// the steps below are referenced by index (j) to ensure the addition of the FQFN in validateFn 'sticks'
 		if s.IsFn() {
-			validateFn(s.CallableFn)
+			validateFn(&steps[j].CallableFn)
 		} else if s.IsGroup() {
-			for _, gfn := range s.Group {
-				validateFn(gfn)
+			for p := range s.Group {
+				validateFn(&steps[j].Group[p])
 			}
 		} else if s.IsForEach() {
 			if s.ForEach.In == "" {
@@ -304,8 +326,8 @@ func validateSteps(exType executableType, name string, steps []Executable, initi
 				problems.add(fmt.Errorf("ForEach at position %d for %s %s is missing 'as' value", j, exType, name))
 			}
 
-			forEachFn := CallableFn{Fn: s.ForEach.Fn, OnErr: s.ForEach.OnErr, As: s.ForEach.As}
-			validateFn(forEachFn)
+			steps[j].ForEach.CallableFn = CallableFn{Fn: s.ForEach.Fn, OnErr: s.ForEach.OnErr, As: s.ForEach.As}
+			validateFn(&s.ForEach.CallableFn)
 		}
 
 		for _, newFn := range fnsToAdd {
@@ -317,23 +339,25 @@ func validateSteps(exType executableType, name string, steps []Executable, initi
 }
 
 func (d *Directive) calculateFQFNs() {
-	d.fqfns = map[string]string{}
-
-	for _, fn := range d.Runnables {
-		namespaced := fmt.Sprintf("%s#%s", fn.Namespace, fn.Name)
-
-		// if the function is in the default namespace, add it to the map both namespaced and not
-		if fn.Namespace == NamespaceDefault {
-			d.fqfns[fn.Name] = d.fqfnForFunc(fn.Namespace, fn.Name)
-			d.fqfns[namespaced] = d.fqfnForFunc(fn.Namespace, fn.Name)
-		} else {
-			d.fqfns[namespaced] = d.fqfnForFunc(fn.Namespace, fn.Name)
+	for i, fn := range d.Runnables {
+		if fn.FQFN != "" {
+			continue
 		}
+
+		if fn.Namespace == "" {
+			fn.Namespace = fqfn.NamespaceDefault
+		}
+
+		if fn.Version == "" {
+			fn.Version = d.AppVersion
+		}
+
+		d.Runnables[i].FQFN = d.fqfnForFunc(fn.Namespace, fn.Name)
 	}
 }
 
 func (d *Directive) fqfnForFunc(namespace, fn string) string {
-	return fmt.Sprintf("%s#%s@%s", namespace, fn, d.AppVersion)
+	return fqfn.FromParts(d.Identifier, namespace, fn, d.AppVersion)
 }
 
 // NumberOfSeconds calculates the total time in seconds for the schedule's 'every' value

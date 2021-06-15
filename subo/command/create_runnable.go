@@ -20,8 +20,23 @@ const (
 	dirFlag             = "dir"
 	namespaceFlag       = "namespace"
 	branchFlag          = "branch"
+	environmentFlag     = "environment"
 	updateTemplatesFlag = "update-templates"
+	headlessFlag        = "headless"
 )
+
+// validLangs are the available languages
+var validLangs = map[string]bool{
+	"rust":           true,
+	"swift":          true,
+	"assemblyscript": true,
+}
+
+// langAliases are aliases for languages
+var langAliases = map[string]string{
+	"typescript": "assemblyscript",
+	"rs":         "rust",
+}
 
 // CreateRunnableCmd returns the build command
 func CreateRunnableCmd() *cobra.Command {
@@ -110,6 +125,14 @@ func CreateRunnableCmd() *cobra.Command {
 }
 
 func writeDotRunnable(cwd, name, lang, namespace string) (*directive.Runnable, error) {
+	if actual, exists := langAliases[lang]; exists {
+		lang = actual
+	}
+
+	if _, valid := validLangs[lang]; !valid {
+		return nil, fmt.Errorf("%s is not an available language", lang)
+	}
+
 	runnable := &directive.Runnable{
 		Name:       name,
 		Lang:       lang,
