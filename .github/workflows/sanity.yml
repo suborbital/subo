@@ -1,0 +1,43 @@
+name: Testapalooza
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ "*" ]
+
+jobs:
+
+  build:
+    strategy:
+        matrix:
+          os: [ubuntu-latest, macos-latest]
+          golang: [1.15, 1.16]
+
+    name: Smoke
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: ${{ matrix.golang }}
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      # - name: Get dependencies
+      #   run: |
+      #     go get ./...
+        
+      - name: Build
+        run: |
+          make subo
+
+      - name: Create project and runnable
+        run: |
+          subo create project smoketest
+          subo create runnable rs-test --lang rust --dir ./smoketest
+          subo create runnable as-test --lang typescript --dir ./smoketest
+          subo create runnable swift-test --lang swift --dir ./smoketest
