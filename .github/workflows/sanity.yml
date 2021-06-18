@@ -42,3 +42,7 @@ jobs:
           subo create runnable rs-test --lang rust --dir ./smoketest
           subo create runnable as-test --lang typescript --dir ./smoketest
           subo create runnable swift-test --lang swift --dir ./smoketest
+      
+      - name: Build project
+        run: |
+          subo build ./smoketest
