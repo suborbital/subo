@@ -38,6 +38,7 @@ jobs:
       - name: Create project and runnable
         run: |
           export PATH=$PATH:$(go env GOPATH)/bin
+          git config --global init.defaultBranch <name>
           subo create project smoketest
           subo create runnable rs-test --lang rust --dir ./smoketest
           subo create runnable as-test --lang typescript --dir ./smoketest
@@ -45,4 +46,5 @@ jobs:
       
       - name: Build project
         run: |
+          export PATH=$PATH:$(go env GOPATH)/bi
           subo build ./smoketest
