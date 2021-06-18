@@ -42,7 +42,7 @@ jobs:
           subo create runnable rs-test --lang rust --dir ./smoketest
           subo create runnable swift-test --lang swift --dir ./smoketest
           subo create runnable as-test --lang typescript --dir ./smoketest
-          # rm -rf ./smoketest/as-test # need to delete because AS building is broken in Docker for some reason
+          rm -rf ./smoketest/as-test # need to delete because AS building is broken in Docker for some reason
       
       - name: Build project
         run: |
