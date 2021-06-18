@@ -11,11 +11,10 @@ jobs:
   build:
     strategy:
         matrix:
-          os: [ubuntu-latest, macos-latest]
           golang: [1.15, 1.16]
 
     name: Smoke
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - name: Set up Go
