@@ -2,8 +2,6 @@ package context
 
 import (
 	"fmt"
-
-	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -48,7 +46,7 @@ func WriteDirective(cwd string, directive *directive.Directive) error {
 		return errors.Wrap(err, "failed to Marshal")
 	}
 
-	if err := ioutil.WriteFile(filePath, directiveBytes, fs.FileMode(os.O_WRONLY)); err != nil {
+	if err := ioutil.WriteFile(filePath, directiveBytes, os.FileMode(os.O_WRONLY)); err != nil {
 		return errors.Wrap(err, "failed to WriteFile")
 	}
 
