@@ -47,5 +47,4 @@ jobs:
       - name: Build project
         run: |
           export PATH=$PATH:$(go env GOPATH)/bin
-          chown -R root ./smoketest
           subo build ./smoketest
