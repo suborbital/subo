@@ -53,10 +53,12 @@ func BuildCmd() *cobra.Command {
 			useNative, _ := cmd.Flags().GetBool("native")
 			makeTarget, _ := cmd.Flags().GetString("make")
 
-			util.LogStart(fmt.Sprintf("make %s", makeTarget))
-			_, _, err = util.Run(fmt.Sprintf("make %s", makeTarget))
-			if err != nil {
-				return errors.Wrapf(err, "🚫 failed to make %s", makeTarget)
+			if makeTarget != "" {
+				util.LogStart(fmt.Sprintf("make %s", makeTarget))
+				_, _, err = util.Run(fmt.Sprintf("make %s", makeTarget))
+				if err != nil {
+					return errors.Wrapf(err, "🚫 failed to make %s", makeTarget)
+				}
 			}
 
 			if useNative {
