@@ -1,0 +1,46 @@
+name: Testapalooza
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ "*" ]
+
+jobs:
+
+  build:
+    strategy:
+        matrix:
+          golang: [1.15, 1.16]
+
+    name: Smoke
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: ${{ matrix.golang }}
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+        
+      - name: Build Subo
+        run: |
+          make subo
+
+      - name: Create project and runnable
+        run: |
+          export PATH=$PATH:$(go env GOPATH)/bin
+          git config --global init.defaultBranch main
+          subo create project smoketest
+          subo create runnable rs-test --lang rust --dir ./smoketest
+          subo create runnable swift-test --lang swift --dir ./smoketest
+          subo create runnable as-test --lang typescript --dir ./smoketest
+          rm -rf ./smoketest/as-test # need to delete because AS building is broken in Docker for some reason
+      
+      - name: Build project
+        run: |
+          export PATH=$PATH:$(go env GOPATH)/bin
+          subo build ./smoketest
