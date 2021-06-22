@@ -51,6 +51,16 @@ func BuildCmd() *cobra.Command {
 			shouldDockerBuild, _ := cmd.Flags().GetBool("docker")
 
 			useNative, _ := cmd.Flags().GetBool("native")
+			makeTarget, _ := cmd.Flags().GetString("make")
+
+			if makeTarget != "" {
+				util.LogStart(fmt.Sprintf("make %s", makeTarget))
+				_, _, err = util.Run(fmt.Sprintf("make %s", makeTarget))
+				if err != nil {
+					return errors.Wrapf(err, "🚫 failed to make %s", makeTarget)
+				}
+			}
+
 			if useNative {
 				util.LogInfo("🔗 using native toolchain")
 			} else {
@@ -152,6 +162,7 @@ func BuildCmd() *cobra.Command {
 
 	cmd.Flags().Bool("no-bundle", false, "if passed, a .wasm.zip bundle will not be generated")
 	cmd.Flags().Bool("native", false, "if passed, build runnables using native toolchain rather than Docker")
+	cmd.Flags().String("make", "", "if passed, execute Make targets as part of a build.")
 	cmd.Flags().Bool("docker", false, "if passed, build your project's Dockerfile. It will be tagged {identifier}:{appVersion}")
 
 	return cmd
