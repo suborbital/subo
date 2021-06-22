@@ -44,25 +44,25 @@ type BundleRef struct {
 	Fullpath string
 }
 
-// CurrentBuildContext returns the build context for the provided working directory
-func CurrentBuildContext(cwd string) (*BuildContext, error) {
-	runnables, cwdIsRunnable, err := getRunnableDirs(cwd)
+// ForDirectory returns the build context for the provided working directory
+func ForDirectory(dir string) (*BuildContext, error) {
+	runnables, cwdIsRunnable, err := getRunnableDirs(dir)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to getRunnableDirs")
 	}
 
-	bundle, err := bundleTargetPath(cwd)
+	bundle, err := bundleTargetPath(dir)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to bundleIfExists")
 	}
 
-	directive, err := readDirectiveFile(cwd)
+	directive, err := readDirectiveFile(dir)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to readDirectiveFile")
 	}
 
 	bctx := &BuildContext{
-		Cwd:           cwd,
+		Cwd:           dir,
 		CwdIsRunnable: cwdIsRunnable,
 		Runnables:     runnables,
 		Bundle:        *bundle,

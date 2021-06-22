@@ -6,7 +6,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"github.com/suborbital/subo/subo/context"
+	"github.com/suborbital/subo/builder/context"
+	"github.com/suborbital/subo/builder/template"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
 )
@@ -34,7 +35,7 @@ func CreateProjectCmd() *cobra.Command {
 				return errors.Wrap(err, "failed to Getwd")
 			}
 
-			bctx, err := context.CurrentBuildContext(cwd)
+			bctx, err := context.ForDirectory(cwd)
 			if err != nil {
 				return errors.Wrap(err, "🚫 failed to get CurrentBuildContext")
 			}
@@ -50,13 +51,13 @@ func CreateProjectCmd() *cobra.Command {
 			environment, _ := cmd.Flags().GetString(environmentFlag)
 			headless, _ := cmd.Flags().GetBool(headlessFlag)
 
-			templatesPath, err := util.TemplateFullPath(branch)
+			templatesPath, err := template.TemplateFullPath(branch)
 			if err != nil {
 				return errors.Wrap(err, "🚫 failed to TemplateFullPath")
 			}
 
 			if update, _ := cmd.Flags().GetBool(updateTemplatesFlag); update {
-				templatesPath, err = util.UpdateTemplates(bctx, name, branch)
+				templatesPath, err = template.UpdateTemplates(bctx, name, branch)
 				if err != nil {
 					return errors.Wrap(err, "🚫 failed to UpdateTemplates")
 				}
@@ -70,15 +71,15 @@ func CreateProjectCmd() *cobra.Command {
 				Headless:    headless,
 			}
 
-			if err := util.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data); err != nil {
+			if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data); err != nil {
 				// if the templates are missing, try updating them and exec again
-				if err == util.ErrTemplateMissing {
-					templatesPath, err = util.UpdateTemplates(bctx, name, branch)
+				if err == template.ErrTemplateMissing {
+					templatesPath, err = template.UpdateTemplates(bctx, name, branch)
 					if err != nil {
 						return errors.Wrap(err, "🚫 failed to UpdateTemplates")
 					}
 
-					if err := util.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data); err != nil {
+					if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data); err != nil {
 						return errors.Wrap(err, "🚫 failed to ExecTmplDir")
 					}
 				} else {

@@ -1,4 +1,4 @@
-package util
+package template
 
 import (
 	"fmt"
@@ -12,22 +12,12 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/suborbital/atmo/directive"
-	"github.com/suborbital/subo/subo/context"
+	"github.com/suborbital/subo/builder/context"
+	"github.com/suborbital/subo/subo/util"
 )
 
 // ErrTemplateMissing and others are template related errors
 var ErrTemplateMissing = errors.New("template missing")
-
-// Mkdir creates a new directory to contain a runnable
-func Mkdir(cwd, name string) (string, error) {
-	path := filepath.Join(cwd, name)
-
-	if err := os.Mkdir(path, 0777); err != nil {
-		return "", errors.Wrap(err, "failed to Mkdir")
-	}
-
-	return path, nil
-}
 
 type tmplData struct {
 	directive.Runnable
@@ -36,7 +26,7 @@ type tmplData struct {
 }
 
 func UpdateTemplates(bctx *context.BuildContext, name, branch string) (string, error) {
-	LogStart("downloading templates")
+	util.LogStart("downloading templates")
 
 	branchDirName := fmt.Sprintf("subo-%s", strings.ReplaceAll(branch, "/", "-"))
 
@@ -56,7 +46,7 @@ func UpdateTemplates(bctx *context.BuildContext, name, branch string) (string, e
 		return "", errors.Wrap(err, "🚫 failed to extractZip for templates")
 	}
 
-	LogDone("templates downloaded")
+	util.LogDone("templates downloaded")
 
 	return tmplPath, nil
 }
@@ -199,7 +189,7 @@ func extractZip(filePath, destPath, branchDirName string) (string, error) {
 		}
 	}
 
-	if _, _, err := Run(fmt.Sprintf("unzip -q %s -d %s", escapedFilepath, escapedDestPath)); err != nil {
+	if _, _, err := util.Run(fmt.Sprintf("unzip -q %s -d %s", escapedFilepath, escapedDestPath)); err != nil {
 		return "", errors.Wrap(err, "failed to Run unzip")
 	}
 
