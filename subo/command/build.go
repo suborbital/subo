@@ -162,7 +162,7 @@ func BuildCmd() *cobra.Command {
 
 	cmd.Flags().Bool("no-bundle", false, "if passed, a .wasm.zip bundle will not be generated")
 	cmd.Flags().Bool("native", false, "if passed, build runnables using native toolchain rather than Docker")
-	cmd.Flags().String("make", "", "if passed, execute Make targets as part of a build.")
+	cmd.Flags().String("make", "", "if passed, execute the provided Make target before building the project bundle")
 	cmd.Flags().Bool("docker", false, "if passed, build your project's Dockerfile. It will be tagged {identifier}:{appVersion}")
 
 	return cmd
