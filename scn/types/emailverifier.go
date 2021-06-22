@@ -1,12 +1,6 @@
-package scn
+package types
 
-import (
-	"net/http"
-	"net/url"
-	"time"
-
-	"github.com/pkg/errors"
-)
+import "time"
 
 // EmailVerifier is an email verification record
 type EmailVerifier struct {
@@ -32,25 +26,4 @@ type CreateEmailVerifierRequest struct {
 // CreateEmailVerifierResponse is a response to a CreateEmailVerifierRequest
 type CreateEmailVerifierResponse struct {
 	Verifier EmailVerifier `json:"verifier"`
-}
-
-// CreateEmailVerifier creates an emailverifier
-func (s *SCN) CreateEmailVerifier(email string) (*EmailVerifier, error) {
-	uri := "/auth/v1/verifier"
-
-	URL, err := url.Parse(s.endpoint + uri)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to url.Parse")
-	}
-
-	req := &CreateEmailVerifierRequest{
-		Email: email,
-	}
-
-	resp := &CreateEmailVerifierResponse{}
-	if err := s.Do(http.MethodPost, URL, req, resp); err != nil {
-		return nil, errors.Wrap(err, "failed to Do")
-	}
-
-	return &resp.Verifier, nil
 }
