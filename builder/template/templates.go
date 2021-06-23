@@ -102,10 +102,6 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 			targetRelPath = builder.String()
 		}
 
-		if info.IsDir() {
-			return os.Mkdir(filepath.Join(targetPath, targetRelPath), 0755)
-		}
-
 		// check if the target path is an existing file, and skip it if so
 		if _, err = os.Stat(filepath.Join(targetPath, targetRelPath)); err != nil {
 			if errors.Is(err, os.ErrNotExist) {
@@ -116,6 +112,10 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 		} else {
 			// if the target file already exists, we're going to skip the rest since we don't want to overwrite
 			return nil
+		}
+
+		if info.IsDir() {
+			return os.Mkdir(filepath.Join(targetPath, targetRelPath), 0755)
 		}
 
 		var data, err1 = ioutil.ReadFile(filepath.Join(templatePath, relPath))
