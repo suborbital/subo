@@ -80,6 +80,16 @@ func (b *Builder) BuildWithToolchain(tcn Toolchain) error {
 	return nil
 }
 
+// Modules returns file references to all of the modules built by this builder
+// returns os.ErrNotExists if none have been built yet.
+func (b *Builder) Modules() ([]os.File, error) {
+	if b.modules == nil || len(b.modules) == 0 {
+		return nil, os.ErrNotExist
+	}
+
+	return b.modules, nil
+}
+
 func (b *Builder) Bundle() error {
 	if b.modules == nil || len(b.modules) == 0 {
 		return errors.New("must build before calling Bundle")
