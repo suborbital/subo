@@ -12,7 +12,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/suborbital/atmo/directive"
-	"github.com/suborbital/subo/builder/context"
 	"github.com/suborbital/subo/subo/util"
 )
 
@@ -25,7 +24,7 @@ type tmplData struct {
 	NameCamel string
 }
 
-func UpdateTemplates(bctx *context.BuildContext, name, branch string) (string, error) {
+func UpdateTemplates(branch string) (string, error) {
 	util.LogStart("downloading templates")
 
 	branchDirName := fmt.Sprintf("subo-%s", strings.ReplaceAll(branch, "/", "-"))
@@ -105,6 +104,18 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 
 		if info.IsDir() {
 			return os.Mkdir(filepath.Join(targetPath, targetRelPath), 0755)
+		}
+
+		// check if the target path is an existing file, and skip it if so
+		if _, err = os.Stat(filepath.Join(targetPath, targetRelPath)); err != nil {
+			if errors.Is(err, os.ErrNotExist) {
+				// that's fine, continue
+			} else {
+				return errors.Wrap(err, "failed to Stat")
+			}
+		} else {
+			// if the target file already exists, we're going to skip the rest since we don't want to overwrite
+			return nil
 		}
 
 		var data, err1 = ioutil.ReadFile(filepath.Join(templatePath, relPath))

@@ -83,7 +83,7 @@ func CreateRunnableCmd() *cobra.Command {
 			}
 
 			if update, _ := cmd.Flags().GetBool(updateTemplatesFlag); update {
-				templatesPath, err = template.UpdateTemplates(bctx, name, branch)
+				templatesPath, err = template.UpdateTemplates(branch)
 				if err != nil {
 					return errors.Wrap(err, "🚫 failed to UpdateTemplates")
 				}
@@ -92,7 +92,7 @@ func CreateRunnableCmd() *cobra.Command {
 			if err := template.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, runnable); err != nil {
 				// if the templates are missing, try updating them and exec again
 				if err == template.ErrTemplateMissing {
-					templatesPath, err = template.UpdateTemplates(bctx, name, branch)
+					templatesPath, err = template.UpdateTemplates(branch)
 					if err != nil {
 						return errors.Wrap(err, "🚫 failed to UpdateTemplates")
 					}
