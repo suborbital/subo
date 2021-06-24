@@ -104,7 +104,7 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 
 		// check if the target path is an existing file, and skip it if so
 		if _, err = os.Stat(filepath.Join(targetPath, targetRelPath)); err != nil {
-			if errors.Is(err, os.ErrNotExist) {
+			if err == os.ErrNotExist {
 				// that's fine, continue
 			} else {
 				return errors.Wrap(err, "failed to Stat")
@@ -115,7 +115,9 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 		}
 
 		if info.IsDir() {
-			return os.Mkdir(filepath.Join(targetPath, targetRelPath), 0755)
+			if err := os.Mkdir(filepath.Join(targetPath, targetRelPath), 0755); err != nil {
+				return errors.Wrap(err, "failed to Mkdir")
+			}
 		}
 
 		var data, err1 = ioutil.ReadFile(filepath.Join(templatePath, relPath))
@@ -137,7 +139,11 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 			data = []byte(builder.String())
 		}
 
-		return ioutil.WriteFile(filepath.Join(targetPath, targetRelPath), data, 0777)
+		if err := ioutil.WriteFile(filepath.Join(targetPath, targetRelPath), data, 0777); err != nil {
+			return errors.Wrap(err, "failed to WriteFile")
+		}
+
+		return nil
 	})
 
 	return err
