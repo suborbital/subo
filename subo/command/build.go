@@ -22,7 +22,7 @@ func BuildCmd() *cobra.Command {
 				dir = args[0]
 			}
 
-			bdr, err := builder.ForDirectory(dir)
+			bdr, err := builder.ForDirectory(&util.PrintLogger{}, dir)
 			if err != nil {
 				return errors.Wrap(err, "failed to builder.ForDirectory")
 			}
@@ -46,7 +46,7 @@ func BuildCmd() *cobra.Command {
 
 			if makeTarget != "" {
 				util.LogStart(fmt.Sprintf("make %s", makeTarget))
-				_, _, err = util.Run(fmt.Sprintf("make %s", makeTarget))
+				_, err = util.Run(fmt.Sprintf("make %s", makeTarget))
 				if err != nil {
 					return errors.Wrapf(err, "🚫 failed to make %s", makeTarget)
 				}
@@ -78,7 +78,7 @@ func BuildCmd() *cobra.Command {
 			if shouldDockerBuild {
 				os.Setenv("DOCKER_BUILDKIT", "0")
 
-				if _, _, err := util.Run(fmt.Sprintf("docker build . -t=%s:%s", bdr.Context.Directive.Identifier, bdr.Context.Directive.AppVersion)); err != nil {
+				if _, err := util.Run(fmt.Sprintf("docker build . -t=%s:%s", bdr.Context.Directive.Identifier, bdr.Context.Directive.AppVersion)); err != nil {
 					return errors.Wrap(err, "🚫 failed to build Docker image")
 				}
 

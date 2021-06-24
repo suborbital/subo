@@ -81,7 +81,7 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 		return errors.Wrap(err, "failed to Stat template directory")
 	}
 
-	var err error = filepath.Walk(templatePath, func(path string, info os.FileInfo, err error) error {
+	var err error = filepath.Walk(templatePath, func(path string, info os.FileInfo, _ error) error {
 		var relPath string = strings.Replace(path, templatePath, "", 1)
 		if relPath == "" {
 			return nil
@@ -103,7 +103,7 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 		}
 
 		// check if the target path is an existing file, and skip it if so
-		if _, err = os.Stat(filepath.Join(targetPath, targetRelPath)); err != nil {
+		if _, err := os.Stat(filepath.Join(targetPath, targetRelPath)); err != nil {
 			if os.IsNotExist(err) {
 				// that's fine, continue
 			} else {
@@ -208,7 +208,7 @@ func extractZip(filePath, destPath, branchDirName string) (string, error) {
 		}
 	}
 
-	if _, _, err := util.Run(fmt.Sprintf("unzip -q %s -d %s", escapedFilepath, escapedDestPath)); err != nil {
+	if _, err := util.Run(fmt.Sprintf("unzip -q %s -d %s", escapedFilepath, escapedDestPath)); err != nil {
 		return "", errors.Wrap(err, "failed to Run unzip")
 	}
 

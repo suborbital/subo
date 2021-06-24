@@ -21,7 +21,16 @@ import (
 // Builder is capable of building Wasm modules from source
 type Builder struct {
 	Context *context.BuildContext
-	modules []os.File
+
+	results []BuildResult
+
+	log util.FriendlyLogger
+}
+
+// BuildResult is the results of a build including the built module and logs
+type BuildResult struct {
+	Module    *os.File
+	OutputLog string
 }
 
 type Toolchain string
@@ -32,7 +41,7 @@ const (
 )
 
 // ForDirectory creates a Builder bound to a particular directory
-func ForDirectory(dir string) (*Builder, error) {
+func ForDirectory(logger util.FriendlyLogger, dir string) (*Builder, error) {
 	ctx, err := context.ForDirectory(dir)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to context.FirDirectory")
@@ -40,6 +49,8 @@ func ForDirectory(dir string) (*Builder, error) {
 
 	b := &Builder{
 		Context: ctx,
+		results: []BuildResult{},
+		log:     logger,
 	}
 
 	return b, nil
@@ -48,50 +59,50 @@ func ForDirectory(dir string) (*Builder, error) {
 func (b *Builder) BuildWithToolchain(tcn Toolchain) error {
 	var err error
 
-	modules := make([]os.File, len(b.Context.Runnables))
+	results := make([]BuildResult, len(b.Context.Runnables))
 
 	for i, r := range b.Context.Runnables {
-		util.LogStart(fmt.Sprintf("building runnable: %s (%s)", r.Name, r.Runnable.Lang))
+		b.log.LogStart(fmt.Sprintf("building runnable: %s (%s)", r.Name, r.Runnable.Lang))
 
-		var file *os.File
+		result := &BuildResult{}
 
 		if tcn == ToolchainNative {
-			if err := checkAndRunPreReqs(r); err != nil {
+			if err := b.checkAndRunPreReqs(r, result); err != nil {
 				return errors.Wrap(err, "🚫 failed to checkAndRunPreReqs")
 			}
 
-			file, err = doNativeBuildForRunnable(r)
+			err = b.doNativeBuildForRunnable(r, result)
 		} else {
-			file, err = doBuildForRunnable(r)
+			err = b.doBuildForRunnable(r, result)
 		}
 
 		if err != nil {
 			return errors.Wrapf(err, "🚫 failed to build %s", r.Name)
 		}
 
-		modules[i] = *file
+		results[i] = *result
 
 		fullWasmFilepath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
-		util.LogDone(fmt.Sprintf("%s was built -> %s", r.Name, fullWasmFilepath))
+		b.log.LogDone(fmt.Sprintf("%s was built -> %s", r.Name, fullWasmFilepath))
 	}
 
-	b.modules = modules
+	b.results = results
 
 	return nil
 }
 
-// Modules returns file references to all of the modules built by this builder
+// Results returns build results for all of the modules built by this builder
 // returns os.ErrNotExists if none have been built yet.
-func (b *Builder) Modules() ([]os.File, error) {
-	if b.modules == nil || len(b.modules) == 0 {
+func (b *Builder) Results() ([]BuildResult, error) {
+	if b.results == nil || len(b.results) == 0 {
 		return nil, os.ErrNotExist
 	}
 
-	return b.modules, nil
+	return b.results, nil
 }
 
 func (b *Builder) Bundle() error {
-	if b.modules == nil || len(b.modules) == 0 {
+	if b.results == nil || len(b.results) == 0 {
 		return errors.New("must build before calling Bundle")
 	}
 
@@ -103,7 +114,7 @@ func (b *Builder) Bundle() error {
 			AtmoVersion: fmt.Sprintf("v%s", release.AtmoVersion),
 		}
 	} else if b.Context.Directive.Headless {
-		util.LogInfo("updating Directive")
+		b.log.LogInfo("updating Directive")
 
 		// bump the appVersion since we're in headless mode
 		majorStr := strings.TrimPrefix(semver.Major(b.Context.Directive.AppVersion), "v")
@@ -131,7 +142,7 @@ func (b *Builder) Bundle() error {
 	}
 
 	if static != nil {
-		util.LogInfo("adding static files to bundle")
+		b.log.LogInfo("adding static files to bundle")
 	}
 
 	directiveBytes, err := b.Context.Directive.Marshal()
@@ -139,54 +150,69 @@ func (b *Builder) Bundle() error {
 		return errors.Wrap(err, "failed to Directive.Marshal")
 	}
 
-	if err := bundle.Write(directiveBytes, b.modules, static, b.Context.Bundle.Fullpath); err != nil {
+	modules := make([]os.File, len(b.results))
+	for i := range b.results {
+		modules[i] = *b.results[i].Module
+	}
+
+	if err := bundle.Write(directiveBytes, modules, static, b.Context.Bundle.Fullpath); err != nil {
 		return errors.Wrap(err, "🚫 failed to WriteBundle")
 	}
 
 	return nil
 }
 
-func doBuildForRunnable(r context.RunnableDir) (*os.File, error) {
+func (b *Builder) doBuildForRunnable(r context.RunnableDir, result *BuildResult) error {
 	img := r.BuildImage
 	if img == "" {
-		return nil, fmt.Errorf("%q is not a supported language", r.Runnable.Lang)
+		return fmt.Errorf("%q is not a supported language", r.Runnable.Lang)
 	}
 
-	_, _, err := util.Run(fmt.Sprintf("docker run --rm --mount type=bind,source=%s,target=/root/runnable %s", r.Fullpath, img))
+	outputLog, err := util.Run(fmt.Sprintf("docker run --rm --mount type=bind,source=%s,target=/root/runnable %s", r.Fullpath, img))
+
+	result.OutputLog = outputLog
+
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to Run docker command")
+		return errors.Wrap(err, "failed to Run docker command")
 	}
 
 	targetPath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
 
 	file, err := os.Open(targetPath)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to open resulting built file %s", targetPath)
+		return errors.Wrapf(err, "failed to open resulting built file %s", targetPath)
 	}
 
-	return file, nil
+	result.Module = file
+
+	return nil
 }
 
-func doNativeBuildForRunnable(r context.RunnableDir) (*os.File, error) {
+// results and resulting file are loaded into the BuildResult pointer
+func (b *Builder) doNativeBuildForRunnable(r context.RunnableDir, result *BuildResult) error {
 	cmds, err := context.NativeBuildCommands(r.Runnable.Lang)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to NativeBuildCommands")
+		return errors.Wrap(err, "failed to NativeBuildCommands")
 	}
 
 	for _, cmd := range cmds {
 		cmdTmpl, err := template.New("cmd").Parse(cmd)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to Parse command template")
+			return errors.Wrap(err, "failed to Parse command template")
 		}
 
 		fullCmd := &strings.Builder{}
 		if err := cmdTmpl.Execute(fullCmd, r); err != nil {
-			return nil, errors.Wrap(err, "failed to Execute command template")
+			return errors.Wrap(err, "failed to Execute command template")
 		}
 
-		_, _, err = util.RunInDir(fullCmd.String(), r.Fullpath)
+		// Even if the command fails, still load the output into the result object
+		outputLog, err := util.RunInDir(fullCmd.String(), r.Fullpath)
+
+		result.OutputLog += outputLog + "\n"
+
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to RunInDir")
+			return errors.Wrap(err, "failed to RunInDir")
 		}
 	}
 
@@ -194,13 +220,15 @@ func doNativeBuildForRunnable(r context.RunnableDir) (*os.File, error) {
 
 	file, err := os.Open(targetPath)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to open resulting built file %s", targetPath)
+		return errors.Wrapf(err, "failed to open resulting built file %s", targetPath)
 	}
 
-	return file, nil
+	result.Module = file
+
+	return nil
 }
 
-func checkAndRunPreReqs(runnable context.RunnableDir) error {
+func (b *Builder) checkAndRunPreReqs(runnable context.RunnableDir, result *BuildResult) error {
 	preReqLangs, ok := context.PreRequisiteCommands[runtime.GOOS]
 	if !ok {
 		return fmt.Errorf("unsupported OS: %s", runtime.GOOS)
@@ -216,14 +244,17 @@ func checkAndRunPreReqs(runnable context.RunnableDir) error {
 
 		if _, err := os.Stat(filepath); err != nil {
 			if errors.Is(err, os.ErrNotExist) {
-				util.LogStart(fmt.Sprintf("missing %s, fixing...", p.File))
+				b.log.LogStart(fmt.Sprintf("missing %s, fixing...", p.File))
 
-				_, _, err := util.RunInDir(p.Command, runnable.Fullpath)
+				outputLog, err := util.RunInDir(p.Command, runnable.Fullpath)
+
+				result.OutputLog += outputLog + "\n"
+
 				if err != nil {
 					return errors.Wrapf(err, "failed to Run prerequisite: %s", p.Command)
 				}
 
-				util.LogDone("fixed!")
+				b.log.LogDone("fixed!")
 			}
 		}
 	}

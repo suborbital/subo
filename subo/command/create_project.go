@@ -89,7 +89,7 @@ func CreateProjectCmd() *cobra.Command {
 
 			util.LogDone(path)
 
-			if _, _, err := util.Run(fmt.Sprintf("git init ./%s", name)); err != nil {
+			if _, err := util.Run(fmt.Sprintf("git init ./%s", name)); err != nil {
 				return errors.Wrap(err, "🚫 failed to initialize Run git init")
 			}
 
