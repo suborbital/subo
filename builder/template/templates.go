@@ -118,6 +118,8 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 			if err := os.Mkdir(filepath.Join(targetPath, targetRelPath), 0755); err != nil {
 				return errors.Wrap(err, "failed to Mkdir")
 			}
+
+			return nil
 		}
 
 		var data, err1 = ioutil.ReadFile(filepath.Join(templatePath, relPath))
