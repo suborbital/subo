@@ -104,7 +104,7 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 
 		// check if the target path is an existing file, and skip it if so
 		if _, err = os.Stat(filepath.Join(targetPath, targetRelPath)); err != nil {
-			if err == os.ErrNotExist {
+			if os.IsNotExist(err) {
 				// that's fine, continue
 			} else {
 				return errors.Wrap(err, "failed to Stat")
