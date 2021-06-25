@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"github.com/suborbital/subo/subo/context"
+	"github.com/suborbital/subo/builder/context"
 	"github.com/suborbital/subo/subo/util"
 )
 
@@ -22,7 +22,7 @@ func DevCmd() *cobra.Command {
 				cwd = "$HOME"
 			}
 
-			bctx, err := context.CurrentBuildContext(cwd)
+			bctx, err := context.ForDirectory(cwd)
 			if err != nil {
 				return errors.Wrap(err, "failed to get CurrentBuildContext")
 			}
@@ -33,7 +33,7 @@ func DevCmd() *cobra.Command {
 
 			port, _ := cmd.Flags().GetString("port")
 
-			_, _, err = util.Run(fmt.Sprintf("docker run -v=%s:/home/atmo -e=ATMO_HTTP_PORT=%s -p=%s:%s suborbital/atmo:%s atmo", bctx.Cwd, port, port, port, bctx.AtmoVersion))
+			_, err = util.Run(fmt.Sprintf("docker run -v=%s:/home/atmo -e=ATMO_HTTP_PORT=%s -p=%s:%s suborbital/atmo:%s atmo", bctx.Cwd, port, port, port, bctx.AtmoVersion))
 			if err != nil {
 				return errors.Wrap(err, "🚫 failed to run dev server")
 			}

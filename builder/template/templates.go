@@ -1,4 +1,4 @@
-package util
+package template
 
 import (
 	"fmt"
@@ -12,22 +12,11 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/suborbital/atmo/directive"
-	"github.com/suborbital/subo/subo/context"
+	"github.com/suborbital/subo/subo/util"
 )
 
 // ErrTemplateMissing and others are template related errors
 var ErrTemplateMissing = errors.New("template missing")
-
-// Mkdir creates a new directory to contain a runnable
-func Mkdir(cwd, name string) (string, error) {
-	path := filepath.Join(cwd, name)
-
-	if err := os.Mkdir(path, 0777); err != nil {
-		return "", errors.Wrap(err, "failed to Mkdir")
-	}
-
-	return path, nil
-}
 
 type tmplData struct {
 	directive.Runnable
@@ -35,8 +24,8 @@ type tmplData struct {
 	NameCamel string
 }
 
-func UpdateTemplates(bctx *context.BuildContext, name, branch string) (string, error) {
-	LogStart("downloading templates")
+func UpdateTemplates(branch string) (string, error) {
+	util.LogStart("downloading templates")
 
 	branchDirName := fmt.Sprintf("subo-%s", strings.ReplaceAll(branch, "/", "-"))
 
@@ -56,7 +45,7 @@ func UpdateTemplates(bctx *context.BuildContext, name, branch string) (string, e
 		return "", errors.Wrap(err, "🚫 failed to extractZip for templates")
 	}
 
-	LogDone("templates downloaded")
+	util.LogDone("templates downloaded")
 
 	return tmplPath, nil
 }
@@ -92,7 +81,7 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 		return errors.Wrap(err, "failed to Stat template directory")
 	}
 
-	var err error = filepath.Walk(templatePath, func(path string, info os.FileInfo, err error) error {
+	var err error = filepath.Walk(templatePath, func(path string, info os.FileInfo, _ error) error {
 		var relPath string = strings.Replace(path, templatePath, "", 1)
 		if relPath == "" {
 			return nil
@@ -113,8 +102,24 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 			targetRelPath = builder.String()
 		}
 
+		// check if the target path is an existing file, and skip it if so
+		if _, err := os.Stat(filepath.Join(targetPath, targetRelPath)); err != nil {
+			if os.IsNotExist(err) {
+				// that's fine, continue
+			} else {
+				return errors.Wrap(err, "failed to Stat")
+			}
+		} else {
+			// if the target file already exists, we're going to skip the rest since we don't want to overwrite
+			return nil
+		}
+
 		if info.IsDir() {
-			return os.Mkdir(filepath.Join(targetPath, targetRelPath), 0755)
+			if err := os.Mkdir(filepath.Join(targetPath, targetRelPath), 0755); err != nil {
+				return errors.Wrap(err, "failed to Mkdir")
+			}
+
+			return nil
 		}
 
 		var data, err1 = ioutil.ReadFile(filepath.Join(templatePath, relPath))
@@ -136,7 +141,11 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 			data = []byte(builder.String())
 		}
 
-		return ioutil.WriteFile(filepath.Join(targetPath, targetRelPath), data, 0777)
+		if err := ioutil.WriteFile(filepath.Join(targetPath, targetRelPath), data, 0777); err != nil {
+			return errors.Wrap(err, "failed to WriteFile")
+		}
+
+		return nil
 	})
 
 	return err
@@ -199,7 +208,7 @@ func extractZip(filePath, destPath, branchDirName string) (string, error) {
 		}
 	}
 
-	if _, _, err := Run(fmt.Sprintf("unzip -q %s -d %s", escapedFilepath, escapedDestPath)); err != nil {
+	if _, err := util.Run(fmt.Sprintf("unzip -q %s -d %s", escapedFilepath, escapedDestPath)); err != nil {
 		return "", errors.Wrap(err, "failed to Run unzip")
 	}
 

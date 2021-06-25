@@ -9,7 +9,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/suborbital/atmo/directive"
-	"github.com/suborbital/subo/subo/context"
+	"github.com/suborbital/subo/builder/context"
+	"github.com/suborbital/subo/builder/template"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
 	"gopkg.in/yaml.v2"
@@ -49,7 +50,7 @@ func CreateRunnableCmd() *cobra.Command {
 			name := args[0]
 
 			dir, _ := cmd.Flags().GetString(dirFlag)
-			bctx, err := context.CurrentBuildContext(dir)
+			bctx, err := context.ForDirectory(dir)
 			if err != nil {
 				return errors.Wrap(err, "🚫 failed to get CurrentBuildContext")
 			}
@@ -76,27 +77,27 @@ func CreateRunnableCmd() *cobra.Command {
 
 			branch, _ := cmd.Flags().GetString(branchFlag)
 
-			templatesPath, err := util.TemplateFullPath(branch)
+			templatesPath, err := template.TemplateFullPath(branch)
 			if err != nil {
 				return errors.Wrap(err, "failed to TemplateDir")
 			}
 
 			if update, _ := cmd.Flags().GetBool(updateTemplatesFlag); update {
-				templatesPath, err = util.UpdateTemplates(bctx, name, branch)
+				templatesPath, err = template.UpdateTemplates(branch)
 				if err != nil {
 					return errors.Wrap(err, "🚫 failed to UpdateTemplates")
 				}
 			}
 
-			if err := util.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, runnable); err != nil {
+			if err := template.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, runnable); err != nil {
 				// if the templates are missing, try updating them and exec again
-				if err == util.ErrTemplateMissing {
-					templatesPath, err = util.UpdateTemplates(bctx, name, branch)
+				if err == template.ErrTemplateMissing {
+					templatesPath, err = template.UpdateTemplates(branch)
 					if err != nil {
 						return errors.Wrap(err, "🚫 failed to UpdateTemplates")
 					}
 
-					if err := util.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, runnable); err != nil {
+					if err := template.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, runnable); err != nil {
 						return errors.Wrap(err, "🚫 failed to ExecTmplDir")
 					}
 				} else {

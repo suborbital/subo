@@ -92,7 +92,7 @@ func CreateReleaseCmd() *cobra.Command {
 			for _, target := range dotSubo.PreMakeTargets {
 				targetWithVersion := strings.Replace(target, "{{ .Version }}", newVersion, -1)
 
-				if _, _, err := util.Run(fmt.Sprintf("make %s", targetWithVersion)); err != nil {
+				if _, err := util.Run(fmt.Sprintf("make %s", targetWithVersion)); err != nil {
 					return errors.Wrapf(err, "failed to run preMakeTarget %s", target)
 				}
 			}
@@ -107,7 +107,7 @@ func CreateReleaseCmd() *cobra.Command {
 			util.LogStart("creating release")
 
 			// ensure the local changes are pushed, create the release, and then pull down the new tag
-			if _, _, err := util.Run("git push"); err != nil {
+			if _, err := util.Run("git push"); err != nil {
 				return errors.Wrap(err, "failed to Run git push")
 			}
 
@@ -116,11 +116,11 @@ func CreateReleaseCmd() *cobra.Command {
 				ghCommand += " --prerelease"
 			}
 
-			if _, _, err := util.Run(ghCommand); err != nil {
+			if _, err := util.Run(ghCommand); err != nil {
 				return errors.Wrap(err, "failed to Run gh command")
 			}
 
-			if _, _, err := util.Run("git pull --tags"); err != nil {
+			if _, err := util.Run("git pull --tags"); err != nil {
 				return errors.Wrap(err, "failed to Run git pull command")
 			}
 
@@ -131,7 +131,7 @@ func CreateReleaseCmd() *cobra.Command {
 			for _, target := range dotSubo.PostMakeTargets {
 				targetWithVersion := strings.Replace(target, "{{ .Version }}", newVersion, -1)
 
-				if _, _, err := util.Run(fmt.Sprintf("make %s", targetWithVersion)); err != nil {
+				if _, err := util.Run(fmt.Sprintf("make %s", targetWithVersion)); err != nil {
 					return errors.Wrapf(err, "failed to run postMakeTarget %s", target)
 				}
 			}
@@ -183,13 +183,13 @@ func checkChangelogFileExists(filePath string) error {
 }
 
 func checkGitCleanliness() error {
-	if out, _, err := util.Run("git diff-index --name-only HEAD"); err != nil {
+	if out, err := util.Run("git diff-index --name-only HEAD"); err != nil {
 		return errors.Wrap(err, "failed to git diff-index")
 	} else if out != "" {
 		return errors.New("project has modified files")
 	}
 
-	if out, _, err := util.Run("git ls-files --exclude-standard --others"); err != nil {
+	if out, err := util.Run("git ls-files --exclude-standard --others"); err != nil {
 		return errors.Wrap(err, "failed to git ls-files")
 	} else if out != "" {
 		return errors.New("project has untracked files")
@@ -201,7 +201,7 @@ func checkGitCleanliness() error {
 func ensureCorrectGitBranch(version string) (string, error) {
 	expectedBranch := fmt.Sprintf("rc-%s", version)
 
-	branch, _, err := util.Run("git branch --show-current")
+	branch, err := util.Run("git branch --show-current")
 	if err != nil {
 		return "", errors.Wrap(err, "failed to Run git branch")
 	}

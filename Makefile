@@ -1,3 +1,5 @@
+include ./builder/builder.mk
+
 subo:
 	go install ./subo
 
@@ -5,27 +7,10 @@ subo/dev:
 	go install -tags=development ./subo
 
 subo/docker:
-	docker build . -t subo:dev
+	docker build . -t suborbital/subo:dev
 
-builder/rs:
-	@$(MAKE) --no-print-directory -C builders/rust $@
-
-builder/rs/%:
-	@$(MAKE) --no-print-directory -C builders/rust $@
-
-builder/swift:
-	@$(MAKE) --no-print-directory -C builders/swift $@
-
-builder/swift/%:
-	@$(MAKE) --no-print-directory -C builders/swift $@
-
-builder/as:
-	@$(MAKE) --no-print-directory -C builders/assemblyscript $@
-
-builder/as/%:
-	@$(MAKE) --no-print-directory -C builders/assemblyscript $@
-
-builders/publish: builder/rs/publish builder/swift/publish builder/as/publish
+subo/docker/publish:
+	docker buildx build . --platform linux/amd64,linux/arm64 -t suborbital/subo:dev --push
 
 mod/replace/atmo:
 	go mod edit -replace github.com/suborbital/atmo=$(HOME)/Workspaces/suborbital/atmo
