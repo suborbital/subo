@@ -2,6 +2,7 @@ package types
 
 // HeartbeatRequest is a request to send heartbeat data
 type HeartbeatRequest struct {
+	Version   string         `json:"version"`
 	Runnables *RunnableStats `json:"runnables"`
 }
 
