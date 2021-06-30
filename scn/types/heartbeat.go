@@ -8,4 +8,5 @@ type HeartbeatRequest struct {
 // RunnableStats are stats about runnables
 type RunnableStats struct {
 	TotalCount int `json:"totalCount"`
+	IdentCount int `json:"identCount"`
 }
