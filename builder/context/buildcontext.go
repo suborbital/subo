@@ -3,7 +3,6 @@ package context
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/suborbital/atmo/directive"
 	"github.com/suborbital/subo/subo/release"
+	"github.com/suborbital/subo/subo/util"
 	"gopkg.in/yaml.v2"
 )
 
@@ -117,7 +117,7 @@ func getRunnableDirs(cwd string) ([]RunnableDir, bool, error) {
 		// determine if a .runnable file exists in that dir
 		innerFiles, err := ioutil.ReadDir(dirPath)
 		if err != nil {
-			log.Printf("couldn't read files in %v", dirPath)
+			util.LogWarn(fmt.Sprintf("couldn't read files in %v", dirPath))
 			continue
 		}
 
