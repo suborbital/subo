@@ -52,5 +52,5 @@ func LogFail(msg string) {
 
 // LogWarn logs a warning from something
 func LogWarn(msg string) {
-	Log(fmt.Sprintf("⚠️ FAILED: %s", msg))
+	Log(fmt.Sprintf("⚠️ WARNING: %s", msg))
 }
