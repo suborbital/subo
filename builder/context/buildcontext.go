@@ -3,6 +3,7 @@ package context
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -116,7 +117,8 @@ func getRunnableDirs(cwd string) ([]RunnableDir, bool, error) {
 		// determine if a .runnable file exists in that dir
 		innerFiles, err := ioutil.ReadDir(dirPath)
 		if err != nil {
-			return nil, false, errors.Wrapf(err, "failed to list files in %s", tf.Name())
+			log.Printf("couldn't read files in %v", dirPath)
+			continue
 		}
 
 		runnableDir, err := getRunnableFromFiles(dirPath, innerFiles)
