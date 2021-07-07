@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/suborbital/atmo/directive"
 	"github.com/suborbital/subo/subo/release"
+	"github.com/suborbital/subo/subo/util"
 	"gopkg.in/yaml.v2"
 )
 
@@ -116,7 +117,8 @@ func getRunnableDirs(cwd string) ([]RunnableDir, bool, error) {
 		// determine if a .runnable file exists in that dir
 		innerFiles, err := ioutil.ReadDir(dirPath)
 		if err != nil {
-			return nil, false, errors.Wrapf(err, "failed to list files in %s", tf.Name())
+			util.LogWarn(fmt.Sprintf("couldn't read files in %v", dirPath))
+			continue
 		}
 
 		runnableDir, err := getRunnableFromFiles(dirPath, innerFiles)
