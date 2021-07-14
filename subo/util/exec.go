@@ -44,12 +44,13 @@ func RunInDir(cmd, dir string) (string, error) {
 	command.Stdout = io.MultiWriter(os.Stdout, &outBuf)
 	command.Stderr = io.MultiWriter(os.Stderr, &outBuf)
 
-	err := command.Run()
-	if err != nil {
-		return "", errors.Wrap(err, "failed to Run command")
-	}
+	runErr := command.Run()
 
 	outStr := outBuf.String()
+
+	if runErr != nil {
+		return outStr, errors.Wrap(runErr, "failed to Run command")
+	}
 
 	return outStr, nil
 }
