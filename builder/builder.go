@@ -29,8 +29,9 @@ type Builder struct {
 
 // BuildResult is the results of a build including the built module and logs
 type BuildResult struct {
-	Module    *os.File
+	Succeeded bool
 	OutputLog string
+	Module    *os.File
 }
 
 type Toolchain string
@@ -173,8 +174,11 @@ func (b *Builder) doBuildForRunnable(r context.RunnableDir, result *BuildResult)
 	result.OutputLog = outputLog
 
 	if err != nil {
+		result.Succeeded = false
 		return errors.Wrap(err, "failed to Run docker command")
 	}
+
+	result.Succeeded = true
 
 	targetPath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
 
@@ -212,8 +216,11 @@ func (b *Builder) doNativeBuildForRunnable(r context.RunnableDir, result *BuildR
 		result.OutputLog += outputLog + "\n"
 
 		if err != nil {
+			result.Succeeded = false
 			return errors.Wrap(err, "failed to RunInDir")
 		}
+
+		result.Succeeded = true
 	}
 
 	targetPath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
