@@ -21,6 +21,7 @@ const (
 	dirFlag             = "dir"
 	namespaceFlag       = "namespace"
 	branchFlag          = "branch"
+	repoFlag            = "repo"
 	environmentFlag     = "environment"
 	updateTemplatesFlag = "update-templates"
 	headlessFlag        = "headless"
@@ -49,6 +50,11 @@ func CreateRunnableCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0]
 
+			namespace, _ := cmd.Flags().GetString(namespaceFlag)
+			lang, _ := cmd.Flags().GetString(langFlag)
+			repo, _ := cmd.Flags().GetString(repoFlag)
+			branch, _ := cmd.Flags().GetString(branchFlag)
+
 			dir, _ := cmd.Flags().GetString(dirFlag)
 			bctx, err := context.ForDirectory(dir)
 			if err != nil {
@@ -59,8 +65,6 @@ func CreateRunnableCmd() *cobra.Command {
 				return fmt.Errorf("🚫 runnable %s already exists", name)
 			}
 
-			lang, _ := cmd.Flags().GetString(langFlag)
-
 			util.LogStart(fmt.Sprintf("creating runnable %s", name))
 
 			path, err := util.Mkdir(bctx.Cwd, name)
@@ -68,22 +72,18 @@ func CreateRunnableCmd() *cobra.Command {
 				return errors.Wrap(err, "🚫 failed to Mkdir")
 			}
 
-			namespace, _ := cmd.Flags().GetString(namespaceFlag)
-
 			runnable, err := writeDotRunnable(bctx.Cwd, name, lang, namespace)
 			if err != nil {
 				return errors.Wrap(err, "🚫 failed to writeDotHive")
 			}
 
-			branch, _ := cmd.Flags().GetString(branchFlag)
-
-			templatesPath, err := template.TemplateFullPath(branch)
+			templatesPath, err := template.TemplateFullPath(repo, branch)
 			if err != nil {
 				return errors.Wrap(err, "failed to TemplateDir")
 			}
 
 			if update, _ := cmd.Flags().GetBool(updateTemplatesFlag); update {
-				templatesPath, err = template.UpdateTemplates(branch)
+				templatesPath, err = template.UpdateTemplates(repo, branch)
 				if err != nil {
 					return errors.Wrap(err, "🚫 failed to UpdateTemplates")
 				}
@@ -92,7 +92,7 @@ func CreateRunnableCmd() *cobra.Command {
 			if err := template.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, runnable); err != nil {
 				// if the templates are missing, try updating them and exec again
 				if err == template.ErrTemplateMissing {
-					templatesPath, err = template.UpdateTemplates(branch)
+					templatesPath, err = template.UpdateTemplates(repo, branch)
 					if err != nil {
 						return errors.Wrap(err, "🚫 failed to UpdateTemplates")
 					}
@@ -119,6 +119,7 @@ func CreateRunnableCmd() *cobra.Command {
 	cmd.Flags().String(dirFlag, cwd, "the directory to put the new runnable in")
 	cmd.Flags().String(langFlag, "rust", "the language of the new runnable")
 	cmd.Flags().String(namespaceFlag, "default", "the namespace for the new runnable")
+	cmd.Flags().String(repoFlag, "suborbital/subo", "git repo to download templates from")
 	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
 	cmd.Flags().Bool(updateTemplatesFlag, false, "update with the newest runnable templates")
 

@@ -12,6 +12,10 @@ import (
 	"github.com/suborbital/subo/subo/util"
 )
 
+const (
+	defaultRepo = "suborbital/subo"
+)
+
 type projectData struct {
 	Name        string
 	Environment string
@@ -51,13 +55,13 @@ func CreateProjectCmd() *cobra.Command {
 			environment, _ := cmd.Flags().GetString(environmentFlag)
 			headless, _ := cmd.Flags().GetBool(headlessFlag)
 
-			templatesPath, err := template.TemplateFullPath(branch)
+			templatesPath, err := template.TemplateFullPath(defaultRepo, branch)
 			if err != nil {
 				return errors.Wrap(err, "🚫 failed to TemplateFullPath")
 			}
 
 			if update, _ := cmd.Flags().GetBool(updateTemplatesFlag); update {
-				templatesPath, err = template.UpdateTemplates(branch)
+				templatesPath, err = template.UpdateTemplates(defaultRepo, branch)
 				if err != nil {
 					return errors.Wrap(err, "🚫 failed to UpdateTemplates")
 				}
@@ -74,7 +78,7 @@ func CreateProjectCmd() *cobra.Command {
 			if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data); err != nil {
 				// if the templates are missing, try updating them and exec again
 				if err == template.ErrTemplateMissing {
-					templatesPath, err = template.UpdateTemplates(branch)
+					templatesPath, err = template.UpdateTemplates(defaultRepo, branch)
 					if err != nil {
 						return errors.Wrap(err, "🚫 failed to UpdateTemplates")
 					}

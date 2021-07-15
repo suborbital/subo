@@ -24,17 +24,24 @@ type tmplData struct {
 	NameCamel string
 }
 
-func UpdateTemplates(branch string) (string, error) {
+func UpdateTemplates(repo, branch string) (string, error) {
 	util.LogStart("downloading templates")
 
-	branchDirName := fmt.Sprintf("subo-%s", strings.ReplaceAll(branch, "/", "-"))
+	repoParts := strings.Split(repo, "/")
+	if len(repoParts) != 2 {
+		return "", fmt.Errorf("repo is invalid, contains %d parts", len(repoParts))
+	}
+
+	repoName := repoParts[1]
+
+	branchDirName := fmt.Sprintf("%s-%s", repoName, strings.ReplaceAll(branch, "/", "-"))
 
 	templateRootPath, err := TemplateRootDir()
 	if err != nil {
 		return "", errors.Wrap(err, "failed to TemplateDir")
 	}
 
-	filepath, err := downloadZip(branch, templateRootPath)
+	filepath, err := downloadZip(repo, branch, templateRootPath)
 	if err != nil {
 		return "", errors.Wrap(err, "🚫 failed to downloadZip for templates")
 	}
@@ -152,8 +159,8 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 }
 
 // downloadZip downloads a ZIP from a particular branch of the Subo repo
-func downloadZip(branch, targetPath string) (string, error) {
-	url := fmt.Sprintf("https://github.com/suborbital/subo/archive/%s.zip", branch)
+func downloadZip(repo, branch, targetPath string) (string, error) {
+	url := fmt.Sprintf("https://github.com/%s/archive/%s.zip", repo, branch)
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {

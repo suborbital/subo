@@ -9,13 +9,20 @@ import (
 	"github.com/pkg/errors"
 )
 
-func TemplateFullPath(branch string) (string, error) {
+func TemplateFullPath(repo, branch string) (string, error) {
+	repoParts := strings.Split(repo, "/")
+	if len(repoParts) != 2 {
+		return "", fmt.Errorf("repo is invalid, contains %d parts", len(repoParts))
+	}
+
+	repoName := repoParts[1]
+
 	root, err := TemplateRootDir()
 	if err != nil {
 		return "", errors.Wrap(err, "failed to TemplateRootDir")
 	}
 
-	return filepath.Join(root, fmt.Sprintf("subo-%s", strings.ReplaceAll(branch, "/", "-")), "templates"), nil
+	return filepath.Join(root, fmt.Sprintf("%s-%s", repoName, strings.ReplaceAll(branch, "/", "-")), "templates"), nil
 }
 
 // TemplateRootDir gets the template directory for subo and ensures it exists
