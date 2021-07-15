@@ -29,8 +29,9 @@ type Builder struct {
 
 // BuildResult is the results of a build including the built module and logs
 type BuildResult struct {
-	Module    *os.File
+	Succeeded bool
 	OutputLog string
+	Module    *os.File
 }
 
 type Toolchain string
@@ -59,7 +60,7 @@ func ForDirectory(logger util.FriendlyLogger, dir string) (*Builder, error) {
 func (b *Builder) BuildWithToolchain(tcn Toolchain) error {
 	var err error
 
-	results := make([]BuildResult, len(b.Context.Runnables))
+	b.results = make([]BuildResult, len(b.Context.Runnables))
 
 	for i, r := range b.Context.Runnables {
 		b.log.LogStart(fmt.Sprintf("building runnable: %s (%s)", r.Name, r.Runnable.Lang))
@@ -76,17 +77,17 @@ func (b *Builder) BuildWithToolchain(tcn Toolchain) error {
 			err = b.doBuildForRunnable(r, result)
 		}
 
+		// even if there was a failure, load the result into the builder
+		// since the logs of the failed build are useful
+		b.results[i] = *result
+
 		if err != nil {
 			return errors.Wrapf(err, "🚫 failed to build %s", r.Name)
 		}
 
-		results[i] = *result
-
 		fullWasmFilepath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
 		b.log.LogDone(fmt.Sprintf("%s was built -> %s", r.Name, fullWasmFilepath))
 	}
-
-	b.results = results
 
 	return nil
 }
@@ -173,8 +174,11 @@ func (b *Builder) doBuildForRunnable(r context.RunnableDir, result *BuildResult)
 	result.OutputLog = outputLog
 
 	if err != nil {
+		result.Succeeded = false
 		return errors.Wrap(err, "failed to Run docker command")
 	}
+
+	result.Succeeded = true
 
 	targetPath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
 
@@ -212,8 +216,11 @@ func (b *Builder) doNativeBuildForRunnable(r context.RunnableDir, result *BuildR
 		result.OutputLog += outputLog + "\n"
 
 		if err != nil {
+			result.Succeeded = false
 			return errors.Wrap(err, "failed to RunInDir")
 		}
+
+		result.Succeeded = true
 	}
 
 	targetPath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
