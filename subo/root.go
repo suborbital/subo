@@ -61,8 +61,16 @@ func computeCommand() *cobra.Command {
 	}
 
 	create.AddCommand(command.ComputeCreateTokenCommand())
-
 	compute.AddCommand(create)
+
+	deploy := &cobra.Command{
+		Use:   "deploy",
+		Short: "deploy compute network resources",
+		Long:  `deploy Suborbital Compute Network resources`,
+	}
+
+	deploy.AddCommand(command.ComputeDeployCoreCommand())
+	compute.AddCommand(deploy)
 
 	return compute
 }
