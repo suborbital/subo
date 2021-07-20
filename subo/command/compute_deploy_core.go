@@ -3,6 +3,8 @@ package command
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -24,9 +26,12 @@ func ComputeDeployCoreCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "core",
 		Short: "deploy the Suborbital Compute Core",
-		Long:  `deploy the Suborbital Compute core using Kubernetes or Docker Compose`,
-		Args:  cobra.ExactArgs(1),
+		Long:  `deploy the Suborbital Compute Core using Kubernetes or Docker Compose`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := introAcceptance(); err != nil {
+				return err
+			}
+
 			cwd, err := os.Getwd()
 			if err != nil {
 				return errors.Wrap(err, "failed to Getwd")
@@ -38,6 +43,13 @@ func ComputeDeployCoreCommand() *cobra.Command {
 			}
 
 			util.LogStart("preparing deployment")
+
+			// start with a clean slate
+			if _, err := os.Stat(filepath.Join(bctx.Cwd, ".suborbital")); err == nil {
+				if err := os.RemoveAll(filepath.Join(bctx.Cwd, ".suborbital")); err != nil {
+					return errors.Wrap(err, "failed to RemoveAll")
+				}
+			}
 
 			_, err = util.Mkdir(bctx.Cwd, ".suborbital")
 			if err != nil {
@@ -84,13 +96,17 @@ func ComputeDeployCoreCommand() *cobra.Command {
 			if !dryRun {
 				util.LogStart("installing...")
 
+				// we don't care if this fails, so don't check error
+				util.Run("kubectl create ns suborbital")
+
 				if _, err := util.Run("kubectl apply -f .suborbital/"); err != nil {
 					return errors.Wrap(err, "🚫 failed to kubectl apply")
 				}
 
 				util.LogDone("installation complete!")
+				util.LogInfo("use `kubectl get pods -n suborbital` and `kubectl get svc -n suborbital` to check deployment status")
 			} else {
-				util.LogInfo("aborting due to dry-run")
+				util.LogInfo("aborting due to dry-run, manifest files left in .suborbital")
 			}
 
 			return nil
@@ -103,9 +119,38 @@ func ComputeDeployCoreCommand() *cobra.Command {
 	return cmd
 }
 
+func introAcceptance() error {
+	fmt.Print(`
+Suborbital Compute Core Installer
+
+BEFORE YOU CONTINUE:
+	- You must first run "subo compute create token <email>" to get an environment token
+
+	- You must have kubectl installed in PATH, and it must be connected to the cluster you'd like to use
+
+	- You must be able to set up DNS records for the builder service after this installation completes
+			- Choose the DNS name you'd like to use before continuing, e.g. builder.acmeco.com
+
+	- You must know the correct Kubernetes storage class for your cluster (this varies by cloud provider)
+		- See the Flight Deck documentation for more details
+
+Are you ready to continue? (y/N): `)
+
+	answer, err := input.ReadStdinString()
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadStdinString")
+	}
+
+	if !strings.EqualFold(answer, "y") {
+		return errors.New("aborting")
+	}
+
+	return nil
+}
+
 // getEnvToken gets the environment token from stdin
 func getEnvToken() (string, error) {
-	fmt.Print("Enter your environment token:")
+	fmt.Print("Enter your environment token: ")
 	token, err := input.ReadStdinString()
 	if err != nil {
 		return "", errors.Wrap(err, "failed to ReadStdinString")
@@ -120,7 +165,7 @@ func getEnvToken() (string, error) {
 
 // getBuilderDomain gets the environment token from stdin
 func getBuilderDomain() (string, error) {
-	fmt.Print("Enter the domain name that will be used for the builder service:")
+	fmt.Print("Enter the domain name that will be used for the builder service: ")
 	domain, err := input.ReadStdinString()
 	if err != nil {
 		return "", errors.Wrap(err, "failed to ReadStdinString")
@@ -135,7 +180,7 @@ func getBuilderDomain() (string, error) {
 
 // getStorageClass gets the storage class to use
 func getStorageClass() (string, error) {
-	fmt.Print("Enter the Kubernetes storage class to use:")
+	fmt.Print("Enter the Kubernetes storage class to use: ")
 	storageClass, err := input.ReadStdinString()
 	if err != nil {
 		return "", errors.Wrap(err, "failed to ReadStdinString")
