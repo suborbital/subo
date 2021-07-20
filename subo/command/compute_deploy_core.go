@@ -79,7 +79,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 			}
 
 			data := deployData{
-				SCCVersion:       "dev",
+				SCCVersion:       "latest",
 				EnvToken:         envToken,
 				BuilderDomain:    builderDomain,
 				StorageClassName: storageClass,
