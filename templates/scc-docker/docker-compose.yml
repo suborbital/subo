@@ -1,7 +1,7 @@
 version: '3'
 services:
   scc-control-plane:
-    image: suborbital/scc-control-plane:v0.0.2
+    image: suborbital/scc-control-plane:v0.0.3
     command: controlplane
     volumes:
       - ./:/home/scn
@@ -17,7 +17,7 @@ services:
       - scn
 
   scc-builder:
-    image: suborbital/scc-builder:v0.0.2
+    image: suborbital/scc-builder:v0.0.3
     command: builder
     volumes:
       - ./:/home/scn
