@@ -26,6 +26,9 @@ Explore the available commands by running 'subo --help'`,
 		Use:   "create",
 		Short: "create a runnable or project",
 		Long:  `create a new Atmo project or WebAssembly runnable`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return nil
+		},
 	}
 
 	if features.EnableReleaseCommands {
