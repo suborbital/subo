@@ -17,6 +17,12 @@ Subo is the full toolchain for using and managing Suborbital Development Platfor
 including building WebAssembly Runnables and Atmo projects.
 
 Explore the available commands by running 'subo --help'`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				cmd.Help()
+			}
+			return nil
+		},
 	}
 
 	cmd.SetVersionTemplate("Subo CLI v{{.Version}}\n")
@@ -27,6 +33,9 @@ Explore the available commands by running 'subo --help'`,
 		Short: "create a runnable or project",
 		Long:  `create a new Atmo project or WebAssembly runnable`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				cmd.Help()
+			}
 			return nil
 		},
 	}
