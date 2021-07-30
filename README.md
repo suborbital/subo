@@ -27,7 +27,7 @@ Subo does not have official support for Windows.
 ## Alternative: install from source (requires Go)
 To build and install `subo`, clone this repo and run:
 ```
-`make subo`
+make subo
 ```
 
 ## Getting started
