@@ -1,23 +1,44 @@
+# github.com/google/uuid v1.3.0
+github.com/google/uuid
 # github.com/inconshreveable/mousetrap v1.0.0
 github.com/inconshreveable/mousetrap
+# github.com/julienschmidt/httprouter v1.3.0
+github.com/julienschmidt/httprouter
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
+# github.com/sethvargo/go-envconfig v0.3.2
+github.com/sethvargo/go-envconfig
 # github.com/spf13/cobra v1.1.3
 ## explicit
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
 github.com/spf13/pflag
-# github.com/suborbital/atmo v0.2.4-0.20210730132532-bc4c9c5f2410
+# github.com/suborbital/atmo v0.2.4-0.20210730160814-a9066e1a1aae
 ## explicit
 github.com/suborbital/atmo/bundle
 github.com/suborbital/atmo/directive
 github.com/suborbital/atmo/fqfn
 # github.com/suborbital/reactr v0.11.0
+github.com/suborbital/reactr/rcap
+github.com/suborbital/reactr/request
 github.com/suborbital/reactr/rwasm/moduleref
+# github.com/suborbital/vektor v0.4.1
+github.com/suborbital/vektor/vk
+github.com/suborbital/vektor/vlog
+# golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
+golang.org/x/crypto/acme
+golang.org/x/crypto/acme/autocert
 # golang.org/x/mod v0.4.2
 ## explicit
 golang.org/x/mod/semver
+# golang.org/x/net v0.0.0-20210726213435-c6fcb2dbf985
+golang.org/x/net/idna
+# golang.org/x/text v0.3.6
+golang.org/x/text/secure/bidirule
+golang.org/x/text/transform
+golang.org/x/text/unicode/bidi
+golang.org/x/text/unicode/norm
 # gopkg.in/yaml.v2 v2.4.0
 ## explicit
 gopkg.in/yaml.v2
