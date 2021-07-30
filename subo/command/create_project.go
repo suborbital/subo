@@ -29,7 +29,7 @@ func CreateProjectCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "project <name>",
 		Short: "create a new project",
-		Long:  `create a new project for Atmo or Hive`,
+		Long:  `create a new project for Atmo or Reactr`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0]
