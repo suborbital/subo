@@ -5,21 +5,29 @@ Subo is the command-line helper for working with the Suborbital Development Plat
 **You do not need to install language-specific tools to get started with WebAssembly and Subo!** A Docker toolchain is supported (see below) that can build your Runnables without needing to install language toolchains.
 
 ## Installing
-You can install `subo` using cURL (uses [gobinaries](https://gobinaries.com), does not support Apple Silicon):
+If you're on Mac (M1 or Intel), the easiest way to install is via `brew`:
 ```
-curl -Ls https://subo.suborbital.dev | sh
+brew tap suborbital/subo
+brew install subo
 ```
 
-## Alternative: install from source (requires Go)
-To build and install `subo`, clone this repo and run:
+On Intel Macs or Linux, you can also install `subo` using cURL (uses [gobinaries](https://gobinaries.com)):
 ```
-`make subo`
+curl -Ls https://subo.suborbital.dev | sh
 ```
 
 ## Verify installation
 Verify subo was installed:
 ```
 subo --help
+```
+
+Subo does not have official support for Windows.
+
+## Alternative: install from source (requires Go)
+To build and install `subo`, clone this repo and run:
+```
+make subo
 ```
 
 ## Getting started
