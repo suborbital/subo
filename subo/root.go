@@ -64,12 +64,24 @@ func computeCommand() *cobra.Command {
 		Use:   "compute",
 		Short: "compute network related resources",
 		Long:  `manage Suborbital Compute Network resources`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				cmd.Help()
+			}
+			return nil
+		},
 	}
 
 	create := &cobra.Command{
 		Use:   "create",
 		Short: "create compute network resources",
 		Long:  `create Suborbital Compute Network resources`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				cmd.Help()
+			}
+			return nil
+		},
 	}
 
 	create.AddCommand(command.ComputeCreateTokenCommand())
@@ -79,6 +91,12 @@ func computeCommand() *cobra.Command {
 		Use:   "deploy",
 		Short: "deploy compute network resources",
 		Long:  `deploy Suborbital Compute Network resources`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				cmd.Help()
+			}
+			return nil
+		},
 	}
 
 	deploy.AddCommand(command.ComputeDeployCoreCommand())
