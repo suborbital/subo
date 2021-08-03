@@ -210,6 +210,8 @@ github.com/suborbital/atmo v0.2.4-0.20210730132532-bc4c9c5f2410 h1:4flkxinvJ87Hq
 github.com/suborbital/atmo v0.2.4-0.20210730132532-bc4c9c5f2410/go.mod h1:mFciE275V/Ifzx9Y86LfHmAuApuJgWdswErbFoMGBCM=
 github.com/suborbital/atmo v0.2.4-0.20210730160814-a9066e1a1aae h1:K5KDt/9v43Usb5JzSXHOs8oyyEFOhKRsXlhQCIxFyrM=
 github.com/suborbital/atmo v0.2.4-0.20210730160814-a9066e1a1aae/go.mod h1:mFciE275V/Ifzx9Y86LfHmAuApuJgWdswErbFoMGBCM=
+github.com/suborbital/atmo v0.2.4-0.20210803132542-7840ab553714 h1:EgN9qR5LGKVwjE7NpiBK8YTVvcPjlsLRC5KSKMknudw=
+github.com/suborbital/atmo v0.2.4-0.20210803132542-7840ab553714/go.mod h1:mFciE275V/Ifzx9Y86LfHmAuApuJgWdswErbFoMGBCM=
 github.com/suborbital/grav v0.3.0/go.mod h1:PapJ62PtT9dPmW37WaCD+UMhoZiNPp0N9E3nUfEujC4=
 github.com/suborbital/grav v0.3.2/go.mod h1:PapJ62PtT9dPmW37WaCD+UMhoZiNPp0N9E3nUfEujC4=
 github.com/suborbital/grav v0.3.3/go.mod h1:PapJ62PtT9dPmW37WaCD+UMhoZiNPp0N9E3nUfEujC4=
