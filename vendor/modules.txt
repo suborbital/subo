@@ -8,7 +8,7 @@ github.com/pkg/errors
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
 github.com/spf13/pflag
-# github.com/suborbital/atmo v0.2.4-0.20210803132542-7840ab553714
+# github.com/suborbital/atmo v0.3.1-0.20210804203705-2c76879ac4f3
 ## explicit
 github.com/suborbital/atmo/bundle
 github.com/suborbital/atmo/directive
