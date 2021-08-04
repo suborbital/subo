@@ -45,7 +45,7 @@ func CreateRunnableCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "runnable <name>",
 		Short: "create a new Runnable",
-		Long:  `create a new Runnable to be used with Atmo or Hive`,
+		Long:  `create a new Runnable to be used with Atmo or Reactr`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0]
@@ -74,7 +74,7 @@ func CreateRunnableCmd() *cobra.Command {
 
 			runnable, err := writeDotRunnable(bctx.Cwd, name, lang, namespace)
 			if err != nil {
-				return errors.Wrap(err, "🚫 failed to writeDotHive")
+				return errors.Wrap(err, "🚫 failed to writeDotRunnable")
 			}
 
 			templatesPath, err := template.TemplateFullPath(repo, branch)
