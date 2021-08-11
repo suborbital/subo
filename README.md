@@ -55,6 +55,8 @@ The language toolchains used by `subo` support the following platforms:
 
 Please read the [contributing guide](./CONTRIBUTING.md) to learn about how you can contribute to Subo! We welcome all types of contribution.
 
-By the way, Subo is (in spirit) a chubby astronaut panda bear (with a retro Mercury-era vibe), and if any designer out there wants to illustrate them, the Suborbital contributors will find some way to compensate you for your time and effort. Also, it's pronounced Sooooobo.
+By the way, Subo is also the name of our mascot, and it's pronounced Sooooobo.
+
+![SOS-Space_Panda-Dark](https://user-images.githubusercontent.com/5942370/129102939-8cc9b6a6-88f4-464b-b60a-85c45d9625ec.png)
 
 Copyright Suborbital contributors 2021.
