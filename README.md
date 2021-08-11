@@ -57,6 +57,6 @@ Please read the [contributing guide](./CONTRIBUTING.md) to learn about how you c
 
 By the way, Subo is also the name of our mascot, and it's pronounced Sooooobo.
 
-![SOS-Space_Panda-Dark](https://user-images.githubusercontent.com/5942370/129102939-8cc9b6a6-88f4-464b-b60a-85c45d9625ec.png)
+![SOS-Space_Panda-Dark-small](https://user-images.githubusercontent.com/5942370/129103528-8b013445-a8a2-44bb-8b39-65d912a66767.png)
 
 Copyright Suborbital contributors 2021.
