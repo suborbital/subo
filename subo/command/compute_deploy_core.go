@@ -11,6 +11,7 @@ import (
 	"github.com/suborbital/subo/builder/context"
 	"github.com/suborbital/subo/builder/template"
 	"github.com/suborbital/subo/subo/input"
+	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
 )
 
@@ -57,6 +58,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 			}
 
 			branch, _ := cmd.Flags().GetString(branchFlag)
+			tag, _ := cmd.Flags().GetString(versionFlag)
 
 			templatesPath, err := template.UpdateTemplates(defaultRepo, branch)
 			if err != nil {
@@ -79,7 +81,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 			}
 
 			data := deployData{
-				SCCVersion:       "v0.0.3",
+				SCCVersion:       tag,
 				EnvToken:         envToken,
 				BuilderDomain:    builderDomain,
 				StorageClassName: storageClass,
@@ -118,6 +120,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 	}
 
 	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
+	cmd.Flags().String(versionFlag, release.SCCTag, "Docker tag to use for control plane images")
 	cmd.Flags().Bool(dryRunFlag, false, "prepare the installation in the .suborbital directory, but do not apply it")
 
 	return cmd

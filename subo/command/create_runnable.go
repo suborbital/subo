@@ -21,6 +21,7 @@ const (
 	dirFlag             = "dir"
 	namespaceFlag       = "namespace"
 	branchFlag          = "branch"
+	versionFlag         = "version"
 	repoFlag            = "repo"
 	environmentFlag     = "environment"
 	updateTemplatesFlag = "update-templates"

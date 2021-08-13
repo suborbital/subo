@@ -9,3 +9,5 @@ var FFIVersion = "0.11.1"
 
 // AtmoVersion is the default version of Atmo that will be used for new projects
 var AtmoVersion = "0.3.1"
+
+var SCCTag = "v0.0.3"
