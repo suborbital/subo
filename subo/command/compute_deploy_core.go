@@ -96,12 +96,12 @@ func ComputeDeployCoreCommand() *cobra.Command {
 			if !dryRun {
 				util.LogStart("installing...")
 
+				// we don't care if this fails, so don't check error
+				util.Run("kubectl create ns suborbital")
+
 				if err := createConfigMap(cwd); err != nil {
 					return errors.Wrap(err, "failed to createConfigMap")
 				}
-
-				// we don't care if this fails, so don't check error
-				util.Run("kubectl create ns suborbital")
 
 				if _, err := util.Run("kubectl apply -f .suborbital/"); err != nil {
 					return errors.Wrap(err, "🚫 failed to kubectl apply")
