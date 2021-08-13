@@ -96,6 +96,10 @@ func ComputeDeployCoreCommand() *cobra.Command {
 			if !dryRun {
 				util.LogStart("installing...")
 
+				if err := createConfigMap(cwd); err != nil {
+					return errors.Wrap(err, "failed to createConfigMap")
+				}
+
 				// we don't care if this fails, so don't check error
 				util.Run("kubectl create ns suborbital")
 
@@ -218,4 +222,29 @@ func detectStorageClass() (string, error) {
 	}
 
 	return outputParts[1], nil
+}
+
+func createConfigMap(cwd string) error {
+	configFilepath := filepath.Join(cwd, "scc-config.yaml")
+
+	configBytes, err := os.ReadFile(configFilepath)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			// that's fine, continue
+		} else {
+			return errors.Wrap(err, "failed to ReadFile scc-config.yaml")
+		}
+	}
+
+	if len(configBytes) == 0 {
+		if err := os.WriteFile(configFilepath, []byte("capabilities:"), os.ModePerm); err != nil {
+			return errors.Wrap(err, "failed to WriteFile scc-config.yaml")
+		}
+	}
+
+	if _, err := util.Run(fmt.Sprintf("kubectl create configmap scc-config --from-file=scc-config.yaml=%s -n suborbital", configFilepath)); err != nil {
+		return errors.Wrap(err, "failed to create configmap (you may need to run `kubectl delete configmap scc-config -n suborbital`)")
+	}
+
+	return nil
 }

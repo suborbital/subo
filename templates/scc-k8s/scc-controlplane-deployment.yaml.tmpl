@@ -42,8 +42,11 @@ spec:
               value: {{ .EnvToken }}
           
           volumeMounts:
-            - mountPath: "/home/scn"
-              name: controlplane-storage
+            - name: controlplane-storage
+              mountPath: "/home/scn"
+            - name: config
+              mountPath: "/home/scn/local"
+              readOnly: true
         
         - name: builder
           image: suborbital/scc-builder:{{ .SCCVersion }}
@@ -78,6 +81,9 @@ spec:
         - name: controlplane-storage
           persistentVolumeClaim:
             claimName: scc-controlplane-pvc
+        - name: controlplane-config
+          configMap:
+            name: scc-config
 
 ---
 
