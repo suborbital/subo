@@ -11,6 +11,7 @@ import (
 	"github.com/suborbital/subo/builder/context"
 	"github.com/suborbital/subo/builder/template"
 	"github.com/suborbital/subo/subo/input"
+	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
 )
 
@@ -57,6 +58,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 			}
 
 			branch, _ := cmd.Flags().GetString(branchFlag)
+			tag, _ := cmd.Flags().GetString(versionFlag)
 
 			templatesPath, err := template.UpdateTemplates(defaultRepo, branch)
 			if err != nil {
@@ -79,7 +81,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 			}
 
 			data := deployData{
-				SCCVersion:       "v0.0.3",
+				SCCVersion:       tag,
 				EnvToken:         envToken,
 				BuilderDomain:    builderDomain,
 				StorageClassName: storageClass,
@@ -99,6 +101,10 @@ func ComputeDeployCoreCommand() *cobra.Command {
 				// we don't care if this fails, so don't check error
 				util.Run("kubectl create ns suborbital")
 
+				if err := createConfigMap(cwd); err != nil {
+					return errors.Wrap(err, "failed to createConfigMap")
+				}
+
 				if _, err := util.Run("kubectl apply -f .suborbital/"); err != nil {
 					return errors.Wrap(err, "🚫 failed to kubectl apply")
 				}
@@ -114,6 +120,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 	}
 
 	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
+	cmd.Flags().String(versionFlag, release.SCCTag, "Docker tag to use for control plane images")
 	cmd.Flags().Bool(dryRunFlag, false, "prepare the installation in the .suborbital directory, but do not apply it")
 
 	return cmd
@@ -131,8 +138,9 @@ BEFORE YOU CONTINUE:
 	- You must be able to set up DNS records for the builder service after this installation completes
 			- Choose the DNS name you'd like to use before continuing, e.g. builder.acmeco.com
 
-	- You must know the correct Kubernetes storage class for your cluster (this varies by cloud provider)
-		- See the Flight Deck documentation for more details
+	- Subo will attempt to determine the default storage class for your Kubernetes cluster, 
+	  but if is unable to do so you will need to provide one
+			- See the Flight Deck documentation for more details
 
 Are you ready to continue? (y/N): `)
 
@@ -180,6 +188,15 @@ func getBuilderDomain() (string, error) {
 
 // getStorageClass gets the storage class to use
 func getStorageClass() (string, error) {
+	defaultClass, err := detectStorageClass()
+	if err != nil {
+		// that's fine, continue
+		fmt.Println("failed to automatically detect Kubernetes storage class:", err.Error())
+	} else if defaultClass != "" {
+		fmt.Println("using default storage class: ", defaultClass)
+		return defaultClass, nil
+	}
+
 	fmt.Print("Enter the Kubernetes storage class to use: ")
 	storageClass, err := input.ReadStdinString()
 	if err != nil {
@@ -191,4 +208,46 @@ func getStorageClass() (string, error) {
 	}
 
 	return storageClass, nil
+}
+
+func detectStorageClass() (string, error) {
+	output, err := util.Run("kubectl get storageclass --output=name")
+	if err != nil {
+		return "", errors.Wrap(err, "failed to get default storageclass")
+	}
+
+	// output will look like: storageclass.storage.k8s.io/do-block-storage
+	// so split on the / and return the last part
+
+	outputParts := strings.Split(output, "/")
+	if len(outputParts) != 2 {
+		return "", errors.New("could not automatically determine storage class")
+	}
+
+	return outputParts[1], nil
+}
+
+func createConfigMap(cwd string) error {
+	configFilepath := filepath.Join(cwd, "scc-config.yaml")
+
+	configBytes, err := os.ReadFile(configFilepath)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			// that's fine, continue
+		} else {
+			return errors.Wrap(err, "failed to ReadFile scc-config.yaml")
+		}
+	}
+
+	if len(configBytes) == 0 {
+		if err := os.WriteFile(configFilepath, []byte("capabilities:"), os.ModePerm); err != nil {
+			return errors.Wrap(err, "failed to WriteFile scc-config.yaml")
+		}
+	}
+
+	if _, err := util.Run(fmt.Sprintf("kubectl create configmap scc-config --from-file=scc-config.yaml=%s -n suborbital", configFilepath)); err != nil {
+		return errors.Wrap(err, "failed to create configmap (you may need to run `kubectl delete configmap scc-config -n suborbital`)")
+	}
+
+	return nil
 }
