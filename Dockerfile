@@ -1,4 +1,4 @@
-FROM golang:1.16
+FROM golang:1.17
 
 RUN mkdir -p /root/github.com/suborbital/subo
 WORKDIR /root/github.com/suborbital/subo
