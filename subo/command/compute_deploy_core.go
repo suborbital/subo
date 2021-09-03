@@ -87,7 +87,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 				StorageClassName: storageClass,
 			}
 
-			if err := template.ExecTmplDir(bctx.Cwd, ".suborbital", templatesPath, "scc-k8s", data); err != nil {
+			if err := template.ExecTmplDir(bctx.Cwd, "", templatesPath, "scc-k8s", data); err != nil {
 				return errors.Wrap(err, "🚫 failed to ExecTmplDir")
 			}
 
