@@ -95,25 +95,30 @@ func ComputeDeployCoreCommand() *cobra.Command {
 
 			dryRun, _ := cmd.Flags().GetBool(dryRunFlag)
 
-			if !dryRun {
-				util.LogStart("installing...")
-
-				// we don't care if this fails, so don't check error
-				util.Run("kubectl create ns suborbital")
-
-				if err := createConfigMap(cwd); err != nil {
-					return errors.Wrap(err, "failed to createConfigMap")
-				}
-
-				if _, err := util.Run("kubectl apply -f .suborbital/"); err != nil {
-					return errors.Wrap(err, "🚫 failed to kubectl apply")
-				}
-
-				util.LogDone("installation complete!")
-				util.LogInfo("use `kubectl get pods -n suborbital` and `kubectl get svc -n suborbital` to check deployment status")
-			} else {
+			if dryRun {
 				util.LogInfo("aborting due to dry-run, manifest files left in .suborbital")
+				return nil
 			}
+
+			util.LogStart("installing...")
+
+			if _, err := util.Run("kubectl apply -f https://github.com/kedacore/keda/releases/download/v2.4.0/keda-2.4.0.yaml"); err != nil {
+				return errors.Wrap(err, "🚫 failed to install KEDA")
+			}
+
+			// we don't care if this fails, so don't check error
+			util.Run("kubectl create ns suborbital")
+
+			if err := createConfigMap(cwd); err != nil {
+				return errors.Wrap(err, "failed to createConfigMap")
+			}
+
+			if _, err := util.Run("kubectl apply -f .suborbital/"); err != nil {
+				return errors.Wrap(err, "🚫 failed to kubectl apply")
+			}
+
+			util.LogDone("installation complete!")
+			util.LogInfo("use `kubectl get pods -n suborbital` and `kubectl get svc -n suborbital` to check deployment status")
 
 			return nil
 		},
@@ -141,6 +146,8 @@ BEFORE YOU CONTINUE:
 	- Subo will attempt to determine the default storage class for your Kubernetes cluster, 
 	  but if is unable to do so you will need to provide one
 			- See the Flight Deck documentation for more details
+
+	- Subo will install the KEDA autoscaler into your cluster. It will not affect any existing deployments.
 
 Are you ready to continue? (y/N): `)
 
