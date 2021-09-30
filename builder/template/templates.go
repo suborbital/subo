@@ -57,20 +57,26 @@ func UpdateTemplates(repo, branch string) (string, error) {
 	return tmplPath, nil
 }
 
-// ExecRunnableTmpl copies a template
-func ExecRunnableTmpl(cwd, name, templatesPath string, runnable *directive.Runnable) error {
-	nameCamel := ""
-	nameParts := strings.Split(runnable.Name, "-")
-	for _, part := range nameParts {
-		nameCamel += strings.ToUpper(string(part[0]))
-		nameCamel += string(part[1:])
+// ExecRunnableTmplStr executes a template string with the runnable's data
+func ExecRunnableTmplStr(templateStr string, runnable *directive.Runnable) (string, error) {
+	templateData := makeTemplateData(runnable)
+
+	tmpl, err := template.New("tmpl").Parse(templateStr)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to parse template string")
 	}
 
-	templateData := tmplData{
-		Runnable:  *runnable,
-		NameCaps:  strings.ToUpper(strings.Replace(runnable.Name, "-", "", -1)),
-		NameCamel: nameCamel,
+	builder := &strings.Builder{}
+	if err := tmpl.Execute(builder, templateData); err != nil {
+		return "", errors.Wrap(err, "failed to Execute template")
 	}
+
+	return builder.String(), nil
+}
+
+// ExecRunnableTmpl copies a template
+func ExecRunnableTmpl(cwd, name, templatesPath string, runnable *directive.Runnable) error {
+	templateData := makeTemplateData(runnable)
 
 	return ExecTmplDir(cwd, name, templatesPath, runnable.Lang, templateData)
 }
@@ -220,4 +226,20 @@ func extractZip(filePath, destPath, branchDirName string) (string, error) {
 	}
 
 	return filepath.Join(existingPath, "templates"), nil
+}
+
+// makeTemplateData makes data to be used in templates
+func makeTemplateData(runnable *directive.Runnable) tmplData {
+	nameCamel := ""
+	nameParts := strings.Split(runnable.Name, "-")
+	for _, part := range nameParts {
+		nameCamel += strings.ToUpper(string(part[0]))
+		nameCamel += string(part[1:])
+	}
+
+	return tmplData{
+		Runnable:  *runnable,
+		NameCaps:  strings.ToUpper(strings.Replace(runnable.Name, "-", "", -1)),
+		NameCamel: nameCamel,
+	}
 }
