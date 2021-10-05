@@ -29,8 +29,12 @@ func ComputeDeployCoreCommand() *cobra.Command {
 		Short: "deploy the Suborbital Compute Core",
 		Long:  `deploy the Suborbital Compute Core using Kubernetes or Docker Compose`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := introAcceptance(); err != nil {
-				return err
+			localInstall := cmd.Flags().Changed(localFlag)
+
+			if !localInstall {
+				if err := introAcceptance(); err != nil {
+					return err
+				}
 			}
 
 			cwd, err := os.Getwd()
@@ -70,28 +74,26 @@ func ComputeDeployCoreCommand() *cobra.Command {
 				return errors.Wrap(err, "🚫 failed to getEnvToken")
 			}
 
-			builderDomain, err := getBuilderDomain()
-			if err != nil {
-				return errors.Wrap(err, "🚫 failed to getBuilderDomain")
-			}
-
-			storageClass, err := getStorageClass()
-			if err != nil {
-				return errors.Wrap(err, "🚫 failed to getStorageClass")
-			}
-
 			data := deployData{
-				SCCVersion:       tag,
-				EnvToken:         envToken,
-				BuilderDomain:    builderDomain,
-				StorageClassName: storageClass,
+				SCCVersion: tag,
+				EnvToken:   envToken,
 			}
 
-			localInstall, _ := cmd.Flags().GetBool(localFlag)
+			if !localInstall {
+				data.BuilderDomain, err = getBuilderDomain()
+				if err != nil {
+					return errors.Wrap(err, "🚫 failed to getBuilderDomain")
+				}
 
-			templateName := "scc-k8s"
-			if localInstall {
-				templateName = "scc-docker"
+				data.StorageClassName, err = getStorageClass()
+				if err != nil {
+					return errors.Wrap(err, "🚫 failed to getStorageClass")
+				}
+			}
+
+			templateName := "scc-docker"
+			if !localInstall {
+				templateName = "scc-k8s"
 			}
 
 			if err := template.ExecTmplDir(bctx.Cwd, "", templatesPath, templateName, data); err != nil {
