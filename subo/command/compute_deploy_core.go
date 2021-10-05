@@ -87,7 +87,14 @@ func ComputeDeployCoreCommand() *cobra.Command {
 				StorageClassName: storageClass,
 			}
 
-			if err := template.ExecTmplDir(bctx.Cwd, "", templatesPath, "scc-k8s", data); err != nil {
+			localInstall, _ := cmd.Flags().GetBool(localFlag)
+
+			templateName := "scc-k8s"
+			if localInstall {
+				templateName = "scc-docker"
+			}
+
+			if err := template.ExecTmplDir(bctx.Cwd, "", templatesPath, templateName, data); err != nil {
 				return errors.Wrap(err, "🚫 failed to ExecTmplDir")
 			}
 
@@ -102,23 +109,33 @@ func ComputeDeployCoreCommand() *cobra.Command {
 
 			util.LogStart("installing...")
 
-			if _, err := util.Run("kubectl apply -f https://github.com/kedacore/keda/releases/download/v2.4.0/keda-2.4.0.yaml"); err != nil {
-				return errors.Wrap(err, "🚫 failed to install KEDA")
-			}
+			if localInstall {
+				if _, err := util.Run("docker-compose up -d"); err != nil {
+					return errors.Wrap(err, "🚫 failed to docker-compose up")
+				}
 
-			// we don't care if this fails, so don't check error
-			util.Run("kubectl create ns suborbital")
+				util.LogInfo("use `docker ps` and `docker-compose logs` to check deployment status")
 
-			if err := createConfigMap(cwd); err != nil {
-				return errors.Wrap(err, "failed to createConfigMap")
-			}
+			} else {
+				if _, err := util.Run("kubectl apply -f https://github.com/kedacore/keda/releases/download/v2.4.0/keda-2.4.0.yaml"); err != nil {
+					return errors.Wrap(err, "🚫 failed to install KEDA")
+				}
 
-			if _, err := util.Run("kubectl apply -f .suborbital/"); err != nil {
-				return errors.Wrap(err, "🚫 failed to kubectl apply")
+				// we don't care if this fails, so don't check error
+				util.Run("kubectl create ns suborbital")
+
+				if err := createConfigMap(cwd); err != nil {
+					return errors.Wrap(err, "failed to createConfigMap")
+				}
+
+				if _, err := util.Run("kubectl apply -f .suborbital/"); err != nil {
+					return errors.Wrap(err, "🚫 failed to kubectl apply")
+				}
+
+				util.LogInfo("use `kubectl get pods -n suborbital` and `kubectl get svc -n suborbital` to check deployment status")
 			}
 
 			util.LogDone("installation complete!")
-			util.LogInfo("use `kubectl get pods -n suborbital` and `kubectl get svc -n suborbital` to check deployment status")
 
 			return nil
 		},
@@ -126,6 +143,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 
 	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
 	cmd.Flags().String(versionFlag, release.SCCTag, "Docker tag to use for control plane images")
+	cmd.Flags().Bool(localFlag, false, "deploy locally using docker-compose")
 	cmd.Flags().Bool(dryRunFlag, false, "prepare the installation in the .suborbital directory, but do not apply it")
 
 	return cmd
