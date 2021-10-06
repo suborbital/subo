@@ -79,6 +79,8 @@ func ComputeDeployCoreCommand() *cobra.Command {
 				EnvToken:   envToken,
 			}
 
+			templateName := "scc-docker"
+
 			if !localInstall {
 				data.BuilderDomain, err = getBuilderDomain()
 				if err != nil {
@@ -89,10 +91,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 				if err != nil {
 					return errors.Wrap(err, "🚫 failed to getStorageClass")
 				}
-			}
 
-			templateName := "scc-docker"
-			if !localInstall {
 				templateName = "scc-k8s"
 			}
 
