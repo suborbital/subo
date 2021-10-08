@@ -17,6 +17,7 @@ import (
 const (
 	preReleaseFlag = "prerelease"
 	dryRunFlag     = "dryrun"
+	localFlag      = "local"
 )
 
 // DotSuboFile describes a .subo file for controlling releases
