@@ -4,9 +4,6 @@ FROM suborbital/subo:dev as subo
 # doesn't work on M1 :(
 
 FROM golang:bullseye as tinygobuilder
-RUN apt update && apt install -y wget gnupg
-RUN echo 'deb http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-11 main' | tee /etc/apt/sources.list.d/llvm.list && \
-    wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
 RUN apt update && apt install -y clang-11 llvm-11-dev lld-11 libclang-11-dev build-essential git cmake ninja-build
 
 WORKDIR /root
