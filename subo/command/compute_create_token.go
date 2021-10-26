@@ -2,8 +2,9 @@ package command
 
 import (
 	"fmt"
+    "github.com/suborbital/subo/subo/util"
 
-	"github.com/pkg/errors"
+    "github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/suborbital/subo/subo/input"
 )
@@ -34,6 +35,10 @@ func ComputeCreateTokenCommand() *cobra.Command {
 
 			fmt.Println(token.Token)
 
+			tokenData := util.TokenData{}
+			if err := tokenData.WriteToken([]byte(token.Token)); err != nil {
+                return errors.Wrap(err, "failed to write token")
+            }
 			return nil
 		},
 	}
