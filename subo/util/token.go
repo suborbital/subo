@@ -1,38 +1,35 @@
 package util
 
 import (
-    "github.com/pkg/errors"
-    "io/ioutil"
-    "os"
-    "path/filepath"
+	"github.com/pkg/errors"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 )
 
-const tokenDir = "suborbital/compute/envtoken"
-
-type TokenData struct {}
-
-func (_ TokenData) GetTokenTmpDir() string {
-	tokenPath := filepath.Join(os.TempDir(), tokenDir)
+func getTokenTmpDir() string {
+	tokenPath := filepath.Join(os.TempDir(), "suborbital", "compute", "envtoken")
 	return tokenPath
 }
 
-func (token TokenData) WriteToken(tokenStr []byte) error {
-	tokenPath := token.GetTokenTmpDir()
+func WriteEnvironmentToken(tokenStr []byte) error {
+	tokenPath := getTokenTmpDir()
 	if _, err := os.Stat(tokenPath); os.IsNotExist(err) {
-		_, err := Mkdir(filepath.Dir(tokenPath), "")
-		if err != nil {
-			return errors.Wrap(err, "failed to write token when create dir")
-		}
+		if _, err := Mkdir(filepath.Dir(tokenPath), ""); err != nil {
+            if err != nil {
+                return errors.Wrap(err, "failed to write token when create dir")
+            }
+        }
 	}
 
 	if err := ioutil.WriteFile(tokenPath, tokenStr, 0700); err != nil {
-		return errors.Wrap(err, "failed to write token")
+		return errors.Wrap(err, "failed to WriteFile for token")
 	}
 	return nil
 }
 
-func (token TokenData) ReadToken() ([]byte, error) {
-	tokenPath := token.GetTokenTmpDir()
+func ReadEnvironmentToken() ([]byte, error) {
+	tokenPath := getTokenTmpDir()
 	buf, err := ioutil.ReadFile(tokenPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read token")

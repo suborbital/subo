@@ -184,13 +184,10 @@ Are you ready to continue? (y/N): `)
 
 // getEnvToken gets the environment token from stdin
 func getEnvToken() (string, error) {
-    tokenData := util.TokenData{}
-    buf, err := tokenData.ReadToken()
-    if err != nil {
-        return "", errors.Wrap(err, "failed to read token")
+    buf, err := util.ReadEnvironmentToken()
+    if err == nil {
+        return string(buf), nil
     }
-    return string(buf), nil
-
 	fmt.Print("Enter your environment token: ")
 	token, err := input.ReadStdinString()
 	if err != nil {
