@@ -12,27 +12,25 @@ func getTokenTmpDir() string {
 	return tokenPath
 }
 
-func WriteEnvironmentToken(tokenStr []byte) error {
+func WriteEnvironmentToken(tokenStr string) error {
 	tokenPath := getTokenTmpDir()
 	if _, err := os.Stat(tokenPath); os.IsNotExist(err) {
 		if _, err := Mkdir(filepath.Dir(tokenPath), ""); err != nil {
-            if err != nil {
-                return errors.Wrap(err, "failed to write token when create dir")
-            }
-        }
+			return errors.Wrap(err, "failed to Mkdir")
+		}
 	}
 
-	if err := ioutil.WriteFile(tokenPath, tokenStr, 0700); err != nil {
+	if err := ioutil.WriteFile(tokenPath, []byte(tokenStr), 0700); err != nil {
 		return errors.Wrap(err, "failed to WriteFile for token")
 	}
 	return nil
 }
 
-func ReadEnvironmentToken() ([]byte, error) {
+func ReadEnvironmentToken() (string, error) {
 	tokenPath := getTokenTmpDir()
 	buf, err := ioutil.ReadFile(tokenPath)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read token")
+		return "", errors.Wrap(err, "failed to ReadFile for token")
 	}
-	return buf, nil
+	return string(buf), nil
 }

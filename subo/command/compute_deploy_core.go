@@ -186,7 +186,7 @@ Are you ready to continue? (y/N): `)
 func getEnvToken() (string, error) {
     buf, err := util.ReadEnvironmentToken()
     if err == nil {
-        return string(buf), nil
+        return buf, nil
     }
 	fmt.Print("Enter your environment token: ")
 	token, err := input.ReadStdinString()
