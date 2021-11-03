@@ -19,6 +19,7 @@ var dockerImageForLang = map[string]string{
 	"swift":          "suborbital/builder-swift",
 	"assemblyscript": "suborbital/builder-as",
 	"tinygo":         "suborbital/builder-tinygo",
+	"grain":          "--platform linux/amd64 suborbital/builder-gr",
 }
 
 // BuildContext describes the context under which the tool is being run

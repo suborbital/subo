@@ -7,7 +7,7 @@ subo/dev:
 	go install -tags=development ./subo
 
 subo/docker:
-	docker build . -t suborbital/subo:dev
+	docker buildx build . --platform linux/amd64 -t suborbital/subo:dev --load
 
 subo/docker/publish:
 	docker buildx build . --platform linux/amd64,linux/arm64 -t suborbital/subo:dev --push

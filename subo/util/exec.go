@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -21,23 +20,8 @@ func RunInDir(cmd, dir string) (string, error) {
 	// you can uncomment this below if you want to see exactly the commands being run
 	fmt.Println("▶️", cmd)
 
-	argLRaw := strings.Split(cmd, " ")
-
-	argL := []string{}
-	for i := 1; i < len(argLRaw); i++ {
-		arg := argLRaw[i]
-
-		// if the argument ends in \ , assume we're escaping a space and join it with the next arg
-		if strings.HasSuffix(arg, "\\") {
-			arg = strings.TrimSuffix(arg, "\\")
-			arg = arg + " " + argLRaw[i+1]
-			i++
-		}
-
-		argL = append(argL, arg)
-	}
-
-	command := exec.Command(argLRaw[0], argL...)
+	command := exec.Command("sh", "-c", cmd)
+	fmt.Println("▶️▶️", command.String())
 
 	command.Dir = dir
 
