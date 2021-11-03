@@ -26,4 +26,11 @@ builder/docker/swift:
 builder/docker/swift/publish:
 	docker buildx build . -f builder/docker/swift/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-swift:$(ver) --push
 
-.PHONY: builder/docker builder/docker/publish builder/docker/as builder/docker/as/publish builder/docker/rust builder/docker/rust/publish builder/docker/swift builder/docker/swift/publish
+# tinygo docker targets
+builder/docker/tinygo:
+	docker build . -f builder/docker/tinygo/Dockerfile -t suborbital/builder-tinygo:$(ver)
+
+builder/docker/tinygo/publish:
+	docker buildx build . -f builder/docker/tinygo/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-tinygo:$(ver) --push
+
+.PHONY: builder/docker builder/docker/publish builder/docker/as builder/docker/as/publish builder/docker/rust builder/docker/rust/publish builder/docker/swift builder/docker/swift/publish builder/docker/tinygo builder/docker/tinygo/publish

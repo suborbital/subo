@@ -33,12 +33,14 @@ var validLangs = map[string]bool{
 	"rust":           true,
 	"swift":          true,
 	"assemblyscript": true,
+	"tinygo":         true,
 }
 
 // langAliases are aliases for languages
 var langAliases = map[string]string{
 	"typescript": "assemblyscript",
 	"rs":         "rust",
+	"go":         "tinygo",
 }
 
 // CreateRunnableCmd returns the build command

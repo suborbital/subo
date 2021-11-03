@@ -18,6 +18,9 @@ var nativeCommandsForLang = map[string]map[string][]string{
 		"assemblyscript": {
 			"npm run asbuild",
 		},
+		"tinygo": {
+			"tinygo build -o {{ .Name }}.wasm -target wasi .",
+		},
 	},
 	"linux": {
 		"rust": {
@@ -30,6 +33,9 @@ var nativeCommandsForLang = map[string]map[string][]string{
 		},
 		"assemblyscript": {
 			"npm run asbuild",
+		},
+		"tinygo": {
+			"tinygo build -o {{ .Name }}.wasm -target wasi .",
 		},
 	},
 }
