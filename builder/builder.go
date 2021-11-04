@@ -99,7 +99,7 @@ func (b *Builder) BuildWithToolchain(tcn Toolchain) error {
 
 	if tcn == ToolchainDocker {
 		for lang := range dockerLangs {
-			result, err := b.dockerBuildForDirectory(b.Context.Cwd, lang)
+			result, err := b.dockerBuildForLang(lang)
 			if err != nil {
 				return errors.Wrap(err, "failed to dockerBuildForDirectory")
 			}
@@ -182,16 +182,16 @@ func (b *Builder) Bundle() error {
 	return nil
 }
 
-func (b *Builder) dockerBuildForDirectory(dirPath, lang string) (*BuildResult, error) {
-	fmt.Println(dirPath, lang)
-	img := context.ImageForLang(lang)
+func (b *Builder) dockerBuildForLang(lang string) (*BuildResult, error) {
+	img := context.ImageForLang(lang, b.Context.BuilderTag)
 	if img == "" {
 		return nil, fmt.Errorf("%q is not a supported language", lang)
 	}
 
 	result := &BuildResult{}
 
-	outputLog, err := util.Run(fmt.Sprintf("docker run --rm --mount type=bind,source=%s,target=/root/runnable %s", dirPath, img))
+	fmt.Println(b.Context.MountPath, ", ", b.Context.RelDockerPath)
+	outputLog, err := util.Run(fmt.Sprintf("docker run --rm --mount type=bind,source=%s,target=/root/runnable %s subo build %s --native --langs %s", b.Context.MountPath, img, b.Context.RelDockerPath, lang))
 
 	result.OutputLog = outputLog
 

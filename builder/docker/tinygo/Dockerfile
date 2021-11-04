@@ -26,5 +26,3 @@ WORKDIR /root/reactr
 RUN git checkout jagger/tinygo
 
 WORKDIR /root/runnable
-
-ENTRYPOINT subo build --native --langs tinygo .

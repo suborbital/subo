@@ -30,6 +30,9 @@ type BuildContext struct {
 	Directive     *directive.Directive
 	AtmoVersion   string
 	Langs         []string
+	MountPath     string
+	RelDockerPath string
+	BuilderTag    string
 }
 
 // RunnableDir represents a directory containing a Runnable
@@ -38,7 +41,6 @@ type RunnableDir struct {
 	UnderscoreName string
 	Fullpath       string
 	Runnable       *directive.Runnable
-	BuildImage     string
 }
 
 // BundleRef contains information about a bundle in the current context
@@ -75,6 +77,10 @@ func ForDirectory(dir string) (*BuildContext, error) {
 		Runnables:     runnables,
 		Bundle:        *bundle,
 		Directive:     directive,
+		Langs:         []string{},
+		MountPath:     fullDir,
+		RelDockerPath: ".",
+		BuilderTag:    fmt.Sprintf("v:%s", release.SuboDotVersion),
 	}
 
 	if directive != nil {
@@ -93,12 +99,6 @@ func (b *BuildContext) RunnableExists(name string) bool {
 	}
 
 	return false
-}
-
-// SetBuildLangs sets the languages that the builder will build
-// defaults to all languages
-func (b *BuildContext) SetBuildLangs(langs []string) {
-	b.Langs = langs
 }
 
 // ShouldBuildLang returns true if the provided language is safe-listed for building
@@ -214,8 +214,7 @@ func getRunnableFromFiles(wd string, files []os.FileInfo) (*RunnableDir, error) 
 		runnable.Namespace = "default"
 	}
 
-	img := ImageForLang(runnable.Lang)
-	if img == "" {
+	if _, exists := dockerImageForLang[runnable.Lang]; !exists {
 		return nil, fmt.Errorf("(%s) %s is not a valid lang", runnable.Name, runnable.Lang)
 	}
 
@@ -229,19 +228,18 @@ func getRunnableFromFiles(wd string, files []os.FileInfo) (*RunnableDir, error) 
 		UnderscoreName: strings.Replace(runnable.Name, "-", "_", -1),
 		Fullpath:       absolutePath,
 		Runnable:       &runnable,
-		BuildImage:     img,
 	}
 
 	return runnableDir, nil
 }
 
-func ImageForLang(lang string) string {
+func ImageForLang(lang, tag string) string {
 	img, ok := dockerImageForLang[lang]
 	if !ok {
 		return ""
 	}
 
-	return fmt.Sprintf("%s:v%s", img, release.SuboDotVersion)
+	return fmt.Sprintf("%s:%s", img, tag)
 }
 
 func bundleTargetPath(cwd string) (*BundleRef, error) {
