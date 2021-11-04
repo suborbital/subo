@@ -8,7 +8,7 @@ import (
 var nativeCommandsForLang = map[string]map[string][]string{
 	"darwin": {
 		"rust": {
-			"cargo build --target wasm32-wasi --lib --release",
+			"cargo build --offline --target wasm32-wasi --lib --release",
 			"cp target/wasm32-wasi/release/{{ .UnderscoreName }}.wasm ./{{ .Name }}.wasm",
 		},
 		"swift": {

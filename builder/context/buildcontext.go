@@ -29,6 +29,7 @@ type BuildContext struct {
 	Bundle        BundleRef
 	Directive     *directive.Directive
 	AtmoVersion   string
+	Langs         []string
 }
 
 // RunnableDir represents a directory containing a Runnable
@@ -82,6 +83,27 @@ func ForDirectory(dir string) (*BuildContext, error) {
 func (b *BuildContext) RunnableExists(name string) bool {
 	for _, r := range b.Runnables {
 		if r.Name == name {
+			return true
+		}
+	}
+
+	return false
+}
+
+// SetBuildLangs sets the languages that the builder will build
+// defaults to all languages
+func (b *BuildContext) SetBuildLangs(langs []string) {
+	b.Langs = langs
+}
+
+// ShouldBuildLang returns true if the provided language is safe-listed for building
+func (b *BuildContext) ShouldBuildLang(lang string) bool {
+	if len(b.Langs) == 0 {
+		return true
+	}
+
+	for _, l := range b.Langs {
+		if l == lang {
 			return true
 		}
 	}

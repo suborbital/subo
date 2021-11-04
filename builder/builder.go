@@ -60,9 +60,13 @@ func ForDirectory(logger util.FriendlyLogger, dir string) (*Builder, error) {
 func (b *Builder) BuildWithToolchain(tcn Toolchain) error {
 	var err error
 
-	b.results = make([]BuildResult, len(b.Context.Runnables))
+	b.results = []BuildResult{}
 
-	for i, r := range b.Context.Runnables {
+	for _, r := range b.Context.Runnables {
+		if !b.Context.ShouldBuildLang(r.Runnable.Lang) {
+			continue
+		}
+
 		b.log.LogStart(fmt.Sprintf("building runnable: %s (%s)", r.Name, r.Runnable.Lang))
 
 		result := &BuildResult{}
@@ -79,7 +83,7 @@ func (b *Builder) BuildWithToolchain(tcn Toolchain) error {
 
 		// even if there was a failure, load the result into the builder
 		// since the logs of the failed build are useful
-		b.results[i] = *result
+		b.results = append(b.results, *result)
 
 		if err != nil {
 			return errors.Wrapf(err, "🚫 failed to build %s", r.Name)

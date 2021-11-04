@@ -37,8 +37,11 @@ func BuildCmd() *cobra.Command {
 				util.LogStart(fmt.Sprintf("building runnables in %s", bdr.Context.Cwd))
 			}
 
+			langs, _ := cmd.Flags().GetStringSlice("langs")
+			bdr.Context.SetBuildLangs(langs)
+
 			noBundle, _ := cmd.Flags().GetBool("no-bundle")
-			shouldBundle := !noBundle && !bdr.Context.CwdIsRunnable
+			shouldBundle := !noBundle && !bdr.Context.CwdIsRunnable && len(langs) == 0
 			shouldDockerBuild, _ := cmd.Flags().GetBool("docker")
 
 			useNative, _ := cmd.Flags().GetBool("native")
@@ -93,6 +96,7 @@ func BuildCmd() *cobra.Command {
 	cmd.Flags().Bool("native", false, "if passed, build runnables using native toolchain rather than Docker")
 	cmd.Flags().String("make", "", "if passed, execute the provided Make target before building the project bundle")
 	cmd.Flags().Bool("docker", false, "if passed, build your project's Dockerfile. It will be tagged {identifier}:{appVersion}")
+	cmd.Flags().StringSlice("langs", []string{}, "if passed, Subo will build only Runnables for the listed languages")
 
 	return cmd
 }
