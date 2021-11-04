@@ -190,7 +190,6 @@ func (b *Builder) dockerBuildForLang(lang string) (*BuildResult, error) {
 
 	result := &BuildResult{}
 
-	fmt.Println(b.Context.MountPath, ", ", b.Context.RelDockerPath)
 	outputLog, err := util.Run(fmt.Sprintf("docker run --rm --mount type=bind,source=%s,target=/root/runnable %s subo build %s --native --langs %s", b.Context.MountPath, img, b.Context.RelDockerPath, lang))
 
 	result.OutputLog = outputLog

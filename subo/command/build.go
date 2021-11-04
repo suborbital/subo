@@ -49,17 +49,17 @@ func BuildCmd() *cobra.Command {
 			mountPath, _ := cmd.Flags().GetString("mountpath")
 			relPath, _ := cmd.Flags().GetString("relpath")
 
-			builderTag, _ := cmd.Flags().GetString("builder-tag")
-			if builderTag != "" {
-				bdr.Context.BuilderTag = builderTag
-			}
-
 			// verify they are valid and set the context values if so
 			if mountPath != "" && relPath == "" {
 				return errors.New("must set '--relpath' when '--mountpath' is used")
 			} else if mountPath != "" && relPath != "" {
 				bdr.Context.MountPath = mountPath
 				bdr.Context.RelDockerPath = relPath
+			}
+
+			builderTag, _ := cmd.Flags().GetString("builder-tag")
+			if builderTag != "" {
+				bdr.Context.BuilderTag = builderTag
 			}
 
 			if makeTarget != "" {
