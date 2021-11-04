@@ -26,8 +26,10 @@ func (p *PrintLogger) LogWarn(msg string)  { LogWarn(msg) }
 // Keeping it DRY
 func log(msg string) {
 	if _, exists := os.LookupEnv("SUBO_DOCKER"); !exists {
-		fmt.Println(msg)
+
 	}
+
+	fmt.Println(msg)
 }
 
 // LogInfo logs information

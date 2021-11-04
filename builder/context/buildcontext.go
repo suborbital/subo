@@ -49,23 +49,28 @@ type BundleRef struct {
 
 // ForDirectory returns the build context for the provided working directory
 func ForDirectory(dir string) (*BuildContext, error) {
-	runnables, cwdIsRunnable, err := getRunnableDirs(dir)
+	fullDir, err := filepath.Abs(dir)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get Abs path")
+	}
+
+	runnables, cwdIsRunnable, err := getRunnableDirs(fullDir)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to getRunnableDirs")
 	}
 
-	bundle, err := bundleTargetPath(dir)
+	bundle, err := bundleTargetPath(fullDir)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to bundleIfExists")
 	}
 
-	directive, err := readDirectiveFile(dir)
+	directive, err := readDirectiveFile(fullDir)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to readDirectiveFile")
 	}
 
 	bctx := &BuildContext{
-		Cwd:           dir,
+		Cwd:           fullDir,
 		CwdIsRunnable: cwdIsRunnable,
 		Runnables:     runnables,
 		Bundle:        *bundle,
@@ -109,6 +114,23 @@ func (b *BuildContext) ShouldBuildLang(lang string) bool {
 	}
 
 	return false
+}
+
+func (b *BuildContext) Modules() ([]os.File, error) {
+	modules := []os.File{}
+
+	for _, r := range b.Runnables {
+		wasmPath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
+
+		file, err := os.Open(wasmPath)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to Open module file %s", wasmPath)
+		}
+
+		modules = append(modules, *file)
+	}
+
+	return modules, nil
 }
 
 func getRunnableDirs(cwd string) ([]RunnableDir, bool, error) {
@@ -192,7 +214,7 @@ func getRunnableFromFiles(wd string, files []os.FileInfo) (*RunnableDir, error) 
 		runnable.Namespace = "default"
 	}
 
-	img := imageForLang(runnable.Lang)
+	img := ImageForLang(runnable.Lang)
 	if img == "" {
 		return nil, fmt.Errorf("(%s) %s is not a valid lang", runnable.Name, runnable.Lang)
 	}
@@ -213,7 +235,7 @@ func getRunnableFromFiles(wd string, files []os.FileInfo) (*RunnableDir, error) 
 	return runnableDir, nil
 }
 
-func imageForLang(lang string) string {
+func ImageForLang(lang string) string {
 	img, ok := dockerImageForLang[lang]
 	if !ok {
 		return ""

@@ -10,4 +10,4 @@ ENV SUBO_DOCKER=1
 
 WORKDIR /root/runnable
 
-ENTRYPOINT subo build --native .
+ENTRYPOINT subo build --native --langs assemblyscript .

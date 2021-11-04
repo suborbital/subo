@@ -9,4 +9,4 @@ ENV SUBO_DOCKER=1
 RUN mkdir -p /root/runnable
 WORKDIR /root/runnable
 
-ENTRYPOINT subo build --native .
+ENTRYPOINT subo build --native --langs swift.

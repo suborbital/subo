@@ -27,4 +27,4 @@ RUN git checkout jagger/tinygo
 
 WORKDIR /root/runnable
 
-ENTRYPOINT subo build --native .
+ENTRYPOINT subo build --native --langs tinygo .
