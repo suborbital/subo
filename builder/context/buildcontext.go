@@ -80,7 +80,7 @@ func ForDirectory(dir string) (*BuildContext, error) {
 		Langs:         []string{},
 		MountPath:     fullDir,
 		RelDockerPath: ".",
-		BuilderTag:    fmt.Sprintf("v:%s", release.SuboDotVersion),
+		BuilderTag:    fmt.Sprintf("v%s", release.SuboDotVersion),
 	}
 
 	if directive != nil {
