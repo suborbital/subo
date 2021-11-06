@@ -51,7 +51,7 @@ func BuildCmd() *cobra.Command {
 
 			// verify they are valid and set the context values if so
 			if mountPath != "" && relPath == "" {
-				return errors.New("must set '--relpath' when '--mountpath' is used")
+				relPath = dir
 			} else if mountPath != "" && relPath != "" {
 				bdr.Context.MountPath = mountPath
 				bdr.Context.RelDockerPath = relPath
@@ -111,8 +111,8 @@ func BuildCmd() *cobra.Command {
 	cmd.Flags().String("make", "", "execute the provided Make target before building the project bundle")
 	cmd.Flags().Bool("docker", false, "build your project's Dockerfile. It will be tagged {identifier}:{appVersion}")
 	cmd.Flags().StringSlice("langs", []string{}, "build only Runnables for the listed languages (comma-seperated)")
-	cmd.Flags().String("mountpath", "", "if passed, the Docker builders will mount their volumes at the provided path, and '--relpath' must be used")
-	cmd.Flags().String("relpath", "", "if passed, the Docker builders will use the provided path, relative to '--mountpath'")
+	cmd.Flags().String("mountpath", "", "if passed, the Docker builders will mount their volumes at the provided path")
+	cmd.Flags().String("relpath", "", "if passed, the Docker builders will run `subo build` using the provided path, relative to '--mountpath'")
 	cmd.Flags().String("builder-tag", "", "use the provided tag for builder images")
 
 	return cmd

@@ -2,6 +2,7 @@ package util
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -18,7 +19,7 @@ func Run(cmd string) (string, error) {
 // RunInDir runs a command in the specified directory and returns the full output or error
 func RunInDir(cmd, dir string) (string, error) {
 	// you can uncomment this below if you want to see exactly the commands being run
-	// fmt.Println("▶️", cmd)
+	fmt.Println("▶️", cmd)
 
 	argLRaw := strings.Split(cmd, " ")
 
