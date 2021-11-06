@@ -12,6 +12,4 @@ RUN cargo install lazy_static; exit 0
 
 COPY --from=subo /go/bin/subo /usr/local/bin
 
-ENV SUBO_DOCKER=1
-
 WORKDIR /root/runnable
