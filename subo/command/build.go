@@ -49,10 +49,12 @@ func BuildCmd() *cobra.Command {
 			mountPath, _ := cmd.Flags().GetString("mountpath")
 			relPath, _ := cmd.Flags().GetString("relpath")
 
-			// verify they are valid and set the context values if so
-			if mountPath != "" && relPath == "" {
-				relPath = dir
-			} else if mountPath != "" && relPath != "" {
+			if mountPath != "" {
+				if relPath == "" {
+					// fallback to the dir arg as that's usually a sane default
+					relPath = dir
+				}
+
 				bdr.Context.MountPath = mountPath
 				bdr.Context.RelDockerPath = relPath
 			}
