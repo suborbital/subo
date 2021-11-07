@@ -5,8 +5,7 @@ go 1.17
 require (
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.1.3
-	github.com/suborbital/atmo v0.3.2
-	github.com/suborbital/reactr v0.12.1-0.20211029140700-726ed982a069
+	github.com/suborbital/atmo v0.3.3-0.20211107231123-658336d50129
 	golang.org/x/mod v0.4.2
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -30,6 +29,7 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
 	github.com/sethvargo/go-envconfig v0.3.2 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/suborbital/reactr v0.12.1-0.20211107205639-a6577851496b // indirect
 	github.com/suborbital/vektor v0.4.1 // indirect
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect
 	golang.org/x/net v0.0.0-20210726213435-c6fcb2dbf985 // indirect
