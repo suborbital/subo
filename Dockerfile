@@ -7,7 +7,7 @@ COPY subo ./subo
 COPY builder ./builder
 COPY scn ./scn
 COPY vendor ./vendor
-COPY go.* .
+COPY go.* ./
 COPY Makefile .
 
 RUN make subo
