@@ -53,6 +53,27 @@ func readDirectiveFile(cwd string) (*directive.Directive, error) {
 	return directive, nil
 }
 
+// readQueriesFile finds a queries.yaml from disk
+func readQueriesFile(cwd string) ([]directive.DBQuery, error) {
+	filePath := filepath.Join(cwd, "Queries.yaml")
+
+	directiveBytes, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, nil
+		}
+
+		return nil, errors.Wrap(err, "failed to ReadFile for Queries.yaml")
+	}
+
+	directive := &directive.Directive{}
+	if err := directive.Unmarshal(directiveBytes); err != nil {
+		return nil, errors.Wrap(err, "failed to Unmarshal Directive")
+	}
+
+	return directive.Queries, nil
+}
+
 // AugmentAndValidateDirectiveFns ensures that all functions referenced in a handler exist
 // in the project and then adds the function list to the provided directive
 func AugmentAndValidateDirectiveFns(dxe *directive.Directive, fns []RunnableDir) error {
@@ -91,8 +112,6 @@ func getHandlerFnList(dxe *directive.Directive) []string {
 				for _, fn := range step.Group {
 					fnMap[fn.Fn] = true
 				}
-			} else if step.IsForEach() {
-				fnMap[step.ForEach.Fn] = true
 			}
 		}
 	}

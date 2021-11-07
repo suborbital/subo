@@ -1,17 +1,13 @@
 name: Testapalooza
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ "*" ]
+on: pull_request
 
 jobs:
 
   build:
     strategy:
         matrix:
-          golang: [1.16]
+          golang: [1.17]
 
     name: Smoke
     runs-on: ubuntu-latest

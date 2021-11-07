@@ -63,6 +63,13 @@ func ForDirectory(dir string) (*BuildContext, error) {
 		return nil, errors.Wrap(err, "failed to readDirectiveFile")
 	}
 
+	queries, err := readQueriesFile(dir)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to readQueriesFile")
+	} else if len(queries) > 0 {
+		directive.Queries = queries
+	}
+
 	bctx := &BuildContext{
 		Cwd:           dir,
 		CwdIsRunnable: cwdIsRunnable,
