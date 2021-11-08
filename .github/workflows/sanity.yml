@@ -1,14 +1,6 @@
 name: Testapalooza
 
-<<<<<<< HEAD
-on:
-  push:
-    branches: [ "*" ]
-  pull_request:
-    branches: [ "*" ]
-=======
 on: pull_request
->>>>>>> main
 
 jobs:
 
