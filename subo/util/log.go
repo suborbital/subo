@@ -2,7 +2,6 @@ package util
 
 import (
 	"fmt"
-	"os"
 )
 
 // FriendlyLogger describes a logger designed to provide friendly output for interactive CLI purposes
@@ -25,9 +24,7 @@ func (p *PrintLogger) LogWarn(msg string)  { LogWarn(msg) }
 
 // Keeping it DRY
 func log(msg string) {
-	if _, exists := os.LookupEnv("SUBO_DOCKER"); !exists {
-		fmt.Println(msg)
-	}
+	fmt.Println(msg)
 }
 
 // LogInfo logs information

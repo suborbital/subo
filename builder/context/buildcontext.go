@@ -29,6 +29,10 @@ type BuildContext struct {
 	Bundle        BundleRef
 	Directive     *directive.Directive
 	AtmoVersion   string
+	Langs         []string
+	MountPath     string
+	RelDockerPath string
+	BuilderTag    string
 }
 
 // RunnableDir represents a directory containing a Runnable
@@ -37,7 +41,6 @@ type RunnableDir struct {
 	UnderscoreName string
 	Fullpath       string
 	Runnable       *directive.Runnable
-	BuildImage     string
 }
 
 // BundleRef contains information about a bundle in the current context
@@ -48,17 +51,22 @@ type BundleRef struct {
 
 // ForDirectory returns the build context for the provided working directory
 func ForDirectory(dir string) (*BuildContext, error) {
-	runnables, cwdIsRunnable, err := getRunnableDirs(dir)
+	fullDir, err := filepath.Abs(dir)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get Abs path")
+	}
+
+	runnables, cwdIsRunnable, err := getRunnableDirs(fullDir)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to getRunnableDirs")
 	}
 
-	bundle, err := bundleTargetPath(dir)
+	bundle, err := bundleTargetPath(fullDir)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to bundleIfExists")
 	}
 
-	directive, err := readDirectiveFile(dir)
+	directive, err := readDirectiveFile(fullDir)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to readDirectiveFile")
 	}
@@ -71,11 +79,15 @@ func ForDirectory(dir string) (*BuildContext, error) {
 	}
 
 	bctx := &BuildContext{
-		Cwd:           dir,
+		Cwd:           fullDir,
 		CwdIsRunnable: cwdIsRunnable,
 		Runnables:     runnables,
 		Bundle:        *bundle,
 		Directive:     directive,
+		Langs:         []string{},
+		MountPath:     fullDir,
+		RelDockerPath: ".",
+		BuilderTag:    fmt.Sprintf("v%s", release.SuboDotVersion),
 	}
 
 	if directive != nil {
@@ -94,6 +106,38 @@ func (b *BuildContext) RunnableExists(name string) bool {
 	}
 
 	return false
+}
+
+// ShouldBuildLang returns true if the provided language is safe-listed for building
+func (b *BuildContext) ShouldBuildLang(lang string) bool {
+	if len(b.Langs) == 0 {
+		return true
+	}
+
+	for _, l := range b.Langs {
+		if l == lang {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (b *BuildContext) Modules() ([]os.File, error) {
+	modules := []os.File{}
+
+	for _, r := range b.Runnables {
+		wasmPath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
+
+		file, err := os.Open(wasmPath)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to Open module file %s", wasmPath)
+		}
+
+		modules = append(modules, *file)
+	}
+
+	return modules, nil
 }
 
 func getRunnableDirs(cwd string) ([]RunnableDir, bool, error) {
@@ -177,8 +221,7 @@ func getRunnableFromFiles(wd string, files []os.FileInfo) (*RunnableDir, error) 
 		runnable.Namespace = "default"
 	}
 
-	img := imageForLang(runnable.Lang)
-	if img == "" {
+	if _, exists := dockerImageForLang[runnable.Lang]; !exists {
 		return nil, fmt.Errorf("(%s) %s is not a valid lang", runnable.Name, runnable.Lang)
 	}
 
@@ -192,19 +235,18 @@ func getRunnableFromFiles(wd string, files []os.FileInfo) (*RunnableDir, error) 
 		UnderscoreName: strings.Replace(runnable.Name, "-", "_", -1),
 		Fullpath:       absolutePath,
 		Runnable:       &runnable,
-		BuildImage:     img,
 	}
 
 	return runnableDir, nil
 }
 
-func imageForLang(lang string) string {
+func ImageForLang(lang, tag string) string {
 	img, ok := dockerImageForLang[lang]
 	if !ok {
 		return ""
 	}
 
-	return fmt.Sprintf("%s:v%s", img, release.SuboDotVersion)
+	return fmt.Sprintf("%s:%s", img, tag)
 }
 
 func bundleTargetPath(cwd string) (*BundleRef, error) {

@@ -31,7 +31,6 @@ type Builder struct {
 type BuildResult struct {
 	Succeeded bool
 	OutputLog string
-	Module    *os.File
 }
 
 type Toolchain string
@@ -60,33 +59,53 @@ func ForDirectory(logger util.FriendlyLogger, dir string) (*Builder, error) {
 func (b *Builder) BuildWithToolchain(tcn Toolchain) error {
 	var err error
 
-	b.results = make([]BuildResult, len(b.Context.Runnables))
+	b.results = []BuildResult{}
 
-	for i, r := range b.Context.Runnables {
-		b.log.LogStart(fmt.Sprintf("building runnable: %s (%s)", r.Name, r.Runnable.Lang))
+	// when building in Docker mode, just collect the langs we need to build, and then
+	// launch the associated builder images which will do the building
+	dockerLangs := map[string]bool{}
 
-		result := &BuildResult{}
+	for _, r := range b.Context.Runnables {
+		if !b.Context.ShouldBuildLang(r.Runnable.Lang) {
+			continue
+		}
 
 		if tcn == ToolchainNative {
+			b.log.LogStart(fmt.Sprintf("building runnable: %s (%s)", r.Name, r.Runnable.Lang))
+
+			result := &BuildResult{}
+
 			if err := b.checkAndRunPreReqs(r, result); err != nil {
 				return errors.Wrap(err, "🚫 failed to checkAndRunPreReqs")
 			}
 
 			err = b.doNativeBuildForRunnable(r, result)
+
+			// even if there was a failure, load the result into the builder
+			// since the logs of the failed build are useful
+			b.results = append(b.results, *result)
+
+			if err != nil {
+				return errors.Wrapf(err, "🚫 failed to build %s", r.Name)
+			}
+
+			fullWasmFilepath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
+			b.log.LogDone(fmt.Sprintf("%s was built -> %s", r.Name, fullWasmFilepath))
+
 		} else {
-			err = b.doBuildForRunnable(r, result)
+			dockerLangs[r.Runnable.Lang] = true
 		}
+	}
 
-		// even if there was a failure, load the result into the builder
-		// since the logs of the failed build are useful
-		b.results[i] = *result
+	if tcn == ToolchainDocker {
+		for lang := range dockerLangs {
+			result, err := b.dockerBuildForLang(lang)
+			if err != nil {
+				return errors.Wrap(err, "failed to dockerBuildForDirectory")
+			}
 
-		if err != nil {
-			return errors.Wrapf(err, "🚫 failed to build %s", r.Name)
+			b.results = append(b.results, *result)
 		}
-
-		fullWasmFilepath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
-		b.log.LogDone(fmt.Sprintf("%s was built -> %s", r.Name, fullWasmFilepath))
 	}
 
 	return nil
@@ -151,9 +170,9 @@ func (b *Builder) Bundle() error {
 		return errors.Wrap(err, "failed to Directive.Marshal")
 	}
 
-	modules := make([]os.File, len(b.results))
-	for i := range b.results {
-		modules[i] = *b.results[i].Module
+	modules, err := b.Context.Modules()
+	if err != nil {
+		return errors.Wrap(err, "failed to Modules for build")
 	}
 
 	if err := bundle.Write(directiveBytes, modules, static, b.Context.Bundle.Fullpath); err != nil {
@@ -163,33 +182,26 @@ func (b *Builder) Bundle() error {
 	return nil
 }
 
-func (b *Builder) doBuildForRunnable(r context.RunnableDir, result *BuildResult) error {
-	img := r.BuildImage
+func (b *Builder) dockerBuildForLang(lang string) (*BuildResult, error) {
+	img := context.ImageForLang(lang, b.Context.BuilderTag)
 	if img == "" {
-		return fmt.Errorf("%q is not a supported language", r.Runnable.Lang)
+		return nil, fmt.Errorf("%q is not a supported language", lang)
 	}
 
-	outputLog, err := util.Run(fmt.Sprintf("docker run --rm --mount type=bind,source=%s,target=/root/runnable %s", r.Fullpath, img))
+	result := &BuildResult{}
+
+	outputLog, err := util.Run(fmt.Sprintf("docker run --rm --mount type=bind,source=%s,target=/root/runnable %s subo build %s --native --langs %s", b.Context.MountPath, img, b.Context.RelDockerPath, lang))
 
 	result.OutputLog = outputLog
 
 	if err != nil {
 		result.Succeeded = false
-		return errors.Wrap(err, "failed to Run docker command")
+		return nil, errors.Wrap(err, "failed to Run docker command")
 	}
 
 	result.Succeeded = true
 
-	targetPath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
-
-	file, err := os.Open(targetPath)
-	if err != nil {
-		return errors.Wrapf(err, "failed to open resulting built file %s", targetPath)
-	}
-
-	result.Module = file
-
-	return nil
+	return result, nil
 }
 
 // results and resulting file are loaded into the BuildResult pointer
@@ -222,15 +234,6 @@ func (b *Builder) doNativeBuildForRunnable(r context.RunnableDir, result *BuildR
 
 		result.Succeeded = true
 	}
-
-	targetPath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
-
-	file, err := os.Open(targetPath)
-	if err != nil {
-		return errors.Wrapf(err, "failed to open resulting built file %s", targetPath)
-	}
-
-	result.Module = file
 
 	return nil
 }

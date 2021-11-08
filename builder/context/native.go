@@ -32,7 +32,9 @@ var nativeCommandsForLang = map[string]map[string][]string{
 			"cp .build/debug/{{ .Name }}.wasm .",
 		},
 		"assemblyscript": {
-			"npm run asbuild",
+			"chmod -R 777 ./",
+			"chmod +x ./node_modules/assemblyscript/bin/asc",
+			"./node_modules/assemblyscript/bin/asc src/index.ts --target release --use abort=src/index/abort",
 		},
 		"tinygo": {
 			"tinygo build -o {{ .Name }}.wasm -target wasi .",

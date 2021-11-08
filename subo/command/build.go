@@ -33,16 +33,36 @@ func BuildCmd() *cobra.Command {
 
 			if bdr.Context.CwdIsRunnable {
 				util.LogInfo("building single Runnable (run from project root to create bundle)")
-			} else {
-				util.LogStart(fmt.Sprintf("building runnables in %s", bdr.Context.Cwd))
 			}
 
+			langs, _ := cmd.Flags().GetStringSlice("langs")
+			bdr.Context.Langs = langs
+
 			noBundle, _ := cmd.Flags().GetBool("no-bundle")
-			shouldBundle := !noBundle && !bdr.Context.CwdIsRunnable
+			shouldBundle := !noBundle && !bdr.Context.CwdIsRunnable && len(langs) == 0
 			shouldDockerBuild, _ := cmd.Flags().GetBool("docker")
 
 			useNative, _ := cmd.Flags().GetBool("native")
 			makeTarget, _ := cmd.Flags().GetString("make")
+
+			// determine if a custom Docker mountpath and relpath were set
+			mountPath, _ := cmd.Flags().GetString("mountpath")
+			relPath, _ := cmd.Flags().GetString("relpath")
+
+			if mountPath != "" {
+				if relPath == "" {
+					// fallback to the dir arg as that's usually a sane default
+					relPath = dir
+				}
+
+				bdr.Context.MountPath = mountPath
+				bdr.Context.RelDockerPath = relPath
+			}
+
+			builderTag, _ := cmd.Flags().GetString("builder-tag")
+			if builderTag != "" {
+				bdr.Context.BuilderTag = builderTag
+			}
 
 			if makeTarget != "" {
 				util.LogStart(fmt.Sprintf("make %s", makeTarget))
@@ -54,7 +74,6 @@ func BuildCmd() *cobra.Command {
 
 			var toolchain builder.Toolchain
 			if useNative {
-				util.LogInfo("🔗 using native toolchain")
 				toolchain = builder.ToolchainNative
 			} else {
 				util.LogInfo("🐳 using Docker toolchain")
@@ -90,9 +109,13 @@ func BuildCmd() *cobra.Command {
 	}
 
 	cmd.Flags().Bool("no-bundle", false, "if passed, a .wasm.zip bundle will not be generated")
-	cmd.Flags().Bool("native", false, "if passed, build runnables using native toolchain rather than Docker")
-	cmd.Flags().String("make", "", "if passed, execute the provided Make target before building the project bundle")
-	cmd.Flags().Bool("docker", false, "if passed, build your project's Dockerfile. It will be tagged {identifier}:{appVersion}")
+	cmd.Flags().Bool("native", false, "use native (locally installed) toolchain rather than Docker")
+	cmd.Flags().String("make", "", "execute the provided Make target before building the project bundle")
+	cmd.Flags().Bool("docker", false, "build your project's Dockerfile. It will be tagged {identifier}:{appVersion}")
+	cmd.Flags().StringSlice("langs", []string{}, "build only Runnables for the listed languages (comma-seperated)")
+	cmd.Flags().String("mountpath", "", "if passed, the Docker builders will mount their volumes at the provided path")
+	cmd.Flags().String("relpath", "", "if passed, the Docker builders will run `subo build` using the provided path, relative to '--mountpath'")
+	cmd.Flags().String("builder-tag", "", "use the provided tag for builder images")
 
 	return cmd
 }

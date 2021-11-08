@@ -16,8 +16,6 @@ RUN CGO_ENABLED=1 go install
 
 COPY --from=subo /go/bin/subo /usr/local/bin
 
-ENV SUBO_DOCKER=1
-
 WORKDIR /root
 
 # temporary hack
@@ -26,5 +24,3 @@ WORKDIR /root/reactr
 RUN git checkout jagger/tinygo
 
 WORKDIR /root/runnable
-
-ENTRYPOINT subo build --native .
