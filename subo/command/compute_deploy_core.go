@@ -1,16 +1,22 @@
 package command
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/suborbital/subo/builder/context"
 	"github.com/suborbital/subo/builder/template"
 	"github.com/suborbital/subo/subo/input"
+	"github.com/suborbital/subo/subo/localproxy"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
 )
@@ -117,6 +123,17 @@ func ComputeDeployCoreCommand() *cobra.Command {
 
 				util.LogInfo("use `docker ps` and `docker-compose logs` to check deployment status")
 
+				proxy := localproxy.New("editor.suborbital.network")
+
+				go func() {
+					if err := proxy.Start(); err != nil {
+						log.Fatal(err)
+					}
+				}()
+
+				time.Sleep(time.Second * 2)
+				localFuncRepl()
+
 			} else {
 				if _, err := util.Run("kubectl apply -f https://github.com/kedacore/keda/releases/download/v2.4.0/keda-2.4.0.yaml"); err != nil {
 					return errors.Wrap(err, "🚫 failed to install KEDA")
@@ -180,6 +197,37 @@ Are you ready to continue? (y/N): `)
 	}
 
 	return nil
+}
+
+type tokenResp struct {
+	Token string `json:"token"`
+}
+
+func localFuncRepl() error {
+	for {
+		fmt.Print("\n\nTo edit a function, enter its name: ")
+		name, err := input.ReadStdinString()
+		if err != nil {
+			return errors.Wrap(err, "failed to ReadStdinString")
+		}
+
+		req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("http://local.suborbital.network:8081/api/v1/token/com.suborbital.asdlfkjasdl/default/%s", name), nil)
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			fmt.Println("failed to create new function:", err.Error())
+			continue
+		}
+
+		body, _ := io.ReadAll(resp.Body)
+		defer resp.Body.Close()
+
+		token := tokenResp{}
+		json.Unmarshal(body, &token)
+
+		editorURL := fmt.Sprintf("http://local.suborbital.network/?builder=http://local.suborbital.network:8082&token=%s&ident=com.suborbital.asdlfkjasdl&fn=%s", token.Token, name)
+
+		fmt.Println("\nfunction ready, visit", editorURL, "to access the editor")
+	}
 }
 
 // getEnvToken gets the environment token from stdin
