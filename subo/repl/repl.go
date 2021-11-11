@@ -24,14 +24,14 @@ func New() *Repl {
 }
 
 func (r *Repl) Run() error {
-	fmt.Print("\n\nPress enter to launch the local command REPL...")
+	fmt.Print("\n\nPress enter to launch the local Compute REPL...")
 
 	if _, err := input.ReadStdinString(); err != nil {
 		return errors.Wrap(err, "failed to ReadStdinString")
 	}
 
 	for {
-		fmt.Println("\n\n1. Edit a function")
+		fmt.Println("\n\n1. Create or edit a function")
 		fmt.Print("\nChoose an option: ")
 
 		opt, err := input.ReadStdinString()
@@ -43,7 +43,7 @@ func (r *Repl) Run() error {
 
 		switch opt {
 		case "1":
-			replErr = r.createFunction()
+			replErr = r.editFunction()
 		default:
 			fmt.Println("invalid, choose again.")
 		}
@@ -54,8 +54,8 @@ func (r *Repl) Run() error {
 	}
 }
 
-func (r *Repl) createFunction() error {
-	fmt.Print("\n\nTo edit a function, enter its name (or FQFN): ")
+func (r *Repl) editFunction() error {
+	fmt.Print("\n\nTo create or edit a function, enter its name (or FQFN): ")
 	name, err := input.ReadStdinString()
 	if err != nil {
 		return errors.Wrap(err, "failed to ReadStdinString")
@@ -87,7 +87,7 @@ func (r *Repl) createFunction() error {
 
 	editorURL := fmt.Sprintf("http://local.suborbital.network/?builder=http://local.suborbital.network:8082&token=%s&ident=%s&namespace=%s&fn=%s", token.Token, ident, namespace, FQFN.Fn)
 
-	fmt.Println("\n✅ function ready, visit", editorURL, "to access the editor")
+	fmt.Println("\n✅ visit", editorURL, "to access the editor")
 
 	return nil
 }

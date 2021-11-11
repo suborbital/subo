@@ -32,7 +32,7 @@ func New(endpoint string) *Proxy {
 
 // Start starts the local proxy server
 func (p *Proxy) Start() error {
-	fmt.Println("\nPROXY: starting, visit http://local.suborbital.network to access the editor")
+	fmt.Println("\nPROXY: local tunnel to function editor started")
 
 	return p.server.ListenAndServe()
 }
