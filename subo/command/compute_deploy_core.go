@@ -2,16 +2,20 @@ package command
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/suborbital/subo/builder/context"
 	"github.com/suborbital/subo/builder/template"
 	"github.com/suborbital/subo/subo/input"
+	"github.com/suborbital/subo/subo/localproxy"
 	"github.com/suborbital/subo/subo/release"
+	"github.com/suborbital/subo/subo/repl"
 	"github.com/suborbital/subo/subo/util"
 )
 
@@ -116,6 +120,21 @@ func ComputeDeployCoreCommand() *cobra.Command {
 				}
 
 				util.LogInfo("use `docker ps` and `docker-compose logs` to check deployment status")
+
+				proxy := localproxy.New("editor.suborbital.network")
+
+				go func() {
+					if err := proxy.Start(); err != nil {
+						log.Fatal(err)
+					}
+				}()
+
+				// this is to give the proxy server some room to bind to the port and start up
+				// it's not ideal, but the least gross way to ensure a good experience
+				time.Sleep(time.Second * 2)
+
+				repl := repl.New()
+				repl.Run()
 
 			} else {
 				if _, err := util.Run("kubectl apply -f https://github.com/kedacore/keda/releases/download/v2.4.0/keda-2.4.0.yaml"); err != nil {

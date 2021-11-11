@@ -19,5 +19,7 @@ target
 *.build
 *.wasm
 
+.scntest
+
 # macOS
 .DS_Store
