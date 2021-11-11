@@ -129,7 +129,10 @@ func ComputeDeployCoreCommand() *cobra.Command {
 					}
 				}()
 
+				// this is to give the proxy server some room to bind to the port and start up
+				// it's not ideal, but the least gross way to ensure a good experience
 				time.Sleep(time.Second * 2)
+
 				repl := repl.New()
 				repl.Run()
 
