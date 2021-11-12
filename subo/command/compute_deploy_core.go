@@ -203,6 +203,10 @@ Are you ready to continue? (y/N): `)
 
 // getEnvToken gets the environment token from stdin
 func getEnvToken() (string, error) {
+    buf, err := util.ReadEnvironmentToken()
+    if err == nil {
+        return buf, nil
+    }
 	fmt.Print("Enter your environment token: ")
 	token, err := input.ReadStdinString()
 	if err != nil {
