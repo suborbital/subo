@@ -15,7 +15,7 @@ func getTokenTmpDir() string {
 func WriteEnvironmentToken(tokenStr string) error {
 	tokenPath := getTokenTmpDir()
 	if _, err := os.Stat(tokenPath); os.IsNotExist(err) {
-		if _, err := Mkdir(filepath.Dir(tokenPath), ""); err != nil {
+		if err := os.MkdirAll(filepath.Dir(tokenPath), os.ModePerm); err != nil {
 			return errors.Wrap(err, "failed to Mkdir")
 		}
 	}
