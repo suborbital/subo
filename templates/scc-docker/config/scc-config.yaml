@@ -1,10 +1,10 @@
 networkRules: &networkRules
   allowIPs: false
+  allowPrivate: false
   allowHTTP: true
   blockedDomains:
-    - "localhost"
     - "*.cluster.local"
-    - "scc-controlplane-service:8081"
+    - "scc-controlplane-service"
     - "scc-builder-service"
 
 capabilities:
