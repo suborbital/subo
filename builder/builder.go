@@ -287,7 +287,7 @@ func (b *Builder) analyzeForCompilerFlags(runnable context.RunnableDir) (string,
 	if runnable.Runnable.Lang == "assemblyscript" {
 		packageJSONBytes, err := ioutil.ReadFile(filepath.Join(runnable.Fullpath, "package.json"))
 		if err != nil {
-			return "", errors.Wrap(err, "faield to ReadFile package.json")
+			return "", errors.Wrap(err, "failed to ReadFile package.json")
 		}
 
 		if strings.Contains(string(packageJSONBytes), "json-as") {
