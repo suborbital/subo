@@ -8,13 +8,17 @@ networkRules: &networkRules
     - "scc-builder-service"
 
 capabilities:
+  logger:
+    enabled: true
   http:
     enabled: true
     rules: *networkRules
   graphql:
     enabled: true
     rules: *networkRules
-  logger:
-    enabled: true
   cache:
+    enabled: false
+  file:
+    enabled: false
+  db:
     enabled: false
