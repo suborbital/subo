@@ -41,6 +41,7 @@ type RunnableDir struct {
 	UnderscoreName string
 	Fullpath       string
 	Runnable       *directive.Runnable
+	CompilerFlags  string
 }
 
 // BundleRef contains information about a bundle in the current context

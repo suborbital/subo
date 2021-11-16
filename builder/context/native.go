@@ -5,6 +5,18 @@ import (
 	"runtime"
 )
 
+// NativeBuildCommands returns the native build commands needed to build a Runnable of a particular language
+func NativeBuildCommands(lang string) ([]string, error) {
+	os := runtime.GOOS
+
+	cmds, exists := nativeCommandsForLang[os][lang]
+	if !exists {
+		return nil, fmt.Errorf("unable to build %s Runnables natively", lang)
+	}
+
+	return cmds, nil
+}
+
 var nativeCommandsForLang = map[string]map[string][]string{
 	"darwin": {
 		"rust": {
@@ -34,22 +46,10 @@ var nativeCommandsForLang = map[string]map[string][]string{
 		"assemblyscript": {
 			"chmod -R 777 ./",
 			"chmod +x ./node_modules/assemblyscript/bin/asc",
-			"./node_modules/assemblyscript/bin/asc src/index.ts --target release --use abort=src/index/abort",
+			"./node_modules/assemblyscript/bin/asc src/index.ts --target release --use abort=src/index/abort {{ .CompilerFlags }}",
 		},
 		"tinygo": {
 			"tinygo build -o {{ .Name }}.wasm -target wasi .",
 		},
 	},
-}
-
-// NativeBuildCommands returns the native build commands needed to build a Runnable of a particular language
-func NativeBuildCommands(lang string) ([]string, error) {
-	os := runtime.GOOS
-
-	cmds, exists := nativeCommandsForLang[os][lang]
-	if !exists {
-		return nil, fmt.Errorf("unable to build %s Runnables natively", lang)
-	}
-
-	return cmds, nil
 }

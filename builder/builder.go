@@ -3,6 +3,7 @@ package builder
 import (
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -77,6 +78,12 @@ func (b *Builder) BuildWithToolchain(tcn Toolchain) error {
 
 			if err := b.checkAndRunPreReqs(r, result); err != nil {
 				return errors.Wrap(err, "🚫 failed to checkAndRunPreReqs")
+			}
+
+			if flags, err := b.analyzeForCompilerFlags(r); err != nil {
+				return errors.Wrap(err, "🚫 failed to analyzeForCompilerFlags")
+			} else if flags != "" {
+				r.CompilerFlags = flags
 			}
 
 			err = b.doNativeBuildForRunnable(r, result)
@@ -222,8 +229,10 @@ func (b *Builder) doNativeBuildForRunnable(r context.RunnableDir, result *BuildR
 			return errors.Wrap(err, "failed to Execute command template")
 		}
 
+		cmdString := strings.TrimSpace(fullCmd.String())
+
 		// Even if the command fails, still load the output into the result object
-		outputLog, err := util.RunInDir(fullCmd.String(), r.Fullpath)
+		outputLog, err := util.RunInDir(cmdString, r.Fullpath)
 
 		result.OutputLog += outputLog + "\n"
 
@@ -270,4 +279,21 @@ func (b *Builder) checkAndRunPreReqs(runnable context.RunnableDir, result *Build
 	}
 
 	return nil
+}
+
+// analyzeForCompilerFlags looks at the Runnable and determines if any additional compiler flags are needed
+// this is initially added to support AS-JSON in AssemblyScript with its need for the --transform flag
+func (b *Builder) analyzeForCompilerFlags(runnable context.RunnableDir) (string, error) {
+	if runnable.Runnable.Lang == "assemblyscript" {
+		packageJSONBytes, err := ioutil.ReadFile(filepath.Join(runnable.Fullpath, "package.json"))
+		if err != nil {
+			return "", errors.Wrap(err, "failed to ReadFile package.json")
+		}
+
+		if strings.Contains(string(packageJSONBytes), "json-as") {
+			return "--transform ./node_modules/json-as/transform", nil
+		}
+	}
+
+	return "", nil
 }
