@@ -18,9 +18,4 @@ COPY --from=subo /go/bin/subo /usr/local/bin
 
 WORKDIR /root
 
-# temporary hack
-RUN git clone https://github.com/suborbital/reactr
-WORKDIR /root/reactr
-RUN git checkout jagger/tinygo
-
 WORKDIR /root/runnable

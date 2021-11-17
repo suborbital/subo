@@ -31,6 +31,8 @@ var nativeCommandsForLang = map[string]map[string][]string{
 			"npm run asbuild",
 		},
 		"tinygo": {
+			"go get -d",
+			"go mod tidy",
 			"tinygo build -o {{ .Name }}.wasm -target wasi .",
 		},
 	},
@@ -49,6 +51,8 @@ var nativeCommandsForLang = map[string]map[string][]string{
 			"./node_modules/assemblyscript/bin/asc src/index.ts --target release --use abort=src/index/abort {{ .CompilerFlags }}",
 		},
 		"tinygo": {
+			"go get -d",
+			"go mod tidy",
 			"tinygo build -o {{ .Name }}.wasm -target wasi .",
 		},
 	},
