@@ -183,7 +183,7 @@ BEFORE YOU CONTINUE:
 
 	- Subo will attempt to determine the default storage class for your Kubernetes cluster, 
 	  but if is unable to do so you will need to provide one
-			- See the Flight Deck documentation for more details
+			- See the Compute documentation for more details
 
 	- Subo will install the KEDA autoscaler into your cluster. It will not affect any existing deployments.
 
@@ -203,10 +203,11 @@ Are you ready to continue? (y/N): `)
 
 // getEnvToken gets the environment token from stdin
 func getEnvToken() (string, error) {
-    buf, err := util.ReadEnvironmentToken()
-    if err == nil {
-        return buf, nil
-    }
+	buf, err := util.ReadEnvironmentToken()
+	if err == nil {
+		return buf, nil
+	}
+
 	fmt.Print("Enter your environment token: ")
 	token, err := input.ReadStdinString()
 	if err != nil {
@@ -277,21 +278,11 @@ func detectStorageClass() (string, error) {
 }
 
 func createConfigMap(cwd string) error {
-	configFilepath := filepath.Join(cwd, "scc-config.yaml")
+	configFilepath := filepath.Join(cwd, "config", "scc-config.yaml")
 
-	configBytes, err := os.ReadFile(configFilepath)
+	_, err := os.Stat(configFilepath)
 	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			// that's fine, continue
-		} else {
-			return errors.Wrap(err, "failed to ReadFile scc-config.yaml")
-		}
-	}
-
-	if len(configBytes) == 0 {
-		if err := os.WriteFile(configFilepath, []byte("capabilities:"), os.ModePerm); err != nil {
-			return errors.Wrap(err, "failed to WriteFile scc-config.yaml")
-		}
+		return errors.Wrap(err, "failed to Stat scc-config.yaml")
 	}
 
 	if _, err := util.Run(fmt.Sprintf("kubectl create configmap scc-config --from-file=scc-config.yaml=%s -n suborbital", configFilepath)); err != nil {
