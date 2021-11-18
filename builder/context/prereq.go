@@ -18,7 +18,7 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 			},
 			Prereq{
 				File:    "_lib/_lib.tar.gz",
-				Command: "curl -L https://github.com/suborbital/reactr/archive/oscar/grain-lib.tar.gz -o _lib/_lib.tar.gz",
+				Command: "curl -L https://github.com/suborbital/reactr/archive/v0.13.0.tar.gz -o _lib/_lib.tar.gz",
 			},
 			Prereq{
 				File:    "_lib/suborbital",
@@ -43,7 +43,7 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 			},
 			Prereq{
 				File:    "_lib/_lib.tar.gz",
-				Command: "curl -L https://github.com/suborbital/reactr/archive/oscar/grain-lib.tar.gz -o _lib/_lib.tar.gz",
+				Command: "curl -L https://github.com/suborbital/reactr/archive/v0.13.0.tar.gz -o _lib/_lib.tar.gz",
 			},
 			Prereq{
 				File:    "_lib/suborbital",
