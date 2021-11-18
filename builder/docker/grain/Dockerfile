@@ -1,6 +1,6 @@
 FROM suborbital/subo:dev as subo
 
-FROM ghcr.io/grain-lang/grain/grain:main
+FROM ghcr.io/grain-lang/grain:main-slim
 
 WORKDIR /root
 RUN mkdir runnable; mkdir suborbital
