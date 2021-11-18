@@ -35,6 +35,9 @@ var nativeCommandsForLang = map[string]map[string][]string{
 			"go mod tidy",
 			"tinygo build -o {{ .Name }}.wasm -target wasi .",
 		},
+		"grain": {
+			"grain compile index.gr -I _lib -o {{ .Name }}.wasm",
+		},
 	},
 	"linux": {
 		"rust": {
@@ -54,6 +57,9 @@ var nativeCommandsForLang = map[string]map[string][]string{
 			"go get -d",
 			"go mod tidy",
 			"tinygo build -o {{ .Name }}.wasm -target wasi .",
+		},
+		"grain": {
+			"grain compile index.gr -I _lib -o {{ .Name }}.wasm",
 		},
 	},
 }
