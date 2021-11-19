@@ -53,11 +53,9 @@ func ComputeDeployCoreCommand() *cobra.Command {
 
 			util.LogStart("preparing deployment")
 
-			// start with a clean slate
-			if _, err := os.Stat(filepath.Join(bctx.Cwd, ".suborbital")); err == nil {
-				if err := os.RemoveAll(filepath.Join(bctx.Cwd, ".suborbital")); err != nil {
-					return errors.Wrap(err, "failed to RemoveAll")
-				}
+			// if there are any existing deployment manifests sitting around, let's replace them
+			if err := removeExistingManifests(bctx); err != nil {
+				return errors.Wrap(err, "failed to removeExistingManifests")
 			}
 
 			_, err = util.Mkdir(bctx.Cwd, ".suborbital")
@@ -287,6 +285,23 @@ func createConfigMap(cwd string) error {
 
 	if _, err := util.Run(fmt.Sprintf("kubectl create configmap scc-config --from-file=scc-config.yaml=%s -n suborbital", configFilepath)); err != nil {
 		return errors.Wrap(err, "failed to create configmap (you may need to run `kubectl delete configmap scc-config -n suborbital`)")
+	}
+
+	return nil
+}
+
+func removeExistingManifests(bctx *context.BuildContext) error {
+	// start with a clean slate
+	if _, err := os.Stat(filepath.Join(bctx.Cwd, ".suborbital")); err == nil {
+		if err := os.RemoveAll(filepath.Join(bctx.Cwd, ".suborbital")); err != nil {
+			return errors.Wrap(err, "failed to RemoveAll .suborbital")
+		}
+	}
+
+	if _, err := os.Stat(filepath.Join(bctx.Cwd, "docker-compose.yml")); err == nil {
+		if err := os.Remove(filepath.Join(bctx.Cwd, "docker-compose.yml")); err != nil {
+			return errors.Wrap(err, "failed to Remove docker-compose.yml")
+		}
 	}
 
 	return nil

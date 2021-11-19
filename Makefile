@@ -1,10 +1,10 @@
 include ./builder/builder.mk
 
 subo:
-	go install ./subo
+	go install
 
 subo/dev:
-	go install -tags=development ./subo
+	go install -tags=development
 
 subo/docker:
 	docker build . -t suborbital/subo:dev
