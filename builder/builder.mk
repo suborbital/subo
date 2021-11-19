@@ -3,7 +3,7 @@ ver = $(shell cat ./builder/.image-ver)
 
 builder/docker: subo/docker builder/docker/rust builder/docker/swift builder/docker/as
 
-builder/docker/publish: subo/docker/publish builder/docker/rust/publish builder/docker/swift/publish builder/docker/as/publish
+builder/docker/publish: subo/docker/publish builder/docker/rust/publish builder/docker/swift/publish builder/docker/as/publish builder/docker/tinygo/publish builder/docker/grain/publish
 
 builder/docker/dev/publish: subo/docker/publish builder/docker/rust/dev/publish builder/docker/swift/dev/publish builder/docker/as/dev/publish
 

@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: atmo
-          image: suborbital/atmo:v0.3.2
+          image: suborbital/atmo:v0.4.0
           command: ["atmo"]
 
           ports:
@@ -55,4 +55,3 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 8080
-  type: LoadBalancer
