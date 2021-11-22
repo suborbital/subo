@@ -65,6 +65,9 @@ spec:
             
             - name: SCC_LOG_LEVEL
               value: "info"
+
+            - name: SCC_CONTROL_PLANE
+              value: "scc-controlplane-service:8081"
           
           volumeMounts:
             - mountPath: "/home/scn"
