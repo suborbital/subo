@@ -45,6 +45,20 @@ var langAliases = map[string]string{
 	"gr":         "grain",
 }
 
+// Error for build command CreateRunnableCmd failures
+type CreateRunnableError struct {
+	Path string // The ouput directory for build command CreateRunnableCmd.
+	Err  error  // The original error.
+}
+
+// Error acts as a cleanup function for CreateRunnableError
+func (err CreateRunnableError) Error() string {
+	if cleanup_err := os.RemoveAll(err.Path); cleanup_err != nil {
+		fmt.Println("🚫 failed to clean up runnable outputs")
+	}
+	return err.Err.Error()
+}
+
 // CreateRunnableCmd returns the build command
 func CreateRunnableCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -79,18 +93,18 @@ func CreateRunnableCmd() *cobra.Command {
 
 			runnable, err := writeDotRunnable(bctx.Cwd, name, lang, namespace)
 			if err != nil {
-				return errors.Wrap(err, "🚫 failed to writeDotRunnable")
+				return errors.Wrap(CreateRunnableError{Path: path, Err: err}, "🚫 failed to writeDotRunnable")
 			}
 
 			templatesPath, err := template.TemplateFullPath(repo, branch)
 			if err != nil {
-				return errors.Wrap(err, "failed to TemplateDir")
+				return errors.Wrap(CreateRunnableError{Path: path, Err: err}, "failed to TemplateDir")
 			}
 
 			if update, _ := cmd.Flags().GetBool(updateTemplatesFlag); update {
 				templatesPath, err = template.UpdateTemplates(repo, branch)
 				if err != nil {
-					return errors.Wrap(err, "🚫 failed to UpdateTemplates")
+					return errors.Wrap(CreateRunnableError{Path: path, Err: err}, "🚫 failed to UpdateTemplates")
 				}
 			}
 
@@ -99,14 +113,14 @@ func CreateRunnableCmd() *cobra.Command {
 				if err == template.ErrTemplateMissing {
 					templatesPath, err = template.UpdateTemplates(repo, branch)
 					if err != nil {
-						return errors.Wrap(err, "🚫 failed to UpdateTemplates")
+						return errors.Wrap(CreateRunnableError{Path: path, Err: err}, "🚫 failed to UpdateTemplates")
 					}
 
 					if err := template.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, runnable); err != nil {
-						return errors.Wrap(err, "🚫 failed to ExecTmplDir")
+						return errors.Wrap(CreateRunnableError{Path: path, Err: err}, "🚫 failed to ExecTmplDir")
 					}
 				} else {
-					return errors.Wrap(err, "🚫 failed to ExecTmplDir")
+					return errors.Wrap(CreateRunnableError{Path: path, Err: err}, "🚫 failed to ExecTmplDir")
 				}
 			}
 
