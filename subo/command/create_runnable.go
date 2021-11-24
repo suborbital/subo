@@ -51,12 +51,12 @@ type CreateRunnableError struct {
 	error        // The original error.
 }
 
-// Error acts as a cleanup function for CreateRunnableError
-func (err CreateRunnableError) Error() string {
-	if cleanup_err := os.RemoveAll(err.Path); cleanup_err != nil {
-		fmt.Println("🚫 failed to clean up runnable outputs")
+// NewCreateRunnableError cleans up and returns CreateRunnableError for CreateRunnableCmd() failures
+func NewCreateRunnableError(path string, err error) CreateRunnableError {
+	if cleanupErr := os.RemoveAll(path); cleanupErr != nil {
+		err = errors.Wrap(err, "failed to clean up runnable outputs")
 	}
-	return err.Err.Error()
+	return CreateRunnableError{Path: path, error: err}
 }
 
 // CreateRunnableCmd returns the build command
