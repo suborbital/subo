@@ -75,7 +75,7 @@ func CreateProjectCmd() *cobra.Command {
 				Headless:    headless,
 			}
 
-			if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data); err != nil {
+			if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data, false); err != nil {
 				// if the templates are missing, try updating them and exec again
 				if err == template.ErrTemplateMissing {
 					templatesPath, err = template.UpdateTemplates(defaultRepo, branch)
@@ -83,7 +83,7 @@ func CreateProjectCmd() *cobra.Command {
 						return errors.Wrap(err, "🚫 failed to UpdateTemplates")
 					}
 
-					if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data); err != nil {
+					if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data, false); err != nil {
 						return errors.Wrap(err, "🚫 failed to ExecTmplDir")
 					}
 				} else {

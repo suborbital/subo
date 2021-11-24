@@ -78,7 +78,7 @@ func ExecRunnableTmplStr(templateStr string, runnable *directive.Runnable) (stri
 func ExecRunnableTmpl(cwd, name, templatesPath string, runnable *directive.Runnable) error {
 	templateData := makeTemplateData(runnable)
 
-	return ExecTmplDir(cwd, name, templatesPath, runnable.Lang, templateData)
+	return ExecTmplDir(cwd, name, templatesPath, runnable.Lang, templateData, false)
 }
 
 // ExecTmplDir copies a generic templated directory
