@@ -93,18 +93,18 @@ func CreateRunnableCmd() *cobra.Command {
 
 			runnable, err := writeDotRunnable(bctx.Cwd, name, lang, namespace)
 			if err != nil {
-				return errors.Wrap(CreateRunnableError{Path: path, Err: err}, "🚫 failed to writeDotRunnable")
+				return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to writeDotRunnable")
 			}
 
 			templatesPath, err := template.TemplateFullPath(repo, branch)
 			if err != nil {
-				return errors.Wrap(CreateRunnableError{Path: path, Err: err}, "failed to TemplateDir")
+				return errors.Wrap(NewCreateRunnableError(path, err), "failed to TemplateDir")
 			}
 
 			if update, _ := cmd.Flags().GetBool(updateTemplatesFlag); update {
 				templatesPath, err = template.UpdateTemplates(repo, branch)
 				if err != nil {
-					return errors.Wrap(CreateRunnableError{Path: path, Err: err}, "🚫 failed to UpdateTemplates")
+					return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to UpdateTemplates")
 				}
 			}
 
@@ -113,14 +113,14 @@ func CreateRunnableCmd() *cobra.Command {
 				if err == template.ErrTemplateMissing {
 					templatesPath, err = template.UpdateTemplates(repo, branch)
 					if err != nil {
-						return errors.Wrap(CreateRunnableError{Path: path, Err: err}, "🚫 failed to UpdateTemplates")
+						return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to UpdateTemplates")
 					}
 
 					if err := template.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, runnable); err != nil {
-						return errors.Wrap(CreateRunnableError{Path: path, Err: err}, "🚫 failed to ExecTmplDir")
+						return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to ExecTmplDir")
 					}
 				} else {
-					return errors.Wrap(CreateRunnableError{Path: path, Err: err}, "🚫 failed to ExecTmplDir")
+					return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to ExecTmplDir")
 				}
 			}
 
