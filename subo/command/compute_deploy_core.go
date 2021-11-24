@@ -97,7 +97,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 				templateName = "scc-k8s"
 			}
 
-			if err := template.ExecTmplDir(bctx.Cwd, "", templatesPath, templateName, data); err != nil {
+			if err := template.ExecTmplDir(bctx.Cwd, "", templatesPath, templateName, data, true); err != nil {
 				return errors.Wrap(err, "🚫 failed to ExecTmplDir")
 			}
 
