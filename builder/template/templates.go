@@ -82,7 +82,7 @@ func ExecRunnableTmpl(cwd, name, templatesPath string, runnable *directive.Runna
 }
 
 // ExecTmplDir copies a generic templated directory
-func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interface{}) error {
+func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interface{}, overwrite bool) error {
 	templatePath := filepath.Join(templatesPath, tmplName)
 	targetPath := filepath.Join(cwd, name)
 
@@ -115,15 +115,15 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 			targetRelPath = builder.String()
 		}
 
-		// check if the target path is an existing file, and skip it if so
+		// check if the target path is an existing file, and skip it if so unless overwrite is True
 		if _, err := os.Stat(filepath.Join(targetPath, targetRelPath)); err != nil {
 			if os.IsNotExist(err) {
 				// that's fine, continue
 			} else {
 				return errors.Wrap(err, "failed to Stat")
 			}
-		} else {
-			// if the target file already exists, we're going to skip the rest since we don't want to overwrite
+		} else if info.IsDir() || !overwrite {
+			// if the target file already exists and overwrite is false, we're going to skip the rest since we don't want to overwrite
 			return nil
 		}
 
