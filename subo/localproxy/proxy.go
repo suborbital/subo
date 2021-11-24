@@ -14,14 +14,14 @@ type Proxy struct {
 }
 
 // New creates a new local proxy
-func New(endpoint string) *Proxy {
+func New(endpoint string, listenPort string) *Proxy {
 	p := &Proxy{
 		endpoint: endpoint,
 		client:   &http.Client{},
 	}
 
 	server := http.Server{
-		Addr:    ":80",
+		Addr:    ":" + listenPort,
 		Handler: p,
 	}
 

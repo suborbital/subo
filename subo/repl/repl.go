@@ -12,15 +12,17 @@ import (
 )
 
 // Repl is a 'local proxy repl' that allows the user to perform simple actions against their local install of Compute
-type Repl struct{}
+type Repl struct {
+	proxyPort string
+}
 
 type tokenResp struct {
 	Token string `json:"token"`
 }
 
 // New creates a new "local proxy repl"
-func New() *Repl {
-	return &Repl{}
+func New(proxyPort string) *Repl {
+	return &Repl{proxyPort: proxyPort}
 }
 
 func (r *Repl) Run() error {
@@ -85,7 +87,12 @@ func (r *Repl) editFunction() error {
 	token := tokenResp{}
 	json.Unmarshal(body, &token)
 
-	editorURL := fmt.Sprintf("http://local.suborbital.network/?builder=http://local.suborbital.network:8082&token=%s&ident=%s&namespace=%s&fn=%s", token.Token, ident, namespace, FQFN.Fn)
+	editorHost := "local.suborbital.network"
+	if r.proxyPort != "80" {
+		editorHost += ":" + r.proxyPort
+	}
+
+	editorURL := fmt.Sprintf("http://%s/?builder=http://local.suborbital.network:8082&token=%s&ident=%s&namespace=%s&fn=%s", editorHost, token.Token, ident, namespace, FQFN.Fn)
 
 	fmt.Println("\n✅ visit", editorURL, "to access the editor")
 
