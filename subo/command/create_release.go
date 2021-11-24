@@ -14,12 +14,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const (
-	preReleaseFlag = "prerelease"
-	dryRunFlag     = "dryrun"
-	localFlag      = "local"
-)
-
 // DotSuboFile describes a .subo file for controlling releases
 type DotSuboFile struct {
 	DotVersionFiles []string `yaml:"dotVersionFiles"`

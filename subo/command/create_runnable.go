@@ -16,18 +16,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const (
-	langFlag            = "lang"
-	dirFlag             = "dir"
-	namespaceFlag       = "namespace"
-	branchFlag          = "branch"
-	versionFlag         = "version"
-	repoFlag            = "repo"
-	environmentFlag     = "environment"
-	updateTemplatesFlag = "update-templates"
-	headlessFlag        = "headless"
-)
-
 // validLangs are the available languages
 var validLangs = map[string]bool{
 	"rust":           true,

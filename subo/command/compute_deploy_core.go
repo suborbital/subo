@@ -26,6 +26,8 @@ type deployData struct {
 	StorageClassName string
 }
 
+const proxyDefaultPort = "80"
+
 // ComputeDeployCoreCommand returns the compute deploy command
 func ComputeDeployCoreCommand() *cobra.Command {
 	cmd := &cobra.Command{
@@ -119,7 +121,8 @@ func ComputeDeployCoreCommand() *cobra.Command {
 
 				util.LogInfo("use `docker ps` and `docker-compose logs` to check deployment status")
 
-				proxy := localproxy.New("editor.suborbital.network")
+				proxyPort, _ := cmd.Flags().GetString(proxyPortFlag)
+				proxy := localproxy.New("editor.suborbital.network", proxyPort)
 
 				go func() {
 					if err := proxy.Start(); err != nil {
@@ -131,7 +134,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 				// it's not ideal, but the least gross way to ensure a good experience
 				time.Sleep(time.Second * 2)
 
-				repl := repl.New()
+				repl := repl.New(proxyPort)
 				repl.Run()
 
 			} else {
@@ -161,6 +164,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 
 	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
 	cmd.Flags().String(versionFlag, release.SCCTag, "Docker tag to use for control plane images")
+	cmd.Flags().String(proxyPortFlag, proxyDefaultPort, "port that the Editor proxy listens on")
 	cmd.Flags().Bool(localFlag, false, "deploy locally using docker-compose")
 	cmd.Flags().Bool(dryRunFlag, false, "prepare the installation in the .suborbital directory, but do not apply it")
 
