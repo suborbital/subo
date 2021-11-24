@@ -45,10 +45,10 @@ var langAliases = map[string]string{
 	"gr":         "grain",
 }
 
-// Error for build command CreateRunnableCmd failures
+// CreateRunnableError wraps errors for CreateRunnableCmd() failures
 type CreateRunnableError struct {
-	Path string // The ouput directory for build command CreateRunnableCmd.
-	Err  error  // The original error.
+	Path string // The ouput directory for build command CreateRunnableCmd().
+	error       // The original error.
 }
 
 // Error acts as a cleanup function for CreateRunnableError
