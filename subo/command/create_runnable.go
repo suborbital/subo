@@ -33,6 +33,20 @@ var langAliases = map[string]string{
 	"gr":         "grain",
 }
 
+// CreateRunnableError wraps errors for CreateRunnableCmd() failures
+type CreateRunnableError struct {
+	Path  string // The ouput directory for build command CreateRunnableCmd().
+	error        // The original error.
+}
+
+// NewCreateRunnableError cleans up and returns CreateRunnableError for CreateRunnableCmd() failures
+func NewCreateRunnableError(path string, err error) CreateRunnableError {
+	if cleanupErr := os.RemoveAll(path); cleanupErr != nil {
+		err = errors.Wrap(err, "failed to clean up runnable outputs")
+	}
+	return CreateRunnableError{Path: path, error: err}
+}
+
 // CreateRunnableCmd returns the build command
 func CreateRunnableCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -67,18 +81,18 @@ func CreateRunnableCmd() *cobra.Command {
 
 			runnable, err := writeDotRunnable(bctx.Cwd, name, lang, namespace)
 			if err != nil {
-				return errors.Wrap(err, "🚫 failed to writeDotRunnable")
+				return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to writeDotRunnable")
 			}
 
 			templatesPath, err := template.TemplateFullPath(repo, branch)
 			if err != nil {
-				return errors.Wrap(err, "failed to TemplateDir")
+				return errors.Wrap(NewCreateRunnableError(path, err), "failed to TemplateDir")
 			}
 
 			if update, _ := cmd.Flags().GetBool(updateTemplatesFlag); update {
 				templatesPath, err = template.UpdateTemplates(repo, branch)
 				if err != nil {
-					return errors.Wrap(err, "🚫 failed to UpdateTemplates")
+					return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to UpdateTemplates")
 				}
 			}
 
@@ -87,14 +101,14 @@ func CreateRunnableCmd() *cobra.Command {
 				if err == template.ErrTemplateMissing {
 					templatesPath, err = template.UpdateTemplates(repo, branch)
 					if err != nil {
-						return errors.Wrap(err, "🚫 failed to UpdateTemplates")
+						return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to UpdateTemplates")
 					}
 
 					if err := template.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, runnable); err != nil {
-						return errors.Wrap(err, "🚫 failed to ExecTmplDir")
+						return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to ExecTmplDir")
 					}
 				} else {
-					return errors.Wrap(err, "🚫 failed to ExecTmplDir")
+					return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to ExecTmplDir")
 				}
 			}
 
