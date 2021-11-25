@@ -1,10 +1,13 @@
 include ./builder/builder.mk
+include ./subo/release/release.mk
+
+GO_INSTALL=go install -ldflags $(RELEASE_FLAGS)
 
 subo:
-	go install
+	$(GO_INSTALL)
 
 subo/dev:
-	go install -tags=development
+	$(GO_INSTALL) -tags=development
 
 subo/docker:
 	docker build . -t suborbital/subo:dev
