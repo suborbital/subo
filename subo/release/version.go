@@ -38,5 +38,5 @@ func CheckForLatestVersion() error {
 	} else if cmdVersion.LessThan(latestCmdVersion) {
 		return errors.New(fmt.Sprintf("upgrade subo %s to the latest release %s\n", cmdVersion, latestCmdVersion))
 	}
-	return err
+	return nil
 }
