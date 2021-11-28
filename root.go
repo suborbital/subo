@@ -5,9 +5,14 @@ import (
 	"github.com/suborbital/subo/subo/command"
 	"github.com/suborbital/subo/subo/features"
 	"github.com/suborbital/subo/subo/release"
+	"github.com/suborbital/subo/subo/util"
 )
 
 func rootCommand() *cobra.Command {
+	err := release.CheckForLatestVersion()
+	if err != nil {
+		util.LogWarn(err.Error())
+	}
 	cmd := &cobra.Command{
 		Use:     "subo",
 		Short:   "Suborbital Development Platform CLI",
