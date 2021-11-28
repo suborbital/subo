@@ -22,13 +22,13 @@ var AtmoVersion = "0.4.2"
 // SCCTag is the docker tag used for creating new compute core deployments
 var SCCTag = "v0.1.0"
 
-// CheckCmdVersion returns an error if SuboDotVersion does not match the latest GitHub release or if the check fails
+// CheckForLatestVersion returns an error if SuboDotVersion does not match the latest GitHub release or if the check fails
 func CheckForLatestVersion() error {
-	repoReleases, _, err := github.NewClient(nil).Repositories.ListReleases(context.Background(), "suborbital", "subo", &github.ListOptions{})
+	latestRepoRelease, _, err := github.NewClient(nil).Repositories.GetLatestRelease(context.Background(), "suborbital", "subo")
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch latest subo release")
 	}
-	latestCmdVersion, err := version.NewVersion(*repoReleases[0].TagName)
+	latestCmdVersion, err := version.NewVersion(*latestRepoRelease.TagName)
 	if err != nil {
 		return errors.Wrap(err, "failed to parse latest subo version")
 	}
