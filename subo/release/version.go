@@ -28,15 +28,18 @@ func CheckForLatestVersion() error {
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch latest subo release")
 	}
+
 	latestCmdVersion, err := version.NewVersion(*latestRepoRelease.TagName)
 	if err != nil {
 		return errors.Wrap(err, "failed to parse latest subo version")
 	}
+
 	cmdVersion, err := version.NewVersion(SuboDotVersion)
 	if err != nil {
 		return errors.Wrap(err, "failed to parse current subo version")
 	} else if cmdVersion.LessThan(latestCmdVersion) {
 		return errors.New(fmt.Sprintf("upgrade subo %s to the latest release %s\n", cmdVersion, latestCmdVersion))
 	}
+
 	return nil
 }

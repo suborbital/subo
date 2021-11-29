@@ -13,6 +13,7 @@ func rootCommand() *cobra.Command {
 	if err != nil {
 		util.LogWarn(err.Error())
 	}
+
 	cmd := &cobra.Command{
 		Use:     "subo",
 		Short:   "Suborbital Development Platform CLI",
