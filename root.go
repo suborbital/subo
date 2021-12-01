@@ -9,10 +9,14 @@ import (
 )
 
 func rootCommand() *cobra.Command {
-	err := release.CheckForLatestVersion()
-	if err != nil {
-		util.LogWarn(err.Error())
-	}
+	defer func() {
+		version_msg, err := release.CheckForLatestVersion()
+		if err != nil {
+			util.LogFail(err.Error())
+		} else if version_msg != "" {
+			util.LogInfo(version_msg)
+		}
+	}()
 
 	cmd := &cobra.Command{
 		Use:     "subo",
