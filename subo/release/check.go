@@ -77,7 +77,7 @@ func CheckForLatestVersion() (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "failed to parse current subo version")
 	} else if cmdVersion.LessThan(latestCmdVersion) {
-		return fmt.Sprintf("upgrade subo %s to the latest release %s\n", cmdVersion, latestCmdVersion), nil
+		return fmt.Sprintf("An upgrade for subo is available: %s → %s\n", cmdVersion, latestCmdVersion), nil
 	}
 
 	return "", nil
