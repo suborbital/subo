@@ -3,7 +3,7 @@ module github.com/suborbital/subo
 go 1.17
 
 require (
-	github.com/google/go-github v17.0.0+incompatible
+	github.com/google/go-github/v41 v41.0.0
 	github.com/hashicorp/go-version v1.3.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.2.1
