@@ -9,12 +9,7 @@ import (
 
 // CacheDir returns the cache directory and creates it if it doesn't exist
 func CacheDir() (string, error) {
-	cachePath, err := os.UserCacheDir()
-	if err != nil {
-		return "", errors.Wrap(err, "failed to get UserCacheDir")
-	}
-
-	targetPath := filepath.Join(cachePath, "suborbital")
+	targetPath := filepath.Join(os.TempDir(), "suborbital", "cache")
 
 	if _, err := os.Stat(targetPath); os.IsNotExist(err) {
 		if err := os.MkdirAll(targetPath, os.ModePerm); err != nil {
