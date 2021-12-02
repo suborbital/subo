@@ -20,11 +20,11 @@ func getTimestampCache() (bool, error) {
 		return false, errors.Wrap(err, "failed to CacheDir")
 	}
 
-	var cached_timestamp time.Time
-	filePath := filepath.Join(cachePath, "latest_version_check.txt")
+	cachedTimestamp := time.Time{}
+	filePath := filepath.Join(cachePath, "subo_last_checked.txt")
 	_, err = os.Stat(filePath)
+
 	if os.IsNotExist(err) {
-		cached_timestamp = time.Time{}
 	} else if err != nil {
 		return false, errors.Wrap(err, "failed to Stat")
 	} else {
@@ -33,7 +33,7 @@ func getTimestampCache() (bool, error) {
 			return false, errors.Wrap(err, "failed to ReadFile")
 		}
 
-		cached_timestamp, err = time.Parse(time.RFC3339, string(data))
+		cachedTimestamp, err = time.Parse(time.RFC3339, string(data))
 		if err != nil {
 			return false, errors.Wrap(err, "failed to parse cached timestamp")
 		}
