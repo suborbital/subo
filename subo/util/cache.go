@@ -7,8 +7,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// GetCacheDir returns and creates the cache directory
-func GetCacheDir() (string, error) {
+// CacheDir returns the cache directory and creates it if it doesn't exist
+func CacheDir() (string, error) {
 	cachePath, err := os.UserCacheDir()
 	if err != nil {
 		return "", errors.Wrap(err, "failed to get UserCacheDir")
