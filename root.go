@@ -5,19 +5,9 @@ import (
 	"github.com/suborbital/subo/subo/command"
 	"github.com/suborbital/subo/subo/features"
 	"github.com/suborbital/subo/subo/release"
-	"github.com/suborbital/subo/subo/util"
 )
 
 func rootCommand() *cobra.Command {
-	defer func() {
-		version_msg, err := release.CheckForLatestVersion()
-		if err != nil {
-			util.LogFail(err.Error())
-		} else if version_msg != "" {
-			util.LogInfo(version_msg)
-		}
-	}()
-
 	cmd := &cobra.Command{
 		Use:     "subo",
 		Short:   "Suborbital Development Platform CLI",
