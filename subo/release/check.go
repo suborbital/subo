@@ -15,9 +15,9 @@ import (
 )
 
 func getTimestampCache() (bool, error) {
-	cachePath, err := util.GetCacheDir()
+	cachePath, err := util.CacheDir()
 	if err != nil {
-		return false, errors.Wrap(err, "failed to GetCacheDir")
+		return false, errors.Wrap(err, "failed to CacheDir")
 	}
 
 	var cached_timestamp time.Time
