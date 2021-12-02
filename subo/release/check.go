@@ -40,9 +40,9 @@ func getTimestampCache() (bool, error) {
 	}
 
 	// check if 1 hour has passed since the last version check, and update the cached timestamp if so
-	current_timestamp := time.Now().UTC()
-	if cached_timestamp.IsZero() || current_timestamp.After(cached_timestamp.Add(time.Duration(1)*time.Hour)) {
-		data := []byte(current_timestamp.Format(time.RFC3339))
+	currentTimestamp := time.Now().UTC()
+	if cachedTimestamp.IsZero() || currentTimestamp.After(cachedTimestamp.Add(time.Hour)) {
+		data := []byte(currentTimestamp.Format(time.RFC3339))
 		if err := ioutil.WriteFile(filePath, data, os.ModePerm); err != nil {
 			return false, errors.Wrap(err, "failed to WriteFile")
 		}
