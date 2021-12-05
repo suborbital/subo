@@ -39,13 +39,20 @@ func getTimestampCache() (time.Time, error) {
 	return cachedTimestamp, nil
 }
 
+func cacheTimestamp(timestamp time.Time) error {
+	cachePath, err := util.CacheDir()
+	if err != nil {
+		return errors.Wrap(err, "failed to CacheDir")
+	}
 
-	// check if 1 hour has passed since the last version check, and update the cached timestamp if so
-	currentTimestamp := time.Now().UTC()
-	if cachedTimestamp.IsZero() || currentTimestamp.After(cachedTimestamp.Add(time.Hour)) {
-		data := []byte(currentTimestamp.Format(time.RFC3339))
-		if err := ioutil.WriteFile(filePath, data, os.ModePerm); err != nil {
-			return false, errors.Wrap(err, "failed to WriteFile")
+	filePath := filepath.Join(cachePath, "subo_last_checked.txt")
+	data := []byte(timestamp.Format(time.RFC3339))
+	if err := ioutil.WriteFile(filePath, data, os.ModePerm); err != nil {
+		return errors.Wrap(err, "failed to WriteFile")
+	}
+
+	return nil
+}
 		}
 	} else {
 		// if 1 hour has not passed, skip version check
