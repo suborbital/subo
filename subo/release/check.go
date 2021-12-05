@@ -96,21 +96,23 @@ func getLatestReleaseCache() (*github.RepositoryRelease, error) {
 	return latestRepoRelease, nil
 }
 
-// CheckForLatestVersion returns an error if SuboDotVersion does not match the latest GitHub release or if the check fails
-func CheckForLatestVersion() (string, error) {
-	getLatestVersion, err := getTimestampCache()
+func cacheLatestRelease(latestRepoRelease *github.RepositoryRelease) error {
+	cachePath, err := util.CacheDir()
 	if err != nil {
-		return "", errors.Wrap(err, "failed to getTimestampCache")
-	} else if !getLatestVersion {
-		return "", nil
+		return errors.Wrap(err, "failed to CacheDir")
 	}
 
-	latestRepoRelease, _, err := github.NewClient(nil).Repositories.GetLatestRelease(context.Background(), "suborbital", "subo")
-	if err != nil {
-		return "", errors.Wrap(err, "failed to fetch latest subo release")
+	buffer := bytes.Buffer{}
+	encoder := gob.NewEncoder(&buffer)
+	if err = encoder.Encode(latestRepoRelease); err != nil {
+		return errors.Wrap(err, "failed to Encode RepositoryRelease")
+	} else if err := ioutil.WriteFile(filepath.Join(cachePath, "subo_latest_release"), buffer.Bytes(), os.ModePerm); err != nil {
+		return errors.Wrap(err, "failed to WriteFile")
 	}
 
-	latestCmdVersion, err := version.NewVersion(*latestRepoRelease.TagName)
+	return nil
+}
+
 	if err != nil {
 		return "", errors.Wrap(err, "failed to parse latest subo version")
 	}
