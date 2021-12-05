@@ -55,6 +55,7 @@ func cacheTimestamp(timestamp time.Time) error {
 
 	return nil
 }
+
 func getLatestReleaseCache() (*github.RepositoryRelease, error) {
 	if cachedTimestamp, err := getTimestampCache(); err != nil {
 		return nil, errors.Wrap(err, "failed to getTimestampCache")
