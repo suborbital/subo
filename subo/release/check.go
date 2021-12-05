@@ -1,7 +1,9 @@
 package release
 
 import (
+	"bytes"
 	"context"
+	"encoding/gob"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -53,13 +55,45 @@ func cacheTimestamp(timestamp time.Time) error {
 
 	return nil
 }
+func getLatestReleaseCache() (*github.RepositoryRelease, error) {
+	if cachedTimestamp, err := getTimestampCache(); err != nil {
+		return nil, errors.Wrap(err, "failed to getTimestampCache")
+	} else if currentTimestamp := time.Now().UTC(); cachedTimestamp.IsZero() || currentTimestamp.After(cachedTimestamp.Add(time.Hour)) {
+		// check if 1 hour has passed since the last version check, and update the cached timestamp and latest release if so
+		if err := cacheTimestamp(currentTimestamp); err != nil {
+			return nil, errors.Wrap(err, "failed to cacheTimestamp")
 		}
-	} else {
-		// if 1 hour has not passed, skip version check
-		return false, nil
+
+		return nil, nil
 	}
 
-	return true, nil
+	cachePath, err := util.CacheDir()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to CacheDir")
+	}
+
+	var latestRepoRelease *github.RepositoryRelease
+	filepath := filepath.Join(cachePath, "subo_latest_release")
+	if _, err = os.Stat(filepath); os.IsNotExist(err) {
+		return nil, nil
+	} else if err != nil {
+		return nil, errors.Wrap(err, "faild to Stat")
+	} else {
+		data, err := ioutil.ReadFile(filepath)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to ReadFile")
+		}
+
+		buffer := bytes.Buffer{}
+		buffer.Write(data)
+		decoder := gob.NewDecoder(&buffer)
+		err = decoder.Decode(&latestRepoRelease)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to Decode cached RepositoryRelease")
+		}
+	}
+
+	return latestRepoRelease, nil
 }
 
 // CheckForLatestVersion returns an error if SuboDotVersion does not match the latest GitHub release or if the check fails
