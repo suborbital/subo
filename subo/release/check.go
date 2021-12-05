@@ -14,30 +14,31 @@ import (
 	"github.com/suborbital/subo/subo/util"
 )
 
-func getTimestampCache() (bool, error) {
+func getTimestampCache() (time.Time, error) {
 	cachePath, err := util.CacheDir()
 	if err != nil {
-		return false, errors.Wrap(err, "failed to CacheDir")
+		return time.Time{}, errors.Wrap(err, "failed to CacheDir")
 	}
 
 	cachedTimestamp := time.Time{}
 	filePath := filepath.Join(cachePath, "subo_last_checked.txt")
-	_, err = os.Stat(filePath)
-
-	if os.IsNotExist(err) {
+	if _, err = os.Stat(filePath); os.IsNotExist(err) {
 	} else if err != nil {
-		return false, errors.Wrap(err, "failed to Stat")
+		return time.Time{}, errors.Wrap(err, "failed to Stat")
 	} else {
 		data, err := ioutil.ReadFile(filePath)
 		if err != nil {
-			return false, errors.Wrap(err, "failed to ReadFile")
+			return time.Time{}, errors.Wrap(err, "failed to ReadFile")
 		}
 
 		cachedTimestamp, err = time.Parse(time.RFC3339, string(data))
 		if err != nil {
-			return false, errors.Wrap(err, "failed to parse cached timestamp")
+			return time.Time{}, errors.Wrap(err, "failed to parse cached timestamp")
 		}
 	}
+	return cachedTimestamp, nil
+}
+
 
 	// check if 1 hour has passed since the last version check, and update the cached timestamp if so
 	currentTimestamp := time.Now().UTC()
