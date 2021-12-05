@@ -113,12 +113,27 @@ func cacheLatestRelease(latestRepoRelease *github.RepositoryRelease) error {
 	return nil
 }
 
+func getLatestVersion() (*version.Version, error) {
+	latestRepoRelease, err := getLatestReleaseCache()
 	if err != nil {
-		return "", errors.Wrap(err, "failed to parse latest subo version")
+		return nil, errors.Wrap(err, "failed to getTimestampCache")
+	} else if latestRepoRelease == nil {
+		latestRepoRelease, _, err = github.NewClient(nil).Repositories.GetLatestRelease(context.Background(), "suborbital", "subo")
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to fetch latest subo release")
+		} else if err = cacheLatestRelease(latestRepoRelease); err != nil {
+			return nil, errors.Wrap(err, "failed to cacheLatestRelease")
+		}
 	}
 
-	cmdVersion, err := version.NewVersion(SuboDotVersion)
+	latestVersion, err := version.NewVersion(*latestRepoRelease.TagName)
 	if err != nil {
+		return nil, errors.Wrap(err, "failed to parse latest subo version")
+	}
+
+	return latestVersion, nil
+}
+
 		return "", errors.Wrap(err, "failed to parse current subo version")
 	} else if cmdVersion.LessThan(latestCmdVersion) {
 		return fmt.Sprintf("An upgrade for subo is available: %s → %s\n", cmdVersion, latestCmdVersion), nil
