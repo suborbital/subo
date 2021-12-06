@@ -9,7 +9,7 @@ import (
 
 // CacheDir returns the cache directory and creates it if it doesn't exist
 func CacheDir() (string, error) {
-	targetPath := filepath.Join(os.TempDir(), "suborbital", "cache")
+	targetPath := filepath.Join(os.TempDir(), "suborbital", "subo")
 
 	if _, err := os.Stat(targetPath); os.IsNotExist(err) {
 		if err := os.MkdirAll(targetPath, os.ModePerm); err != nil {
