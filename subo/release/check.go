@@ -49,7 +49,7 @@ func cacheTimestamp(timestamp time.Time) error {
 		return errors.Wrap(err, "failed to CacheDir")
 	}
 
-	filePath := filepath.Join(cachePath, "subo_last_checked.txt")
+	filePath := filepath.Join(cachePath, lastCheckedFilename)
 	data := []byte(timestamp.Format(time.RFC3339))
 	if err := ioutil.WriteFile(filePath, data, os.ModePerm); err != nil {
 		return errors.Wrap(err, "failed to WriteFile")
