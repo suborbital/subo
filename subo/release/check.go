@@ -16,6 +16,8 @@ import (
 	"github.com/suborbital/subo/subo/util"
 )
 
+const lastCheckedFilename = "subo_last_checked"
+
 func getTimestampCache() (time.Time, error) {
 	cachePath, err := util.CacheDir()
 	if err != nil {
