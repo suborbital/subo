@@ -25,7 +25,7 @@ func getTimestampCache() (time.Time, error) {
 	}
 
 	cachedTimestamp := time.Time{}
-	filePath := filepath.Join(cachePath, "subo_last_checked.txt")
+	filePath := filepath.Join(cachePath, lastCheckedFilename)
 	if _, err = os.Stat(filePath); os.IsNotExist(err) {
 	} else if err != nil {
 		return time.Time{}, errors.Wrap(err, "failed to Stat")
