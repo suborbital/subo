@@ -17,6 +17,7 @@ import (
 )
 
 const lastCheckedFilename = "subo_last_checked"
+const latestReleaseFilename = "subo_latest_release"
 
 func getTimestampCache() (time.Time, error) {
 	cachePath, err := util.CacheDir()
@@ -76,7 +77,7 @@ func getLatestReleaseCache() (*github.RepositoryRelease, error) {
 	}
 
 	var latestRepoRelease *github.RepositoryRelease
-	filepath := filepath.Join(cachePath, "subo_latest_release")
+	filepath := filepath.Join(cachePath, latestReleaseFilename)
 	if _, err = os.Stat(filepath); os.IsNotExist(err) {
 		return nil, nil
 	} else if err != nil {
@@ -109,7 +110,7 @@ func cacheLatestRelease(latestRepoRelease *github.RepositoryRelease) error {
 	encoder := gob.NewEncoder(&buffer)
 	if err = encoder.Encode(latestRepoRelease); err != nil {
 		return errors.Wrap(err, "failed to Encode RepositoryRelease")
-	} else if err := ioutil.WriteFile(filepath.Join(cachePath, "subo_latest_release"), buffer.Bytes(), os.ModePerm); err != nil {
+	} else if err := ioutil.WriteFile(filepath.Join(cachePath, latestReleaseFilename), buffer.Bytes(), os.ModePerm); err != nil {
 		return errors.Wrap(err, "failed to WriteFile")
 	}
 
