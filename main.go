@@ -9,7 +9,7 @@ import (
 	"github.com/suborbital/subo/subo/util"
 )
 
-const checkVersionTimeout = 500 * time.Millisecond
+const checkVersionTimeout = 2500 * time.Millisecond
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
