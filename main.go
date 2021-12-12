@@ -14,7 +14,7 @@ const checkVersionTimeout = 500 * time.Millisecond
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	done := checkVersion(ctx)
+	versionChan := checkVersion(ctx)
 
 	rootCmd := rootCommand()
 	if err := rootCmd.Execute(); err != nil {
@@ -22,27 +22,30 @@ func main() {
 	}
 
 	select {
-	case <-done:
+	case msg := <-versionChan:
+		util.LogInfo(msg)
 	case <-time.After(checkVersionTimeout):
 		util.LogFail("failed to CheckForLatestVersion due to timeout")
 	}
 }
 
-func checkVersion(ctx context.Context) chan bool {
-	done := make(chan bool)
+func checkVersion(ctx context.Context) chan string {
+	versionChan := make(chan string)
 
 	go func() {
+		msg := ""
 		if version, err := release.CheckForLatestVersion(); err != nil {
-			util.LogFail(err.Error())
+			msg = err.Error()
 		} else if version != "" {
-			util.LogInfo(version)
+			msg = version
 		}
+
 		select {
 		case <-ctx.Done():
 		default:
-			done <- true
+			versionChan <- msg
 		}
 	}()
 
-	return done
+	return versionChan
 }

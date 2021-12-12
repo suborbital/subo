@@ -37,12 +37,17 @@ func ComputeDeployCoreCommand() *cobra.Command {
 		Long:  `deploy the Suborbital Compute Core using Kubernetes or Docker Compose`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			localInstall := cmd.Flags().Changed(localFlag)
+			shouldReset := cmd.Flags().Changed(resetFlag)
+			shouldUpdate := cmd.Flags().Changed(updateFlag)
+			branch, _ := cmd.Flags().GetString(branchFlag)
+			tag, _ := cmd.Flags().GetString(versionFlag)
 
 			if !localInstall {
 				if err := introAcceptance(); err != nil {
 					return err
 				}
 			}
+
 			proxyPort, _ := cmd.Flags().GetInt(proxyPortFlag)
 			if proxyPort < 1 || proxyPort > (2<<16)-1 {
 				return errors.New("🚫 proxy-port must be between 1 and 65535")
@@ -58,62 +63,75 @@ func ComputeDeployCoreCommand() *cobra.Command {
 				return errors.Wrap(err, "🚫 failed to get CurrentBuildContext")
 			}
 
-			util.LogStart("preparing deployment")
+			// if the --reset flag was passed or there's no existing manifests
+			// then we need to 'build the world' from scratch
+			if shouldReset || shouldUpdate || !manifestsExist(bctx) {
+				util.LogStart("preparing deployment")
 
-			// if there are any existing deployment manifests sitting around, let's replace them
-			if err := removeExistingManifests(bctx); err != nil {
-				return errors.Wrap(err, "failed to removeExistingManifests")
-			}
-
-			_, err = util.Mkdir(bctx.Cwd, ".suborbital")
-			if err != nil {
-				return errors.Wrap(err, "🚫 failed to Mkdir")
-			}
-
-			branch, _ := cmd.Flags().GetString(branchFlag)
-			tag, _ := cmd.Flags().GetString(versionFlag)
-
-			templatesPath, err := template.UpdateTemplates(defaultRepo, branch)
-			if err != nil {
-				return errors.Wrap(err, "🚫 failed to UpdateTemplates")
-			}
-
-			envToken, err := getEnvToken()
-			if err != nil {
-				return errors.Wrap(err, "🚫 failed to getEnvToken")
-			}
-
-			data := deployData{
-				SCCVersion: tag,
-				EnvToken:   envToken,
-			}
-
-			templateName := "scc-docker"
-
-			if !localInstall {
-				data.BuilderDomain, err = getBuilderDomain()
-				if err != nil {
-					return errors.Wrap(err, "🚫 failed to getBuilderDomain")
+				// if there are any existing deployment manifests sitting around, let's replace them
+				if err := removeExistingManifests(bctx); err != nil {
+					return errors.Wrap(err, "failed to removeExistingManifests")
 				}
 
-				data.StorageClassName, err = getStorageClass()
+				_, err = util.Mkdir(bctx.Cwd, ".suborbital")
 				if err != nil {
-					return errors.Wrap(err, "🚫 failed to getStorageClass")
+					return errors.Wrap(err, "🚫 failed to Mkdir")
 				}
 
-				templateName = "scc-k8s"
-			}
+				var templatesPath string
 
-			if err := template.ExecTmplDir(bctx.Cwd, "", templatesPath, templateName, data); err != nil {
-				return errors.Wrap(err, "🚫 failed to ExecTmplDir")
-			}
+				if shouldUpdate {
+					templatesPath, err = template.UpdateTemplates(defaultRepo, branch)
+					if err != nil {
+						return errors.Wrap(err, "🚫 failed to UpdateTemplates")
+					}
+				} else {
+					templatesPath, err = template.TemplatesExist(defaultRepo, branch)
+					if err != nil {
+						templatesPath, err = template.UpdateTemplates(defaultRepo, branch)
+						if err != nil {
+							return errors.Wrap(err, "🚫 failed to UpdateTemplates")
+						}
+					}
+				}
 
-			util.LogDone("ready to start installation")
+				envToken, err := getEnvToken()
+				if err != nil {
+					return errors.Wrap(err, "🚫 failed to getEnvToken")
+				}
+
+				data := deployData{
+					SCCVersion: tag,
+					EnvToken:   envToken,
+				}
+
+				templateName := "scc-docker"
+
+				if !localInstall {
+					data.BuilderDomain, err = getBuilderDomain()
+					if err != nil {
+						return errors.Wrap(err, "🚫 failed to getBuilderDomain")
+					}
+
+					data.StorageClassName, err = getStorageClass()
+					if err != nil {
+						return errors.Wrap(err, "🚫 failed to getStorageClass")
+					}
+
+					templateName = "scc-k8s"
+				}
+
+				if err := template.ExecTmplDir(bctx.Cwd, "", templatesPath, templateName, data); err != nil {
+					return errors.Wrap(err, "🚫 failed to ExecTmplDir")
+				}
+
+				util.LogDone("ready to start installation")
+			}
 
 			dryRun, _ := cmd.Flags().GetBool(dryRunFlag)
 
 			if dryRun {
-				util.LogInfo("aborting due to dry-run, manifest files left in .suborbital")
+				util.LogInfo("aborting due to dry-run, manifest files remain in " + bctx.Cwd)
 				return nil
 			}
 
@@ -137,7 +155,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 
 				// this is to give the proxy server some room to bind to the port and start up
 				// it's not ideal, but the least gross way to ensure a good experience
-				time.Sleep(time.Second * 2)
+				time.Sleep(time.Second * 1)
 
 				repl := repl.New(proxyPortStr)
 				repl.Run()
@@ -171,7 +189,9 @@ func ComputeDeployCoreCommand() *cobra.Command {
 	cmd.Flags().String(versionFlag, release.SCCTag, "Docker tag to use for control plane images")
 	cmd.Flags().Int(proxyPortFlag, proxyDefaultPort, "port that the Editor proxy listens on")
 	cmd.Flags().Bool(localFlag, false, "deploy locally using docker-compose")
-	cmd.Flags().Bool(dryRunFlag, false, "prepare the installation in the .suborbital directory, but do not apply it")
+	cmd.Flags().Bool(dryRunFlag, false, "prepare the deployment in the .suborbital directory, but do not apply it")
+	cmd.Flags().Bool(resetFlag, false, "reset the deployment to default (replaces docker-compose.yaml and/or Kubernetes manifests)")
+	cmd.Flags().Bool(updateFlag, false, "update to the newest available version (replaces docker-compose.yaml and/or Kubernetes manifests")
 
 	return cmd
 }
@@ -297,6 +317,18 @@ func createConfigMap(cwd string) error {
 	}
 
 	return nil
+}
+
+func manifestsExist(bctx *context.BuildContext) bool {
+	if _, err := os.Stat(filepath.Join(bctx.Cwd, ".suborbital")); err == nil {
+		return true
+	}
+
+	if _, err := os.Stat(filepath.Join(bctx.Cwd, "docker-compose.yml")); err == nil {
+		return true
+	}
+
+	return false
 }
 
 func removeExistingManifests(bctx *context.BuildContext) error {

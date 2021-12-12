@@ -57,6 +57,34 @@ func UpdateTemplates(repo, branch string) (string, error) {
 	return tmplPath, nil
 }
 
+// TemplatesExist returns the templates directory for the provided repo and branch
+func TemplatesExist(repo, branch string) (string, error) {
+	repoParts := strings.Split(repo, "/")
+	if len(repoParts) != 2 {
+		return "", fmt.Errorf("repo is invalid, contains %d parts", len(repoParts))
+	}
+
+	repoName := repoParts[1]
+
+	templateRootPath, err := TemplateRootDir()
+	if err != nil {
+		return "", errors.Wrap(err, "failed to TemplateDir")
+	}
+
+	branchDirName := fmt.Sprintf("%s-%s", repoName, strings.ReplaceAll(branch, "/", "-"))
+	existingPath := filepath.Join(templateRootPath, branchDirName)
+
+	tmplPath := filepath.Join(existingPath, "templates")
+
+	if files, err := os.ReadDir(tmplPath); err != nil {
+		return "", errors.Wrap(err, "failed to ReadDir")
+	} else if len(files) == 0 {
+		return "", errors.New("templates directory is empty")
+	}
+
+	return tmplPath, nil
+}
+
 // ExecRunnableTmplStr executes a template string with the runnable's data
 func ExecRunnableTmplStr(templateStr string, runnable *directive.Runnable) (string, error) {
 	templateData := makeTemplateData(runnable)
