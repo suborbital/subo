@@ -38,13 +38,16 @@ builder/docker/swift/dev/publish:
 	docker buildx build . -f builder/docker/swift/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-swift:dev --push
 
 # tinygo docker targets
-builder/docker/tinygo:
+builder/docker/tinygo-builder:
+	docker build . -f builder/docker/tinygo/Dockerfile.builder -t suborbital/builder-tinygo-builder:$(ver)
+
+builder/docker/tinygo: builder/docker/tinygo-builder
 	docker build . -f builder/docker/tinygo/Dockerfile -t suborbital/builder-tinygo:$(ver)
 
 builder/docker/tinygo/publish:
 	docker buildx build . -f builder/docker/tinygo/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-tinygo:$(ver) --push
 
-builder/docker/tinygo/dev/publish:
+builder/docker/tinygo/dev/publish: 
 	docker buildx build . -f builder/docker/tinygo/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-tinygo:dev --push
 
 # Grain docker targets
