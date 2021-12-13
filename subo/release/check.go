@@ -145,11 +145,7 @@ func CheckForLatestVersion() (string, error) {
 	} else if cmdVersion, err := version.NewVersion(SuboDotVersion); err != nil {
 		return "", errors.Wrap(err, "failed to parse current subo version")
 	} else if cmdVersion.LessThan(latestCmdVersion) {
-		check, err := InstallInfo(latestCmdVersion)
-		if err != nil {
-			return fmt.Sprintf("An upgrade for subo is available: %s → %s\n", cmdVersion, latestCmdVersion), nil
-		}
-		return fmt.Sprintf("An upgrade for subo is available: %s → %s\n%s", cmdVersion, latestCmdVersion, check), nil
+		return fmt.Sprintf("An upgrade for subo is available: %s → %s\n%s", cmdVersion, latestCmdVersion, InstallInfo(latestCmdVersion)), nil
 	}
 
 	return "", nil
