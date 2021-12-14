@@ -38,7 +38,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			localInstall := cmd.Flags().Changed(localFlag)
 			shouldReset := cmd.Flags().Changed(resetFlag)
-			shouldUpdate := cmd.Flags().Changed(updateFlag)
+			// shouldUpdate := cmd.Flags().Changed(updateFlag) will re-add this later once we have proper update semantics
 			branch, _ := cmd.Flags().GetString(branchFlag)
 			tag, _ := cmd.Flags().GetString(versionFlag)
 
@@ -65,7 +65,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 
 			// if the --reset flag was passed or there's no existing manifests
 			// then we need to 'build the world' from scratch
-			if shouldReset || shouldUpdate || !manifestsExist(bctx) {
+			if shouldReset || !manifestsExist(bctx) {
 				util.LogStart("preparing deployment")
 
 				// if there are any existing deployment manifests sitting around, let's replace them
@@ -78,20 +78,11 @@ func ComputeDeployCoreCommand() *cobra.Command {
 					return errors.Wrap(err, "🚫 failed to Mkdir")
 				}
 
-				var templatesPath string
-
-				if shouldUpdate {
+				templatesPath, err := template.TemplatesExist(defaultRepo, branch)
+				if err != nil {
 					templatesPath, err = template.UpdateTemplates(defaultRepo, branch)
 					if err != nil {
 						return errors.Wrap(err, "🚫 failed to UpdateTemplates")
-					}
-				} else {
-					templatesPath, err = template.TemplatesExist(defaultRepo, branch)
-					if err != nil {
-						templatesPath, err = template.UpdateTemplates(defaultRepo, branch)
-						if err != nil {
-							return errors.Wrap(err, "🚫 failed to UpdateTemplates")
-						}
 					}
 				}
 
@@ -191,7 +182,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 	cmd.Flags().Bool(localFlag, false, "deploy locally using docker-compose")
 	cmd.Flags().Bool(dryRunFlag, false, "prepare the deployment in the .suborbital directory, but do not apply it")
 	cmd.Flags().Bool(resetFlag, false, "reset the deployment to default (replaces docker-compose.yaml and/or Kubernetes manifests)")
-	cmd.Flags().Bool(updateFlag, false, "update to the newest available version (replaces docker-compose.yaml and/or Kubernetes manifests")
+	// cmd.Flags().Bool(updateFlag, false, "update to the newest available version (replaces docker-compose.yaml and/or Kubernetes manifests")
 
 	return cmd
 }
