@@ -32,7 +32,7 @@ func New(endpoint string, listenPort string) *Proxy {
 
 // Start starts the local proxy server
 func (p *Proxy) Start() error {
-	fmt.Println("\nPROXY: local tunnel to function editor started")
+	fmt.Println("\nPROXY: local tunnel to function editor starting")
 
 	return p.server.ListenAndServe()
 }
