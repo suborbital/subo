@@ -1,7 +1,8 @@
 # all paths are relative to project root
 ver = $(shell cat ./builder/.image-ver)
+tinygo_ver = $(shell cat ./builder/docker/tinygo/.tinygo-ver)
 
-builder/docker: subo/docker builder/docker/rust builder/docker/swift builder/docker/as
+builder/docker: subo/docker builder/docker/rust builder/docker/swift builder/docker/as builder/docker/tinygo
 
 builder/docker/publish: subo/docker/publish builder/docker/rust/publish builder/docker/swift/publish builder/docker/as/publish builder/docker/tinygo/publish builder/docker/grain/publish
 
@@ -37,17 +38,24 @@ builder/docker/swift/publish:
 builder/docker/swift/dev/publish:
 	docker buildx build . -f builder/docker/swift/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-swift:dev --push
 
-# tinygo docker targets
-builder/docker/tinygo-builder:
-	docker build . -f builder/docker/tinygo/Dockerfile.builder -t suborbital/builder-tinygo-builder:$(ver)
+# TinyGo (base) docker targets
+builder/docker/tinygo-base:
+	docker build . -f builder/docker/tinygo/Dockerfile.base -t suborbital/tinygo-base:$(tinygo_ver)
 
-builder/docker/tinygo: builder/docker/tinygo-builder
+builder/docker/tinygo-base/publish:
+	docker buildx build . -f builder/docker/tinygo/Dockerfile.base --platform linux/amd64,linux/arm64 -t suborbital/tinygo-base:$(tinygo_ver) --push
+
+builder/docker/tinygo-base/dev/publish:
+	docker buildx build . -f builder/docker/tinygo/Dockerfile.base --platform linux/amd64,linux/arm64 -t suborbital/tinygo-base:dev --push
+
+# TinyGo (slim) docker targets
+builder/docker/tinygo: builder/docker/tinygo-base
 	docker build . -f builder/docker/tinygo/Dockerfile -t suborbital/builder-tinygo:$(ver)
 
 builder/docker/tinygo/publish:
 	docker buildx build . -f builder/docker/tinygo/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-tinygo:$(ver) --push
 
-builder/docker/tinygo/dev/publish: 
+builder/docker/tinygo/dev/publish:
 	docker buildx build . -f builder/docker/tinygo/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-tinygo:dev --push
 
 # Grain docker targets

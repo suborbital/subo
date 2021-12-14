@@ -1,4 +1,4 @@
-FROM suborbital/builder-tinygo-builder:v0.2.1 as builder
+FROM suborbital/tinygo-base:v0.21.0 as builder
 FROM suborbital/subo:dev as subo
 
 FROM golang:bullseye
@@ -14,4 +14,4 @@ RUN ln -s /usr/local/tinygo/bin/wasm-opt /usr/local/bin/wasm-opt
 
 WORKDIR /root/runnable
 
-RUN go mod download github.com/suborbital/reactr@v0.13
+RUN go mod download github.com/suborbital/reactr@latest
