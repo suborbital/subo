@@ -1,20 +1,13 @@
 package release
 
 import (
-	"fmt"
 	"os/exec"
-
-	"github.com/hashicorp/go-version"
 )
 
-func InstallInfo(v *version.Version) string {
-
-	_, err := exec.Command("brew", "list", "subo").Output()
-
-	if err != nil {
-		return fmt.Sprintf("Head over to https://github.com/suborbital/subo/releases/tag/v%s or pull new changes", v)
+// InstallInfo checks if subo was installed using Homebrew or via some other method and returns update instructions
+func InstallInfo() string {
+	if _, err := exec.Command("brew", "list", "subo").Output(); err != nil {
+		return "Check out our install/upgrade instructions at https://github.com/suborbital/subo#installing"
 	}
-
 	return "Run: 'brew upgrade subo' to update subo"
-
 }
