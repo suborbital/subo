@@ -92,8 +92,8 @@ Reactr and Atmo provide an [API](https://atmo.suborbital.dev/runnable-api/introd
 - Structured logging
 - Access to persistent cache
 - Access to a static filesystem
+- Database access
 
 This API will soon have:
 - The ability to render templates
-- Database access
 - Access to blob storage
