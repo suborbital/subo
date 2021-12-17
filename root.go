@@ -40,6 +40,9 @@ including building WebAssembly Runnables and Atmo projects.`,
 	// compute network related commands
 	cmd.AddCommand(computeCommand())
 
+	// docs related commands
+	cmd.AddCommand(docsCommand())
+
 	// add top-level commands to root
 	cmd.AddCommand(create)
 	cmd.AddCommand(command.BuildCmd())
@@ -75,4 +78,16 @@ func computeCommand() *cobra.Command {
 	compute.AddCommand(deploy)
 
 	return compute
+}
+
+func docsCommand() *cobra.Command {
+	docs := &cobra.Command{
+		Use:   "docs",
+		Short: "documentation generation resources",
+		Long:  "test and generate code embedded markdown documentation",
+	}
+	docs.AddCommand(command.DocsBuildCmd())
+	docs.AddCommand(command.DocsTestCmd())
+
+	return docs
 }

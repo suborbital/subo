@@ -92,7 +92,7 @@ func getLatestReleaseCache() (*github.RepositoryRelease, error) {
 			return nil, errors.Wrap(err, "failed to ReadFile")
 		}
 
-		buffer := bytes.Buffer{}
+		var buffer bytes.Buffer
 		buffer.Write(data)
 		decoder := gob.NewDecoder(&buffer)
 		err = decoder.Decode(&latestRepoRelease)
@@ -114,7 +114,7 @@ func cacheLatestRelease(latestRepoRelease *github.RepositoryRelease) error {
 		return errors.Wrap(err, "failed to CacheDir")
 	}
 
-	buffer := bytes.Buffer{}
+	var buffer bytes.Buffer
 	encoder := gob.NewEncoder(&buffer)
 	if err = encoder.Encode(latestRepoRelease); err != nil {
 		return errors.Wrap(err, "failed to Encode RepositoryRelease")
