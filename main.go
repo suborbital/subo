@@ -23,7 +23,9 @@ func main() {
 
 	select {
 	case msg := <-versionChan:
-		util.LogInfo(msg)
+		if msg != "" {
+			util.LogInfo(msg)
+		}
 	case <-time.After(checkVersionTimeout):
 		util.LogFail("failed to CheckForLatestVersion due to timeout")
 	}
