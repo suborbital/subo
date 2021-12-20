@@ -75,7 +75,7 @@ spec:
       initContainers:
         - name: scc-init
           image: busybox
-          command: ["/bin/touch", "/data/.who"]
+          command: ["/bin/chmod","-R","770", "/data"]
           volumeMounts:
           - name: controlplane-storage
             mountPath: /data
