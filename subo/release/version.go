@@ -11,4 +11,4 @@ var FFIVersion = "0.13.1"
 var AtmoVersion = "0.4.2"
 
 // SCCTag is the docker tag used for creating new compute core deployments
-var SCCTag = "v0.1.0"
+var SCCTag = "v0.1.1"
