@@ -2,7 +2,7 @@ package release
 
 // SuboDotVersion represents the dot version for subo
 // it is also the image tag used for builders
-var SuboDotVersion = "0.2.1"
+var SuboDotVersion = "0.3.1"
 
 // FFIVersion is the FFI version used by this version of subo
 var FFIVersion = "0.13.1"
@@ -11,4 +11,4 @@ var FFIVersion = "0.13.1"
 var AtmoVersion = "0.4.2"
 
 // SCCTag is the docker tag used for creating new compute core deployments
-var SCCTag = "v0.1.0"
+var SCCTag = "v0.1.1"

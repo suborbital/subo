@@ -28,7 +28,7 @@ func BuildCmd() *cobra.Command {
 			}
 
 			if len(bdr.Context.Runnables) == 0 {
-				return errors.New("🚫 no runnables found in current directory (no .runnable yaml files found)")
+				return errors.New("🚫 no runnables found in current directory (no .runnable.yaml files found)")
 			}
 
 			if bdr.Context.CwdIsRunnable {
@@ -41,6 +41,10 @@ func BuildCmd() *cobra.Command {
 			noBundle, _ := cmd.Flags().GetBool("no-bundle")
 			shouldBundle := !noBundle && !bdr.Context.CwdIsRunnable && len(langs) == 0
 			shouldDockerBuild, _ := cmd.Flags().GetBool("docker")
+
+			if bdr.Context.CwdIsRunnable && shouldDockerBuild {
+				return errors.New("🚫 cannot build Docker image for a single Runnable (must be a project)")
+			}
 
 			useNative, _ := cmd.Flags().GetBool("native")
 			makeTarget, _ := cmd.Flags().GetString("make")
@@ -94,7 +98,11 @@ func BuildCmd() *cobra.Command {
 				defer util.LogDone(fmt.Sprintf("bundle was created -> %s @ %s", bdr.Context.Bundle.Fullpath, bdr.Context.Directive.AppVersion))
 			}
 
-			if shouldDockerBuild {
+			if shouldDockerBuild && !bdr.Context.CwdIsRunnable {
+				if bdr.Context.Directive == nil {
+					return errors.New("🚫 failed to open Directive.yaml")
+				}
+
 				os.Setenv("DOCKER_BUILDKIT", "0")
 
 				if _, err := util.Run(fmt.Sprintf("docker build . -t=%s:%s", bdr.Context.Directive.Identifier, bdr.Context.Directive.AppVersion)); err != nil {

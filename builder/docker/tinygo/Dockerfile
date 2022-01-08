@@ -1,23 +1,17 @@
+FROM suborbital/tinygo-base:v0.21.0 as builder
 FROM suborbital/subo:dev as subo
 
-FROM golang:bullseye as tinygobuilder
-RUN apt-get update && apt-get install -y clang-11 llvm-11-dev lld-11 libclang-11-dev build-essential git cmake ninja-build
-
-WORKDIR /root
-RUN mkdir runnable
-RUN git clone --depth 1 --branch v0.21.0 https://github.com/tinygo-org/tinygo.git
-RUN git clone --depth 1 --branch version_102 https://github.com/WebAssembly/binaryen
-RUN mkdir binaryen/build
-
-WORKDIR /root/tinygo
-RUN git submodule update --init --remote lib/wasi-libc
-RUN make wasi-libc
-RUN CGO_ENABLED=1 go install
-
-WORKDIR /root/binaryen/build
-RUN cmake ../ -GNinja . && ninja wasm-opt
-RUN cp -r bin lib /usr/local/.
+FROM golang:bullseye
 
 COPY --from=subo /go/bin/subo /usr/local/bin
+COPY --from=builder /root/tinygo/build/release.tar.gz /usr/local/.
+WORKDIR /usr/local
+RUN tar -xzf release.tar.gz \
+    && rm release.tar.gz
+
+RUN ln -s /usr/local/tinygo/bin/tinygo /usr/local/bin/tinygo
+RUN ln -s /usr/local/tinygo/bin/wasm-opt /usr/local/bin/wasm-opt
 
 WORKDIR /root/runnable
+
+RUN go mod download github.com/suborbital/reactr@latest
