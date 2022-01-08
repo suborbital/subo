@@ -38,6 +38,10 @@ func getTimestampCache() (time.Time, error) {
 
 		cachedTimestamp, err = time.Parse(time.RFC3339, string(data))
 		if err != nil {
+			err_remove := os.Remove(filePath)
+			if err_remove != nil {
+				return time.Time{}, errors.Wrap(err, "faild to Remove bad cached timestamp")
+			}
 			return time.Time{}, errors.Wrap(err, "failed to parse cached timestamp")
 		}
 	}
@@ -93,6 +97,10 @@ func getLatestReleaseCache() (*github.RepositoryRelease, error) {
 		decoder := gob.NewDecoder(&buffer)
 		err = decoder.Decode(&latestRepoRelease)
 		if err != nil {
+			err_remove := os.Remove(filePath)
+			if err_remove != nil {
+				return nil, errors.Wrap(err, "faild to Remove bad cached repo release")
+			}
 			return nil, errors.Wrap(err, "failed to Decode cached RepositoryRelease")
 		}
 	}
