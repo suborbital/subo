@@ -14,7 +14,7 @@ impl runnable::Runnable for Example {
     }
 }
 ```
-subo will package your Runnable into a Wasm module that can be used by Reactr or Atmo and run just like any other Runnable! You can see examples of Runnables in the [test project](../test-project).
+subo will package your Runnable into a Wasm module that can be used by Reactr or Atmo and run just like any other Runnable! You can see examples of Runnables in the [Reactr repository](https://github.com/suborbital/reactr/tree/main/rwasm/testdata).
 
 ## Create a project
 To create a new project for Atmo or Reactr, use `subo create project <name>`. This will create a new folder which contains a Directive.yaml and an example Runnable.
