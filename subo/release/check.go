@@ -97,8 +97,8 @@ func getLatestReleaseCache() (*github.RepositoryRelease, error) {
 		decoder := gob.NewDecoder(&buffer)
 		err = decoder.Decode(&latestRepoRelease)
 		if err != nil {
-			err_remove := os.Remove(filePath)
-			if err_remove != nil {
+			errRemove := os.Remove(filePath)
+			if errRemove != nil {
 				return nil, errors.Wrap(err, "failed to Remove bad cached RepositoryRelease")
 			}
 			return nil, errors.Wrap(err, "failed to Decode cached RepositoryRelease")
