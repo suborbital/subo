@@ -38,9 +38,9 @@ func getTimestampCache() (time.Time, error) {
 
 		cachedTimestamp, err = time.Parse(time.RFC3339, string(data))
 		if err != nil {
-			err_remove := os.Remove(filePath)
-			if err_remove != nil {
-				return time.Time{}, errors.Wrap(err, "faild to Remove bad cached timestamp")
+			errRemove := os.Remove(filePath)
+			if errRemove != nil {
+				return time.Time{}, errors.Wrap(err, "failed to Remove bad cached timestamp")
 			}
 			return time.Time{}, errors.Wrap(err, "failed to parse cached timestamp")
 		}
