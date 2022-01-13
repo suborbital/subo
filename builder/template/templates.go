@@ -182,7 +182,7 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 			data = []byte(builder.String())
 		}
 
-		if err := ioutil.WriteFile(filepath.Join(targetPath, targetRelPath), data, 0777); err != nil {
+		if err := ioutil.WriteFile(filepath.Join(targetPath, targetRelPath), data, 0600); err != nil {
 			return errors.Wrap(err, "failed to WriteFile")
 		}
 
@@ -219,7 +219,7 @@ func downloadZip(repo, branch, targetPath string) (string, error) {
 		}
 	}
 
-	if err := os.MkdirAll(targetPath, os.ModePerm); err != nil {
+	if err := os.MkdirAll(targetPath, 0755); err != nil {
 		return "", errors.Wrap(err, "failed to MkdirAll")
 	}
 

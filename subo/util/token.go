@@ -1,10 +1,11 @@
 package util
 
 import (
-	"github.com/pkg/errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/pkg/errors"
 )
 
 func getTokenTmpDir() string {
@@ -15,12 +16,12 @@ func getTokenTmpDir() string {
 func WriteEnvironmentToken(tokenStr string) error {
 	tokenPath := getTokenTmpDir()
 	if _, err := os.Stat(tokenPath); os.IsNotExist(err) {
-		if err := os.MkdirAll(filepath.Dir(tokenPath), os.ModePerm); err != nil {
+		if err := os.MkdirAll(filepath.Dir(tokenPath), 0755); err != nil {
 			return errors.Wrap(err, "failed to Mkdir")
 		}
 	}
 
-	if err := ioutil.WriteFile(tokenPath, []byte(tokenStr), 0700); err != nil {
+	if err := ioutil.WriteFile(tokenPath, []byte(tokenStr), 0600); err != nil {
 		return errors.Wrap(err, "failed to WriteFile for token")
 	}
 	return nil

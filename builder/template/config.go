@@ -36,7 +36,7 @@ func TemplateRootDir() (string, error) {
 
 	if os.Stat(tmplPath); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			if err := os.MkdirAll(tmplPath, os.ModePerm); err != nil {
+			if err := os.MkdirAll(tmplPath, 0755); err != nil {
 				return "", errors.Wrap(err, "failed to MkdirAll template directory")
 			}
 		} else {

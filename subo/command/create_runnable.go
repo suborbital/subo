@@ -156,7 +156,7 @@ func writeDotRunnable(cwd, name, lang, namespace string) (*directive.Runnable, e
 
 	path := filepath.Join(cwd, name, ".runnable.yaml")
 
-	if err := ioutil.WriteFile(path, bytes, 0700); err != nil {
+	if err := ioutil.WriteFile(path, bytes, 0600); err != nil {
 		return nil, errors.Wrap(err, "failed to WriteFile runnable")
 	}
 
