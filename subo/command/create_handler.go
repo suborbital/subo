@@ -46,12 +46,12 @@ type handlerData struct {
 
 os. package 
 
-OVERWITE IT
+// OVERWITE IT
 
 // CreateHandlerCmd returns the build command
 func CreateHandlerCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "handler <name>", //this <name> has to pull a default runnable
+		Use:   "handler <name>", //this <name> has to pull a default runnable which is in form: /name
 		Short: "create a new handler",
 		Long:  `create a new handler for Subo CLI`,
 		Args:  cobra.ExactArgs(1),
@@ -120,8 +120,9 @@ func CreateHandlerCmd() *cobra.Command {
 
 
 			//Need to grab lib.ts (from templates) and be able to pass that into the handler
+			fmt.Sprintf("foo", input) //this is going to be a template literal because we have to pass in the input- 
 
-			if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data); err != nil {
+			if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, fmt.Sprintf("%s", input), data); err != nil {
 				// if the templates are missing, try updating them and exec again
 				if err == template.ErrTemplateMissing {
 					templatesPath, err = template.UpdateTemplates(defaultRepo, branch)
@@ -129,7 +130,7 @@ func CreateHandlerCmd() *cobra.Command {
 						return errors.Wrap(err, "🚫 failed to UpdateTemplates")
 					}
 
-					if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data); err != nil {
+					if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, fmt.Sprintf("%s", input), data); err != nil {
 						return errors.Wrap(err, "🚫 failed to ExecTmplDir")
 					}
 				} else {
@@ -147,7 +148,7 @@ func CreateHandlerCmd() *cobra.Command {
 				return errors.Wrap(err, "🚫 failed to initialize Run git init")
 			}
 
-			return nil
+			return nilq
 		},
 	}
 
