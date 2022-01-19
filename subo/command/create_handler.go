@@ -2,7 +2,9 @@ package command
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -10,10 +12,7 @@ import (
 	"github.com/suborbital/subo/builder/template"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
-)
-
-const (
-	defaultRepo = "suborbital/subo"
+	"gopkg.in/yaml.v2"
 )
 
 type handlerData struct {
@@ -43,8 +42,6 @@ type handlerData struct {
 
 //READ ENTIRE FILE
 //TAKE FROM DIRECTIVE.go
-
-os. package 
 
 // OVERWITE IT
 
