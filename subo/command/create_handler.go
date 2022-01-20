@@ -3,14 +3,10 @@ package command
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"github.com/suborbital/subo/builder/context"
-	"github.com/suborbital/subo/builder/template"
-	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
 	"gopkg.in/yaml.v2"
 )
@@ -96,14 +92,14 @@ func CreateHandlerCmd() *cobra.Command {
 				return errors.Wrap(err, "🚫 failed to initialize Run git init")
 			}
 
-			return nilq
+			return nil
 		},
 	}
 
 
-	cmd.Flags().String(typeFlag, "POST", "the method for which you want ")
-	cmd.Flags().String(resourceFlag, "main", "git branch to download templates from") //
-	cmd.Flags().String(methodFlag, "POST", "the method for which you want ")
+	cmd.Flags().String(typeFlag, "request", "the method for which you want ")
+	cmd.Flags().String(resourceFlag, "/foo", "git branch to download templates from") //
+	cmd.Flags().String(methodFlag, "GET", "the method for which you want ")
 	// cmd.Flags().String(streamFlag, "main", "git branch to download templates from") //stream is a stype of handler 
 	// cmd.Flags().String(stepsFlag, "fn", "Runnable functions to be composed when handling requests to the resource.")
 
@@ -120,12 +116,12 @@ func writeHandler(cwd, handlerType, resource, method, string) (*directive.Runnab
 	handler := &directive.Handler{
 		HandlerType:       handlerType,
 		Resource:   resource,
-		Method:     method
-	}
+		Method:     method,
 		// Stream:     stream,
 		// Steps:  	steps,
-	
+	}
 
+	//Not sure if I need this at all
 	bytes, err := yaml.Marshal(handler)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to Marshal handler")
