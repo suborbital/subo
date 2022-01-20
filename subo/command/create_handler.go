@@ -24,8 +24,6 @@ type handlerData struct {
 // The basic command can just create a handler with a placeholder function. 
 // Some potential flags: --method, --stream, --steps
 
-//ACCESS the Directive File that I need to Call, save to variable for later use:
-directive := BuildContext.Directive //this will give me access to the actual directive file
 //READ ENTIRE FILE
 readDirectiveFile(cwd string)(directive, error) //directive here = *directive.Directive
 // Write CreateHandler Function
@@ -56,6 +54,15 @@ func CreateHandlerCmd() *cobra.Command {
 			util.LogStart(fmt.Sprintf("creating handler with function name %s", name))
 
 			bctx, err := context.ForDirectory(dir)
+			//ACCESS the Directive File that I need to Call, save to variable for later use:
+			bctx.Directive //this will give me access to the actual directive file
+			//create new handler = directive.Handler object and add it to the array of handlers then call the WRITE function
+
+			//create new handler object
+			//add handler object to the directive
+
+			// Append handler to the Directive File
+			//Check error handling 
 		
 			handler, err := writeHandler(bctx.Cwd)
 			if err != nil {
@@ -81,14 +88,8 @@ func CreateHandlerCmd() *cobra.Command {
 
 	return cmd
 }
-// Append handler to the Directive File
-// func appendHandler(cwd, method, stream, steps string) (*directive.Runnable, error) { 
 
-// }
-
-//WriteDirective File 
-
-//Run Directive Validator
+Directive.WriteDirectiveFile(bctx.cwd string, bctx.directive *directive.Directive)
 
 
 
