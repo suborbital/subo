@@ -38,6 +38,10 @@ func getTimestampCache() (time.Time, error) {
 
 		cachedTimestamp, err = time.Parse(time.RFC3339, string(data))
 		if err != nil {
+			errRemove := os.Remove(filePath)
+			if errRemove != nil {
+				return time.Time{}, errors.Wrap(err, "failed to Remove bad cached timestamp")
+			}
 			return time.Time{}, errors.Wrap(err, "failed to parse cached timestamp")
 		}
 	}
@@ -77,13 +81,13 @@ func getLatestReleaseCache() (*github.RepositoryRelease, error) {
 	}
 
 	var latestRepoRelease *github.RepositoryRelease
-	filepath := filepath.Join(cachePath, latestReleaseFilename)
-	if _, err = os.Stat(filepath); os.IsNotExist(err) {
+	filePath := filepath.Join(cachePath, latestReleaseFilename)
+	if _, err = os.Stat(filePath); os.IsNotExist(err) {
 		return nil, nil
 	} else if err != nil {
 		return nil, errors.Wrap(err, "faild to Stat")
 	} else {
-		data, err := ioutil.ReadFile(filepath)
+		data, err := ioutil.ReadFile(filePath)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to ReadFile")
 		}
@@ -93,6 +97,10 @@ func getLatestReleaseCache() (*github.RepositoryRelease, error) {
 		decoder := gob.NewDecoder(&buffer)
 		err = decoder.Decode(&latestRepoRelease)
 		if err != nil {
+			errRemove := os.Remove(filePath)
+			if errRemove != nil {
+				return nil, errors.Wrap(err, "failed to Remove bad cached RepositoryRelease")
+			}
 			return nil, errors.Wrap(err, "failed to Decode cached RepositoryRelease")
 		}
 	}
@@ -145,7 +153,7 @@ func CheckForLatestVersion() (string, error) {
 	} else if cmdVersion, err := version.NewVersion(SuboDotVersion); err != nil {
 		return "", errors.Wrap(err, "failed to parse current subo version")
 	} else if cmdVersion.LessThan(latestCmdVersion) {
-		return fmt.Sprintf("An upgrade for subo is available: %s → %s\n", cmdVersion, latestCmdVersion), nil
+		return fmt.Sprintf("An upgrade for subo is available: %s → %s", cmdVersion, latestCmdVersion), nil
 	}
 
 	return "", nil
