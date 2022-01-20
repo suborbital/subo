@@ -25,7 +25,6 @@ type handlerData struct {
 // Some potential flags: --method, --stream, --steps
 
 //READ ENTIRE FILE
-readDirectiveFile(cwd string)(directive, error) //directive here = *directive.Directive
 // Write CreateHandler Function
 // CreateHandlerCmd returns the build command
 func CreateHandlerCmd() *cobra.Command {
@@ -52,6 +51,7 @@ func CreateHandlerCmd() *cobra.Command {
 			//     method: GET
 			//  
 			util.LogStart(fmt.Sprintf("creating handler with function name %s", name))
+			readDirectiveFile(cwd string)(directive, error) //directive here = *directive.Directive
 
 			bctx, err := context.ForDirectory(dir)
 			//ACCESS the Directive File that I need to Call, save to variable for later use:
@@ -63,6 +63,12 @@ func CreateHandlerCmd() *cobra.Command {
 
 			// Append handler to the Directive File
 			//Check error handling 
+			
+			//Write Directive File
+			Directive.WriteDirectiveFile(bctx.cwd string, bctx.directive *directive.Directive)
+			if err := context.WriteDirectiveFile(b.Context.Cwd, b.Context.Directive); err != nil {
+				return errors.Wrap(err, "failed to WriteDirectiveFile")
+			}
 		
 			handler, err := writeHandler(bctx.Cwd)
 			if err != nil {
@@ -89,7 +95,7 @@ func CreateHandlerCmd() *cobra.Command {
 	return cmd
 }
 
-Directive.WriteDirectiveFile(bctx.cwd string, bctx.directive *directive.Directive)
+
 
 
 
