@@ -45,6 +45,12 @@ type handlerData struct {
 
 // OVERWITE IT
 
+// CreateHandlerError wraps errors for CreateHandlerCmd() failures
+type CreateHandlerError struct {
+	Path  string // The ouput directory for build command CreateHandlerCmd().
+	error        // The original error.
+}
+
 // CreateHandlerCmd returns the build command
 func CreateHandlerCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -55,85 +61,30 @@ func CreateHandlerCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0]
 
-
-			// type, _ := cmd.Flags().GetString(typeFlag)
-			// resource, _ := cmd.Flags().GetString(resourceFlag)
+			type, _ := cmd.Flags().GetString(typeFlag)
+			resource, _ := cmd.Flags().GetString(resourceFlag)
 			method, _ := cmd.Flags().GetString(methodFlag)
-			stream, _ := cmd.Flags().GetString(streamFlag)
+			// stream, _ := cmd.Flags().GetString(streamFlag)
 			// steps, _ := cmd.Flags().GetString(stepsFlag)
 
-			cwd, err := os.Getwd()
-			if err != nil {
-				return errors.Wrap(err, "failed to Getwd")
-			}
+			//STEPS: In order to create a handler what information do you need: 
+			//1. What directory you are pulling the runnable from- actually NOT PULLING any runnable, 
+			//we are just creating handler document 
 
-			bctx, err := context.ForDirectory(cwd)
-			if err != nil {
-				return errors.Wrap(err, "🚫 failed to get CurrentBuildContext")
-			}
-
+			//So, if they put /foo we need to put in this handler: "fn: foo"
+			//Handler will look like: 
+			// handlers:
+			//   - type: request
+			//     resource: /foo
+			//     method: GET
+			//  
 			util.LogStart(fmt.Sprintf("creating handler with function name %s", name))
 
-			// path, err := util.Mkdir(bctx.Cwd, name)
-			// if err != nil {
-			// 	return errors.Wrap(err, "🚫 failed to Mkdir")
-			// }
-
-			// branch, _ := cmd.Flags().GetString(branchFlag)
-			// environment, _ := cmd.Flags().GetString(environmentFlag)
-			// headless, _ := cmd.Flags().GetBool(headlessFlag)
-
-			// templatesPath, err := template.TemplateFullPath(defaultRepo, branch)
-			// if err != nil {
-			// 	return errors.Wrap(err, "🚫 failed to TemplateFullPath")
-			// }
-
-			// if update, _ := cmd.Flags().GetBool(updateTemplatesFlag); update {
-			// 	templatesPath, err = template.UpdateTemplates(defaultRepo, branch)
-			// 	if err != nil {
-			// 		return errors.Wrap(err, "🚫 failed to UpdateTemplates")
-			// 	}
-			// }
-
-			data := handlerData{
-				Name:        name,
-				Environment: environment,
-				APIVersion:  release.FFIVersion,
-				AtmoVersion: release.AtmoVersion,
-				Headless:    headless,
-			}
-			//Need to set up code to take from templates
-			templatesPath, err := template.TemplateFullPath(repo, branch)
-			if err != nil {
-				return errors.Wrap(err, "failed to TemplateDir")
-			}
-					//maybe? 
-			if update, _ := cmd.Flags().GetBool(updateTemplatesFlag); update {
-				templatesPath, err = template.UpdateTemplates(repo, branch)
-				if err != nil {
-					return errors.Wrap(err, "🚫 failed to UpdateTemplates")
-				}
-			}
-
+			//Do I need to set up infrastructure where I need to check that the placeholder fn actually exisst in our runnables list?
 
 			//Need to grab lib.ts (from templates) and be able to pass that into the handler
 			fmt.Sprintf("foo", input) //this is going to be a template literal because we have to pass in the input- 
 
-			if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, fmt.Sprintf("%s", input), data); err != nil {
-				// if the templates are missing, try updating them and exec again
-				if err == template.ErrTemplateMissing {
-					templatesPath, err = template.UpdateTemplates(defaultRepo, branch)
-					if err != nil {
-						return errors.Wrap(err, "🚫 failed to UpdateTemplates")
-					}
-
-					if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, fmt.Sprintf("%s", input), data); err != nil {
-						return errors.Wrap(err, "🚫 failed to ExecTmplDir")
-					}
-				} else {
-					return errors.Wrap(err, "🚫 failed to ExecTmplDir")
-				}
-			}
 			handler, err := writeHandler(bctx.Cwd)
 			if err != nil {
 				return errors.Wrap(err, "🚫 failed to writeHandler")
@@ -149,9 +100,12 @@ func CreateHandlerCmd() *cobra.Command {
 		},
 	}
 
+
+	cmd.Flags().String(typeFlag, "POST", "the method for which you want ")
+	cmd.Flags().String(resourceFlag, "main", "git branch to download templates from") //
 	cmd.Flags().String(methodFlag, "POST", "the method for which you want ")
-	cmd.Flags().String(streamFlag, "main", "git branch to download templates from") //stream is a stype of handler 
-	cmd.Flags().String(stepsFlag, "fn", "Runnable functions to be composed when handling requests to the resource.")
+	// cmd.Flags().String(streamFlag, "main", "git branch to download templates from") //stream is a stype of handler 
+	// cmd.Flags().String(stepsFlag, "fn", "Runnable functions to be composed when handling requests to the resource.")
 
 	// cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
 	// cmd.Flags().String(environmentFlag, "com.suborbital", "project environment name (your company's reverse domain")
@@ -161,11 +115,13 @@ func CreateHandlerCmd() *cobra.Command {
 	return cmd
 }
 
-func writeHandler(cwd, method, stream, steps string) (*directive.Runnable, error) { //notate optional params      , method, lang, namespace string
+func writeHandler(cwd, type, resource, method, string) (*directive.Runnable, error) { //notate optional params      , method, lang, namespace string
 	
 	handler := &directive.Handler{
+		Type:       type,
+		Resource:   resource,
 		Method:     method,
-		Stream:     stream,
+		// Stream:     stream,
 		// Steps:  	steps,
 	}
 
@@ -174,7 +130,7 @@ func writeHandler(cwd, method, stream, steps string) (*directive.Runnable, error
 		return nil, errors.Wrap(err, "failed to Marshal handler")
 	}
 
-	path := filepath.Join(cwd, name, ".handler.yaml") //How to get it to Directive.yaml?
+	path := filepath.Join(cwd, name, ".handler.yaml") //How to get it to Directive.yaml? Is this being appended to the directive.yaml.tmpl file?
 
 	if err := ioutil.WriteFile(path, bytes, 0700); err != nil { //Don't need to write entire file
 		return nil, errors.Wrap(err, "failed to WriteFile handler")
@@ -186,6 +142,9 @@ func writeHandler(cwd, method, stream, steps string) (*directive.Runnable, error
 // func appendHandler(cwd, method, stream, steps string) (*directive.Runnable, error) { 
 
 // }
+
+
+//NOTES
 
 //Handler Structure
 // handlers:
@@ -201,8 +160,6 @@ func writeHandler(cwd, method, stream, steps string) (*directive.Runnable, error
 //         with:
 //           url: modify-url
 //           logme: hello
-
-
 
 //
 //

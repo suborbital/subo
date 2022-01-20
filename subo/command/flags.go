@@ -9,6 +9,8 @@ const (
 	streamFlag          = "stream"
 	versionFlag         = "version"
 	repoFlag            = "repo"
+	typeFlag            = "type"
+	resourceFlag        = "resource"
 	environmentFlag     = "environment"
 	updateTemplatesFlag = "update-templates"
 	headlessFlag        = "headless"
