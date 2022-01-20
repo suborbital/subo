@@ -11,7 +11,7 @@ func rootCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "subo",
 		Short:   "Suborbital Development Platform CLI",
-		Version: release.SuboDotVersion,
+		Version: release.Version(),
 		Long: `Subo is the full toolchain for using and managing Suborbital Development Platform tools,
 including building WebAssembly Runnables and Atmo projects.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
