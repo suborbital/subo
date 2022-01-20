@@ -61,7 +61,7 @@ func CreateHandlerCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0]
 
-			type, _ := cmd.Flags().GetString(typeFlag)
+			handlerType, _ := cmd.Flags().GetString(typeFlag)
 			resource, _ := cmd.Flags().GetString(resourceFlag)
 			method, _ := cmd.Flags().GetString(methodFlag)
 			// stream, _ := cmd.Flags().GetString(streamFlag)
@@ -115,15 +115,16 @@ func CreateHandlerCmd() *cobra.Command {
 	return cmd
 }
 
-func writeHandler(cwd, type, resource, method, string) (*directive.Runnable, error) { //notate optional params      , method, lang, namespace string
+func writeHandler(cwd, handlerType, resource, method, string) (*directive.Runnable, error) { //notate optional params      , method, lang, namespace string
 	
 	handler := &directive.Handler{
-		Type:       type,
+		HandlerType:       handlerType,
 		Resource:   resource,
-		Method:     method,
+		Method:     method
+	}
 		// Stream:     stream,
 		// Steps:  	steps,
-	}
+	
 
 	bytes, err := yaml.Marshal(handler)
 	if err != nil {
