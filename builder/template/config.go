@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/suborbital/subo/subo/util"
 )
 
 func TemplateFullPath(repo, branch string) (string, error) {
@@ -36,7 +37,7 @@ func TemplateRootDir() (string, error) {
 
 	if os.Stat(tmplPath); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			if err := os.MkdirAll(tmplPath, 0755); err != nil {
+			if err := os.MkdirAll(tmplPath, util.PermDirectory); err != nil {
 				return "", errors.Wrap(err, "failed to MkdirAll template directory")
 			}
 		} else {

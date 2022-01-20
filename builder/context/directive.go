@@ -8,6 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/suborbital/atmo/directive"
+	"github.com/suborbital/subo/subo/util"
 	"gopkg.in/yaml.v2"
 )
 
@@ -20,7 +21,7 @@ func WriteDirectiveFile(cwd string, directive *directive.Directive) error {
 		return errors.Wrap(err, "failed to Marshal")
 	}
 
-	if err := ioutil.WriteFile(filePath, directiveBytes, os.FileMode(os.O_WRONLY)); err != nil {
+	if err := ioutil.WriteFile(filePath, directiveBytes, util.PermFilePrivate); err != nil {
 		return errors.Wrap(err, "failed to WriteFile")
 	}
 
