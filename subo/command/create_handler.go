@@ -71,7 +71,7 @@ func CreateHandlerCmd() *cobra.Command {
 			//1. What directory you are pulling the runnable from- actually NOT PULLING any runnable, 
 			//we are just creating handler document 
 
-			//So, if they put /foo we need to put in this handler: "fn: foo"
+			//So, if they put /foo we need to put in this handler: "resource: /foo"
 			//Handler will look like: 
 			// handlers:
 			//   - type: request
@@ -83,7 +83,7 @@ func CreateHandlerCmd() *cobra.Command {
 			//Do I need to set up infrastructure where I need to check that the placeholder fn actually exisst in our runnables list?
 
 			//Need to grab lib.ts (from templates) and be able to pass that into the handler
-			fmt.Sprintf("foo", input) //this is going to be a template literal because we have to pass in the input- 
+			// fmt.Sprintf("foo", input) //this is going to be a template literal because we have to pass in the input- 
 
 			handler, err := writeHandler(bctx.Cwd)
 			if err != nil {
