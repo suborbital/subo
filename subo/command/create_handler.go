@@ -12,11 +12,9 @@ import (
 )
 
 type handlerData struct {
-	Name        string
-	Environment string
-	Headless    bool
-	APIVersion  string
-	AtmoVersion string
+	HandlerType string
+	Request 	string
+	Method    	string
 }
 
 //GOAL
@@ -37,7 +35,7 @@ func CreateHandlerCmd() *cobra.Command {
 			name := args[0]
 
 			handlerType, _ := cmd.Flags().GetString(typeFlag)
-			resource, _ := cmd.Flags().GetString(resourceFlag)
+			resource, _ := cmd.Flags().GetString(resourceFlag) //name and the resource are the same
 			method, _ := cmd.Flags().GetString(methodFlag)
 			// stream, _ := cmd.Flags().GetString(streamFlag)
 			// steps, _ := cmd.Flags().GetString(stepsFlag)
@@ -55,16 +53,21 @@ func CreateHandlerCmd() *cobra.Command {
 
 			bctx, err := context.ForDirectory(dir)
 			//ACCESS the Directive File that I need to Call, save to variable for later use:
-			bctx.Directive //this will give me access to the actual directive file
+			//bctx.Directive //this will give me access to the actual directive file
 			//create new handler = directive.Handler object and add it to the array of handlers then call the WRITE function
 
 			//create new handler object
+			handler := &bctx.directive.Handler{
+					HandlerType:handlerType,
+					Resource:   resource,
+					Method:     method,
+			}
+				// Stream:     stream,
+					// Steps:  	steps,
+			
 			//add handler object to the directive
 
-			// Append handler to the Directive File
-			//Check error handling 
-			
-			//Write Directive File
+			//Write Directive File which overwrites the entire file
 			Directive.WriteDirectiveFile(bctx.cwd string, bctx.directive *directive.Directive)
 			if err := context.WriteDirectiveFile(b.Context.Cwd, b.Context.Directive); err != nil {
 				return errors.Wrap(err, "failed to WriteDirectiveFile")
