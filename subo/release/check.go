@@ -56,7 +56,7 @@ func cacheTimestamp(timestamp time.Time) error {
 
 	filePath := filepath.Join(cachePath, lastCheckedFilename)
 	data := []byte(timestamp.Format(time.RFC3339))
-	if err := ioutil.WriteFile(filePath, data, os.ModePerm); err != nil {
+	if err := ioutil.WriteFile(filePath, data, util.PermFile); err != nil {
 		return errors.Wrap(err, "failed to WriteFile")
 	}
 
@@ -118,7 +118,7 @@ func cacheLatestRelease(latestRepoRelease *github.RepositoryRelease) error {
 	encoder := gob.NewEncoder(&buffer)
 	if err = encoder.Encode(latestRepoRelease); err != nil {
 		return errors.Wrap(err, "failed to Encode RepositoryRelease")
-	} else if err := ioutil.WriteFile(filepath.Join(cachePath, latestReleaseFilename), buffer.Bytes(), os.ModePerm); err != nil {
+	} else if err := ioutil.WriteFile(filepath.Join(cachePath, latestReleaseFilename), buffer.Bytes(), util.PermFile); err != nil {
 		return errors.Wrap(err, "failed to WriteFile")
 	}
 

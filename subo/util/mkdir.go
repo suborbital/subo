@@ -11,7 +11,7 @@ import (
 func Mkdir(cwd, name string) (string, error) {
 	path := filepath.Join(cwd, name)
 
-	if err := os.Mkdir(path, 0777); err != nil {
+	if err := os.Mkdir(path, PermDirectory); err != nil {
 		return "", errors.Wrap(err, "failed to Mkdir")
 	}
 
