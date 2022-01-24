@@ -18,20 +18,19 @@ type handlerData struct {
 
 func CreateHandlerCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "handler <name>",
+		Use:   "handler <resource>",
 		Short: "create a new handler",
 		Long:  `create a new handler for Subo CLI`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			name := args[0]
+			resource := args[0]
 
 			handlerType, _ := cmd.Flags().GetString(typeFlag)
-			resource, _ := cmd.Flags().GetString(resourceFlag)
 			method, _ := cmd.Flags().GetString(methodFlag)
 
 			dir, _ := cmd.Flags().GetString(dirFlag)
 
-			util.LogStart(fmt.Sprintf("creating handler with function name %s", name))
+			util.LogStart(fmt.Sprintf("creating handler with function name %s", resource))
 
 			bctx, err := context.ForDirectory(dir)
 			if err != nil {
@@ -39,7 +38,7 @@ func CreateHandlerCmd() *cobra.Command {
 			}
 
 			if bctx.Directive == nil {
-				util.LogFail("Handlers must be created in a project")
+				util.LogFail("Handlers can only be created in projects with a Directive.yaml file")
 				return errors.New("Directive.yaml not found")
 			}
 			//Create a new handler object
@@ -59,15 +58,14 @@ func CreateHandlerCmd() *cobra.Command {
 				return errors.Wrap(err, "failed to WriteDirectiveFile")
 			}
 
-			util.LogDone(fmt.Sprintf("handler with resource name %s created", name))
+			util.LogDone(fmt.Sprintf("handler with resource name %s created", resource))
 
 			return nil
 		},
 	}
 
-	cmd.Flags().String(typeFlag, "request", "the method for which you want ")
-	cmd.Flags().String(resourceFlag, "/foo", "git branch to download templates from")
-	cmd.Flags().String(methodFlag, "GET", "the method for which you want ")
+	cmd.Flags().String(typeFlag, "request", "the kind of input put into the handler")
+	cmd.Flags().String(methodFlag, "GET", "used to determine what action to execute on a specific resource")
 
 	return cmd
 }
