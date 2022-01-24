@@ -2,24 +2,23 @@ package command
 
 import (
 	"fmt"
-	"io/ioutil"
-	"path/filepath"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/suborbital/atmo/directive"
+	"github.com/suborbital/subo/builder/context"
 	"github.com/suborbital/subo/subo/util"
-	"gopkg.in/yaml.v2"
 )
 
 type handlerData struct {
 	HandlerType string
-	Request 	string
-	Method    	string
+	Request     string
+	Method      string
 }
 
 //GOAL
-// Would love to be able to run subo create handler /foo and have it added to the directive. 
-// The basic command can just create a handler with a placeholder function. 
+// Would love to be able to run subo create handler /foo and have it added to the directive.
+// The basic command can just create a handler with a placeholder function.
 // Some potential flags: --method, --stream, --steps
 
 //READ ENTIRE FILE
@@ -39,77 +38,54 @@ func CreateHandlerCmd() *cobra.Command {
 			method, _ := cmd.Flags().GetString(methodFlag)
 			// stream, _ := cmd.Flags().GetString(streamFlag)
 			// steps, _ := cmd.Flags().GetString(stepsFlag)
+			dir, _ := cmd.Flags().GetString(dirFlag)
 
-	
-			//So, if they put /foo we need to put in this handler: "resource: /foo"
-			//Handler will look like: 
-			// handlers:
-			//   - type: request
-			//     resource: /foo
-			//     method: GET
-			//  
 			util.LogStart(fmt.Sprintf("creating handler with function name %s", name))
-			readDirectiveFile(cwd string)(directive, error) //directive here = *directive.Directive
 
 			bctx, err := context.ForDirectory(dir)
-			//ACCESS the Directive File that I need to Call, save to variable for later use:
-			//bctx.Directive //this will give me access to the actual directive file
-			//create new handler = directive.Handler object and add it to the array of handlers then call the WRITE function
-
-			//create new handler object
-			handler := &bctx.directive.Handler{
-					HandlerType:handlerType,
-					Resource:   resource,
-					Method:     method,
+			if err != nil {
+				return errors.Wrap(err, "failed to ForDirectory")
 			}
-				// Stream:     stream,
-					// Steps:  	steps,
-			
+
+			if bctx.Directive == nil {
+				util.LogFail("Handlers must be created in a project")
+				return errors.New("Directive.yaml not found")
+			}
+			// //create new handler object
+
+			handler := directive.Handler{
+				Input: directive.Input{
+					Type:     handlerType,
+					Resource: resource,
+					Method:   method,
+				},
+			}
+
+			// Stream:     stream,
+			// Steps:  	steps,
+
 			//add handler object to the directive
+			bctx.Directive.Handlers = append(bctx.Directive.Handlers, handler)
 
 			//Write Directive File which overwrites the entire file
-			Directive.WriteDirectiveFile(bctx.cwd string, bctx.directive *directive.Directive)
-			if err := context.WriteDirectiveFile(b.Context.Cwd, b.Context.Directive); err != nil {
+			if err := context.WriteDirectiveFile(bctx.Cwd, bctx.Directive); err != nil {
 				return errors.Wrap(err, "failed to WriteDirectiveFile")
 			}
-		
-			handler, err := writeHandler(bctx.Cwd)
-			if err != nil {
-				return errors.Wrap(err, "🚫 failed to writeHandler")
-			}
 
-			util.LogDone(path)
-
-			if _, err := util.Run(fmt.Sprintf("git init ./%s", name)); err != nil {
-				return errors.Wrap(err, "🚫 failed to initialize Run git init")
-			}
+			util.LogDone(fmt.Sprintf("handler with resource name %s created", name))
 
 			return nil
 		},
 	}
 
-
 	cmd.Flags().String(typeFlag, "request", "the method for which you want ")
 	cmd.Flags().String(resourceFlag, "/foo", "git branch to download templates from") //
 	cmd.Flags().String(methodFlag, "GET", "the method for which you want ")
-	// cmd.Flags().String(streamFlag, "main", "git branch to download templates from") //stream is a stype of handler 
+	// cmd.Flags().String(streamFlag, "main", "git branch to download templates from") //stream is a stype of handler
 	// cmd.Flags().String(stepsFlag, "fn", "Runnable functions to be composed when handling requests to the resource.")
 
 	return cmd
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // // WriteDirectiveFile writes a Directive to disk
 // func WriteDirectiveFile(cwd string, directive *directive.Directive) error {
@@ -127,10 +103,9 @@ func CreateHandlerCmd() *cobra.Command {
 // 	return nil
 // }
 
-
-//Writes the handler 
+//Writes the handler
 // func writeHandler(cwd string, handlerType, resource, method, string) (*directive.Runnable, error) { //notate optional params      , method, lang, namespace string
-	
+
 // 	handler := &directive.Handler{
 // 		HandlerType:       handlerType,
 // 		Resource:   resource,
@@ -154,10 +129,9 @@ func CreateHandlerCmd() *cobra.Command {
 // 	return handler, nil
 // }
 
-// func appendHandler(cwd, method, stream, steps string) (*directive.Runnable, error) { 
+// func appendHandler(cwd, method, stream, steps string) (*directive.Runnable, error) {
 
 // }
-
 
 //NOTES
 
