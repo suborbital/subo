@@ -26,7 +26,7 @@ func CreateHandlerCmd() *cobra.Command {
 			name := args[0]
 
 			handlerType, _ := cmd.Flags().GetString(typeFlag)
-			resource, _ := cmd.Flags().GetString(resourceFlag) //name and the resource are the same
+			resource, _ := cmd.Flags().GetString(resourceFlag)
 			method, _ := cmd.Flags().GetString(methodFlag)
 
 			dir, _ := cmd.Flags().GetString(dirFlag)
