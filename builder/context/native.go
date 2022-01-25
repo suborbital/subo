@@ -38,6 +38,10 @@ var nativeCommandsForLang = map[string]map[string][]string{
 		"grain": {
 			"grain compile index.gr -I _lib -o {{ .Name }}.wasm",
 		},
+		"js": {
+			"webpack",
+			"javy build/index.js -o {{ .Name }}.wasm",
+		},
 	},
 	"linux": {
 		"rust": {
@@ -60,6 +64,10 @@ var nativeCommandsForLang = map[string]map[string][]string{
 		},
 		"grain": {
 			"grain compile index.gr -I _lib -o {{ .Name }}.wasm",
+		},
+		"js": {
+			"webpack",
+			"javy build/index.js -o {{ .Name }}.wasm",
 		},
 	},
 }

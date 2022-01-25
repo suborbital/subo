@@ -32,6 +32,12 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 			},
 		},
 		"tinygo": {},
+		"js": {
+			Prereq{
+				File:    "node_modules",
+				Command: "npm install --include=dev",
+			},
+		},
 	},
 	"linux": {
 		"rust":  {},
@@ -57,5 +63,11 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 			},
 		},
 		"tinygo": {},
+		"js": {
+			Prereq{
+				File:    "node_modules",
+				Command: "npm install --include=dev",
+			},
+		},
 	},
 }
