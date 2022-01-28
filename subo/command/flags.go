@@ -6,7 +6,6 @@ const (
 	namespaceFlag       = "namespace"
 	branchFlag          = "branch"
 	methodFlag          = "method"
-	streamFlag          = "stream"
 	versionFlag         = "version"
 	repoFlag            = "repo"
 	typeFlag            = "type"

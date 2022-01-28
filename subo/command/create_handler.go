@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -28,19 +29,22 @@ func CreateHandlerCmd() *cobra.Command {
 			handlerType, _ := cmd.Flags().GetString(typeFlag)
 			method, _ := cmd.Flags().GetString(methodFlag)
 
-			dir, _ := cmd.Flags().GetString(dirFlag)
+			util.LogStart(fmt.Sprintf("creating handler for %s", resource))
 
-			util.LogStart(fmt.Sprintf("creating handler with function name %s", resource))
-
-			bctx, err := context.ForDirectory(dir)
+			cwd, err := os.Getwd()
 			if err != nil {
-				return errors.Wrap(err, "failed to ForDirectory")
+				return errors.Wrap(err, "failed to Getwd")
+			}
+
+			bctx, err := context.ForDirectory(cwd)
+			if err != nil {
+				return errors.Wrap(err, "🚫 failed to get CurrentBuildContext")
 			}
 
 			if bctx.Directive == nil {
-				util.LogFail("Handlers can only be created in projects with a Directive.yaml file")
-				return errors.New("Directive.yaml not found")
+				return errors.New("cannot create handler, Directive.yaml not found")
 			}
+
 			//Create a new handler object
 			handler := directive.Handler{
 				Input: directive.Input{
@@ -58,14 +62,14 @@ func CreateHandlerCmd() *cobra.Command {
 				return errors.Wrap(err, "failed to WriteDirectiveFile")
 			}
 
-			util.LogDone(fmt.Sprintf("handler with resource name %s created", resource))
+			util.LogDone(fmt.Sprintf("handler for %s created", resource))
 
 			return nil
 		},
 	}
 
-	cmd.Flags().String(typeFlag, "request", "the kind of input put into the handler")
-	cmd.Flags().String(methodFlag, "GET", "used to determine what action to execute on a specific resource")
+	cmd.Flags().String(typeFlag, "request", "the handler's input type")
+	cmd.Flags().String(methodFlag, "GET", "the HTTP method for 'request' handlers")
 
 	return cmd
 }
