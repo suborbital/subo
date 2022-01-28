@@ -21,7 +21,7 @@ func CreateHandlerCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "handler <resource>",
 		Short: "create a new handler",
-		Long:  `create a new handler for Subo CLI`,
+		Long:  `create a new handler in Directive.yaml`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			resource := args[0]
