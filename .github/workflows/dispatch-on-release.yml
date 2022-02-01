@@ -1,0 +1,27 @@
+name: dispatch-on-release
+on:
+  release:
+    types: [released]
+
+jobs:
+  post-on-release:
+    name: Post dispatch on release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Stores new tag in environment variable
+        run: |
+          version=`echo ${{ github.event.release.tag_name }} | sed s/v//`
+          echo "version=$version" >> $GITHUB_ENV
+      - name: Downloads release file and computes sha256
+        run: |
+          curl -L -o subo.tar.gz https://github.com/suborbital/subo/archive/v${{ env.version }}.tar.gz
+          suboSHA=`sha256sum subo.tar.gz | cut -c -64`
+          rm subo.tar.gz
+          echo "sha=$suboSHA" >> $GITHUB_ENV
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPOTOKEN }}
+          repository: suborbital/homebrew-subo
+          event-type: subo-release
+          client-payload: '{"tag": "${{ env.version }}", "sha": "${{ env.sha }}", "release_url": "${{ github.event.release.html_url}}"}'
