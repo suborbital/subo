@@ -80,6 +80,8 @@ github.com/creack/pty v1.1.7/go.mod h1:lj5s0c3V2DBrqTV7llrYr5NG6My20zk30Fl46Y7Do
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/deislabs/go-bindle v0.1.1-0.20220201013943-612c59d27f42 h1:3cVBSH19n7v34A7IJEoZAacdkWLs1w2YlbltWETOB1Q=
+github.com/deislabs/go-bindle v0.1.1-0.20220201013943-612c59d27f42/go.mod h1:Xl2ji6ePNND4HqiEeeF9Fe5X4UHaz0ZpOT1N1PE4OuQ=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f h1:lO4WD4F/rVNCu3HqELle0jiPLLBs70cWOduZpkS1E78=
 github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f/go.mod h1:cuUVRXasLTGF7a8hSLbxyZXjz+1KgoB3wDUb6vlszIc=
@@ -445,8 +447,6 @@ github.com/suborbital/atmo v0.3.1-0.20210810195347-325b9aa81ca7/go.mod h1:fqKzib
 github.com/suborbital/atmo v0.3.1-0.20210811161300-cf9b7d3fbb19/go.mod h1:p8Myr6lgyUiGcGczf9XEhhW1RVFgwnCYGEtZJ+tMSIg=
 github.com/suborbital/atmo v0.4.0 h1:mJFnAk8I5iBHjZOSxLGtuTt9rbiq7WvG4Zoq0UBTdO4=
 github.com/suborbital/atmo v0.4.0/go.mod h1:QYOhwWfEpPf5EK6PzOKIEA1HRyXigC59PXypmIx/wDk=
-github.com/suborbital/go-bindle v0.1.1-0.20220128142812-540ab0e23635 h1:10llO3sK/pbNkjCIVnkg4pqpu/ImRvpjel7csyVpt84=
-github.com/suborbital/go-bindle v0.1.1-0.20220128142812-540ab0e23635/go.mod h1:kyolfT+D3IzSJz/DUo+eSC+u9NP3x4r7GsiUQtE0jXw=
 github.com/suborbital/grav v0.3.0/go.mod h1:PapJ62PtT9dPmW37WaCD+UMhoZiNPp0N9E3nUfEujC4=
 github.com/suborbital/grav v0.3.2/go.mod h1:PapJ62PtT9dPmW37WaCD+UMhoZiNPp0N9E3nUfEujC4=
 github.com/suborbital/grav v0.3.3/go.mod h1:PapJ62PtT9dPmW37WaCD+UMhoZiNPp0N9E3nUfEujC4=

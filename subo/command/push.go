@@ -115,7 +115,7 @@ func PushCmd() *cobra.Command {
 				return errors.Wrap(err, "failed to createOrReadKeypair")
 			}
 
-			if err := invoice.GenerateCreatorSignature(sigKey, privKey); err != nil {
+			if err := invoice.GenerateSignature(suboAuthor, types.RoleCreator, sigKey, privKey); err != nil {
 				return errors.Wrap(err, "failed to GenerateCreatorSignaure")
 			}
 

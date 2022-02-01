@@ -3,9 +3,10 @@ module github.com/suborbital/subo
 go 1.17
 
 require (
-	github.com/deislabs/go-bindle v0.1.0
+	github.com/deislabs/go-bindle v0.1.1-0.20220201013943-612c59d27f42
 	github.com/google/go-github/v41 v41.0.0
 	github.com/hashicorp/go-version v1.3.0
+	github.com/pelletier/go-toml v1.9.4
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.2.1
 	github.com/suborbital/atmo v0.4.0
@@ -31,7 +32,6 @@ require (
 	github.com/jackc/pgx/v4 v4.13.0 // indirect
 	github.com/jmoiron/sqlx v1.3.4 // indirect
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
-	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/sethvargo/go-envconfig v0.4.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/suborbital/reactr v0.13.0 // indirect
@@ -42,5 +42,3 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )
-
-replace github.com/deislabs/go-bindle => github.com/suborbital/go-bindle v0.1.1-0.20220128142812-540ab0e23635
