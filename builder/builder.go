@@ -259,13 +259,25 @@ func (b *Builder) checkAndRunPreReqs(runnable context.RunnableDir, result *Build
 	}
 
 	for _, p := range preReqs {
+
 		filepath := filepath.Join(runnable.Fullpath, p.File)
 
 		if _, err := os.Stat(filepath); err != nil {
 			if errors.Is(err, os.ErrNotExist) {
 				b.log.LogStart(fmt.Sprintf("missing %s, fixing...", p.File))
 
-				outputLog, err := util.RunInDir(p.Command, runnable.Fullpath)
+				cmdTmpl, err := template.New("cmd").Parse(p.Command)
+				if err != nil {
+					return errors.Wrapf(err, "failed to parse prerequisite Command string into template: %s", p.Command)
+				}
+
+				var fullCmd strings.Builder
+				err = cmdTmpl.Execute(&fullCmd, runnable)
+				if err != nil {
+					return errors.Wrap(err, "failed to execute prerequisite Command string with runnableDir")
+				}
+
+				outputLog, err := util.RunInDir(fullCmd.String(), runnable.Fullpath)
 
 				result.OutputLog += outputLog + "\n"
 
