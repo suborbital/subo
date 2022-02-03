@@ -20,5 +20,7 @@ mod/replace/atmo:
 
 tidy:
 	go mod tidy && go mod download && go mod vendor
+lint:
+	golangci-lint run ./...
 
 .PHONY: subo subo/docker
