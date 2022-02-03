@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Mkdir creates a new directory to contain a runnable
+// Mkdir creates a new directory to contain a runnable.
 func Mkdir(cwd, name string) (string, error) {
 	path := filepath.Join(cwd, name)
 

@@ -15,7 +15,7 @@ import (
 	"github.com/suborbital/subo/subo/util"
 )
 
-// DotSuboFile describes a .subo file for controlling releases
+// DotSuboFile describes a .subo file for controlling releases.
 type DotSuboFile struct {
 	DotVersionFiles []string `yaml:"dotVersionFiles"`
 	PreMakeTargets  []string `yaml:"preMakeTargets"`
@@ -23,7 +23,7 @@ type DotSuboFile struct {
 }
 
 // CreateReleaseCmd returns the create release command
-// this is only available for development builds
+// this is only available for development builds.
 func CreateReleaseCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "release <version> <title>",
@@ -37,23 +37,23 @@ func CreateReleaseCmd() *cobra.Command {
 			newVersion := args[0]
 			releaseName := args[1]
 
-			// ensure the version entered is sane
+			// ensure the version entered is sane.
 			if err := validateVersion(newVersion); err != nil {
 				return errors.Wrap(err, "failed to validateVersion")
 			}
 
-			// ensure the git repo is clean, no untracked or uncommitted changes
+			// ensure the git repo is clean, no untracked or uncommitted changes.
 			if err := checkGitCleanliness(); err != nil {
 				return errors.Wrap(err, "failed to checkGitCleanliness")
 			}
 
-			// ensure the current git branch is an rc branch
+			// ensure the current git branch is an rc branch.
 			branch, err := ensureCorrectGitBranch(newVersion)
 			if err != nil {
 				return errors.Wrap(err, "failed to ensureCorrectGitBranch")
 			}
 
-			// ensure a .subo.yml file is present and valid
+			// ensure a .subo.yml file is present and valid.
 			dotSubo, err := findDotSubo(cwd)
 			if err != nil {
 				return errors.Wrap(err, "failed to findDotSubo")
@@ -61,14 +61,14 @@ func CreateReleaseCmd() *cobra.Command {
 				return errors.New(".subo.yml file is missing")
 			}
 
-			// ensure a changelog exists for the relase
+			// ensure a changelog exists for the release.
 			changelogFilePath := filepath.Join(cwd, "changelogs", fmt.Sprintf("%s.md", newVersion))
 
 			if err := checkChangelogFileExists(changelogFilePath); err != nil {
 				return errors.Wrap(err, "failed to checkChangelogFileExists")
 			}
 
-			// ensure each of the vesionFiles contains the string of the new version
+			// ensure each of the versionFiles contains the string of the new version.
 			for _, f := range dotSubo.DotVersionFiles {
 				filePath := filepath.Join(cwd, f)
 
@@ -84,7 +84,7 @@ func CreateReleaseCmd() *cobra.Command {
 			util.LogDone("release is ready to go")
 			util.LogStart("running pre-make targets")
 
-			// run all of the pre-release make targets
+			// run all of the pre-release make targets.
 			for _, target := range dotSubo.PreMakeTargets {
 				targetWithVersion := strings.Replace(target, "{{ .Version }}", newVersion, -1)
 
@@ -102,7 +102,7 @@ func CreateReleaseCmd() *cobra.Command {
 
 			util.LogStart("creating release")
 
-			// ensure the local changes are pushed, create the release, and then pull down the new tag
+			// ensure the local changes are pushed, create the release, and then pull down the new tag.
 			if _, err := util.Run("git push"); err != nil {
 				return errors.Wrap(err, "failed to Run git push")
 			}
@@ -123,7 +123,7 @@ func CreateReleaseCmd() *cobra.Command {
 			util.LogDone("release created!")
 			util.LogStart("running post-make targets")
 
-			// run all of the post-release make targets
+			// run all of the post-release make targets.
 			for _, target := range dotSubo.PostMakeTargets {
 				targetWithVersion := strings.Replace(target, "{{ .Version }}", newVersion, -1)
 

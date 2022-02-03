@@ -11,7 +11,7 @@ import (
 	"github.com/suborbital/subo/subo/util"
 )
 
-// DevCmd returns the dev command
+// DevCmd returns the dev command.
 func DevCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "dev",

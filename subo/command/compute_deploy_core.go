@@ -30,7 +30,7 @@ type deployData struct {
 
 const proxyDefaultPort int = 80
 
-// ComputeDeployCoreCommand returns the compute deploy command
+// ComputeDeployCoreCommand returns the compute deploy command.
 func ComputeDeployCoreCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "core",
@@ -39,7 +39,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			localInstall := cmd.Flags().Changed(localFlag)
 			shouldReset := cmd.Flags().Changed(resetFlag)
-			// shouldUpdate := cmd.Flags().Changed(updateFlag) will re-add this later once we have proper update semantics
+			// shouldUpdate := cmd.Flags().Changed(updateFlag) will re-add this later once we have proper update semantics.
 			branch, _ := cmd.Flags().GetString(branchFlag)
 			tag, _ := cmd.Flags().GetString(versionFlag)
 
@@ -65,11 +65,11 @@ func ComputeDeployCoreCommand() *cobra.Command {
 			}
 
 			// if the --reset flag was passed or there's no existing manifests
-			// then we need to 'build the world' from scratch
+			// then we need to 'build the world' from scratch.
 			if shouldReset || !manifestsExist(bctx) {
 				util.LogStart("preparing deployment")
 
-				// if there are any existing deployment manifests sitting around, let's replace them
+				// if there are any existing deployment manifests sitting around, let's replace them.
 				if err := removeExistingManifests(bctx); err != nil {
 					return errors.Wrap(err, "failed to removeExistingManifests")
 				}
@@ -146,7 +146,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 				}()
 
 				// this is to give the proxy server some room to bind to the port and start up
-				// it's not ideal, but the least gross way to ensure a good experience
+				// it's not ideal, but the least gross way to ensure a good experience.
 				time.Sleep(time.Second * 1)
 
 				repl := repl.New(proxyPortStr)
@@ -157,7 +157,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 					return errors.Wrap(err, "🚫 failed to install KEDA")
 				}
 
-				// we don't care if this fails, so don't check error
+				// we don't care if this fails, so don't check error.
 				util.Run("kubectl create ns suborbital")
 
 				if err := createConfigMap(cwd); err != nil {
@@ -183,7 +183,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 	cmd.Flags().Bool(localFlag, false, "deploy locally using docker-compose")
 	cmd.Flags().Bool(dryRunFlag, false, "prepare the deployment in the .suborbital directory, but do not apply it")
 	cmd.Flags().Bool(resetFlag, false, "reset the deployment to default (replaces docker-compose.yaml and/or Kubernetes manifests)")
-	// cmd.Flags().Bool(updateFlag, false, "update to the newest available version (replaces docker-compose.yaml and/or Kubernetes manifests")
+	// cmd.Flags().Bool(updateFlag, false, "update to the newest available version (replaces docker-compose.yaml and/or Kubernetes manifests").
 
 	return cmd
 }
@@ -220,7 +220,7 @@ Are you ready to continue? (y/N): `)
 	return nil
 }
 
-// getEnvToken gets the environment token from stdin
+// getEnvToken gets the environment token from stdin.
 func getEnvToken() (string, error) {
 	buf, err := util.ReadEnvironmentToken()
 	if err == nil {
@@ -240,7 +240,7 @@ func getEnvToken() (string, error) {
 	return token, nil
 }
 
-// getBuilderDomain gets the environment token from stdin
+// getBuilderDomain gets the environment token from stdin.
 func getBuilderDomain() (string, error) {
 	fmt.Print("Enter the domain name that will be used for the builder service: ")
 	domain, err := input.ReadStdinString()
@@ -255,11 +255,11 @@ func getBuilderDomain() (string, error) {
 	return domain, nil
 }
 
-// getStorageClass gets the storage class to use
+// getStorageClass gets the storage class to use.
 func getStorageClass() (string, error) {
 	defaultClass, err := detectStorageClass()
 	if err != nil {
-		// that's fine, continue
+		// that's fine, continue.
 		fmt.Println("failed to automatically detect Kubernetes storage class:", err.Error())
 	} else if defaultClass != "" {
 		fmt.Println("using default storage class: ", defaultClass)
@@ -286,7 +286,7 @@ func detectStorageClass() (string, error) {
 	}
 
 	// output will look like: storageclass.storage.k8s.io/do-block-storage
-	// so split on the / and return the last part
+	// so split on the / and return the last part.
 
 	outputParts := strings.Split(output, "/")
 	if len(outputParts) != 2 {
@@ -324,7 +324,7 @@ func manifestsExist(bctx *context.BuildContext) bool {
 }
 
 func removeExistingManifests(bctx *context.BuildContext) error {
-	// start with a clean slate
+	// start with a clean slate.
 	if _, err := os.Stat(filepath.Join(bctx.Cwd, ".suborbital")); err == nil {
 		if err := os.RemoveAll(filepath.Join(bctx.Cwd, ".suborbital")); err != nil {
 			return errors.Wrap(err, "failed to RemoveAll .suborbital")

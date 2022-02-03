@@ -25,7 +25,7 @@ type projectData struct {
 	AtmoVersion string
 }
 
-// CreateProjectCmd returns the build command
+// CreateProjectCmd returns the build command.
 func CreateProjectCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "project <name>",
@@ -77,7 +77,7 @@ func CreateProjectCmd() *cobra.Command {
 			}
 
 			if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data); err != nil {
-				// if the templates are missing, try updating them and exec again
+				// if the templates are missing, try updating them and exec again.
 				if err == template.ErrTemplateMissing {
 					templatesPath, err = template.UpdateTemplates(defaultRepo, branch)
 					if err != nil {

@@ -12,7 +12,7 @@ import (
 	"github.com/suborbital/subo/subo/input"
 )
 
-// Repl is a 'local proxy repl' that allows the user to perform simple actions against their local install of Compute
+// Repl is a 'local proxy repl' that allows the user to perform simple actions against their local install of Compute.
 type Repl struct {
 	proxyPort string
 }
@@ -21,7 +21,7 @@ type tokenResp struct {
 	Token string `json:"token"`
 }
 
-// New creates a new "local proxy repl"
+// New creates a new "local proxy repl".
 func New(proxyPort string) *Repl {
 	return &Repl{proxyPort: proxyPort}
 }

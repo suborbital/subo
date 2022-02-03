@@ -38,7 +38,7 @@ func CleanCmd() *cobra.Command {
 			util.LogStart(fmt.Sprintf("cleaning in %s", bctx.Cwd))
 
 			for _, r := range bctx.Runnables {
-				//delete target or .build folder
+				// Delete target or .build folder.
 				files, _ := ioutil.ReadDir(r.Fullpath)
 
 				for _, file := range files {

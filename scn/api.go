@@ -19,18 +19,18 @@ const (
 	tokenRequestHeaderKey = "X-Suborbital-Env-Token"
 )
 
-// API is an API client
+// API is an API client.
 type API struct {
 	endpoint string
 }
 
-// VerifiedAPI is an API that has an email-verified access level
+// VerifiedAPI is an API that has an email-verified access level.
 type VerifiedAPI struct {
 	api      *API
 	verifier *types.RequestVerifier
 }
 
-// EnvironmentAPI is an API authenticated to a particular SCN environment
+// EnvironmentAPI is an API authenticated to a particular SCN environment.
 type EnvironmentAPI struct {
 	api   *API
 	token string
@@ -44,7 +44,7 @@ func New(endpoint string) *API {
 	return s
 }
 
-// ForVerifiedEmail verifies an email address is correct and then creates a VerifiedAPI object
+// ForVerifiedEmail verifies an email address is correct and then creates a VerifiedAPI object.
 func (a *API) ForVerifiedEmail(email string, codeFn func() (string, error)) (*VerifiedAPI, error) {
 	verifier, err := a.createEmailVerifier(email)
 	if err != nil {
@@ -69,7 +69,7 @@ func (a *API) ForVerifiedEmail(email string, codeFn func() (string, error)) (*Ve
 	return verified, nil
 }
 
-// ForEnvironment returns an EnvironmentAPI scoped to the given token
+// ForEnvironment returns an EnvironmentAPI scoped to the given token.
 func (a *API) ForEnvironment(token string) (*EnvironmentAPI, error) {
 	env := &EnvironmentAPI{
 		api:   a,
@@ -79,12 +79,12 @@ func (a *API) ForEnvironment(token string) (*EnvironmentAPI, error) {
 	return env, nil
 }
 
-// do performs a request
+// do performs a request.
 func (a *API) do(method string, URI string, body, result interface{}) error {
 	return a.doWithHeaders(method, URI, nil, body, result)
 }
 
-// doWithHeaders performs a request with the provided headers
+// doWithHeaders performs a request with the provided headers.
 func (a *API) doWithHeaders(method string, URI string, headers map[string]string, body, result interface{}) error {
 	var buffer io.Reader
 

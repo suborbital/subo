@@ -16,7 +16,7 @@ import (
 	"github.com/suborbital/subo/subo/util"
 )
 
-// ErrTemplateMissing and others are template related errors
+// ErrTemplateMissing and others are template related errors.
 var ErrTemplateMissing = errors.New("template missing")
 
 type tmplData struct {
@@ -47,7 +47,7 @@ func UpdateTemplates(repo, branch string) (string, error) {
 		return "", errors.Wrap(err, "🚫 failed to downloadZip for templates")
 	}
 
-	// tmplPath may be different than the default if a custom URL was provided
+	// The tmplPath may be different than the default if a custom URL was provided.
 	tmplPath, err := extractZip(filepath, templateRootPath, branchDirName)
 	if err != nil {
 		return "", errors.Wrap(err, "🚫 failed to extractZip for templates")
@@ -58,7 +58,7 @@ func UpdateTemplates(repo, branch string) (string, error) {
 	return tmplPath, nil
 }
 
-// TemplatesExist returns the templates directory for the provided repo and branch
+// TemplatesExist returns the templates directory for the provided repo and branch.
 func TemplatesExist(repo, branch string) (string, error) {
 	repoParts := strings.Split(repo, "/")
 	if len(repoParts) != 2 {
@@ -86,7 +86,7 @@ func TemplatesExist(repo, branch string) (string, error) {
 	return tmplPath, nil
 }
 
-// ExecRunnableTmplStr executes a template string with the runnable's data
+// ExecRunnableTmplStr executes a template string with the runnable's data.
 func ExecRunnableTmplStr(templateStr string, runnable *directive.Runnable) (string, error) {
 	templateData := makeTemplateData(runnable)
 
@@ -103,14 +103,14 @@ func ExecRunnableTmplStr(templateStr string, runnable *directive.Runnable) (stri
 	return builder.String(), nil
 }
 
-// ExecRunnableTmpl copies a template
+// ExecRunnableTmpl copies a template.
 func ExecRunnableTmpl(cwd, name, templatesPath string, runnable *directive.Runnable) error {
 	templateData := makeTemplateData(runnable)
 
 	return ExecTmplDir(cwd, name, templatesPath, runnable.Lang, templateData)
 }
 
-// ExecTmplDir copies a generic templated directory
+// ExecTmplDir copies a generic templated directory.
 func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interface{}) error {
 	templatePath := filepath.Join(templatesPath, tmplName)
 	targetPath := filepath.Join(cwd, name)
@@ -123,8 +123,8 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 		return errors.Wrap(err, "failed to Stat template directory")
 	}
 
-	var err error = filepath.Walk(templatePath, func(path string, info os.FileInfo, _ error) error {
-		var relPath string = strings.Replace(path, templatePath, "", 1)
+	var err = filepath.Walk(templatePath, func(path string, info os.FileInfo, _ error) error {
+		var relPath = strings.Replace(path, templatePath, "", 1)
 		if relPath == "" {
 			return nil
 		}
@@ -144,15 +144,15 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 			targetRelPath = builder.String()
 		}
 
-		// check if the target path is an existing file, and skip it if so
+		// Check if the target path is an existing file, and skip it if so.
 		if _, err := os.Stat(filepath.Join(targetPath, targetRelPath)); err != nil {
 			if os.IsNotExist(err) {
-				// that's fine, continue
+				// That's fine, continue.
 			} else {
 				return errors.Wrap(err, "failed to Stat")
 			}
 		} else {
-			// if the target file already exists, we're going to skip the rest since we don't want to overwrite
+			// If the target file already exists, we're going to skip the rest since we don't want to overwrite.
 			return nil
 		}
 
@@ -193,7 +193,7 @@ func ExecTmplDir(cwd, name, templatesPath, tmplName string, templateData interfa
 	return err
 }
 
-// downloadZip downloads a ZIP from a particular branch of the Subo repo
+// downloadZip downloads a ZIP from a particular branch of the Subo repo.
 func downloadZip(repo, branch, targetPath string) (string, error) {
 	url := fmt.Sprintf("https://github.com/%s/archive/%s.zip", repo, branch)
 
@@ -213,7 +213,7 @@ func downloadZip(repo, branch, targetPath string) (string, error) {
 
 	filePath := filepath.Join(targetPath, "subo.zip")
 
-	// check if the zip already exists, and delete it if it does
+	// Check if the zip already exists, and delete it if it does.
 	if _, err := os.Stat(filePath); err == nil {
 		if err := os.Remove(filePath); err != nil {
 			return "", errors.Wrap(err, "failed to delete exising templates zip")
@@ -237,7 +237,7 @@ func downloadZip(repo, branch, targetPath string) (string, error) {
 	return filePath, nil
 }
 
-// extractZip extracts a ZIP file
+// extractZip extracts a ZIP file.
 func extractZip(filePath, destPath, branchDirName string) (string, error) {
 	escapedFilepath := strings.ReplaceAll(filePath, " ", "\\ ")
 	escapedDestPath := strings.ReplaceAll(destPath, " ", "\\ ") + string(filepath.Separator)
@@ -257,7 +257,7 @@ func extractZip(filePath, destPath, branchDirName string) (string, error) {
 	return filepath.Join(existingPath, "templates"), nil
 }
 
-// makeTemplateData makes data to be used in templates
+// makeTemplateData makes data to be used in templates.
 func makeTemplateData(runnable *directive.Runnable) tmplData {
 	nameCamel := ""
 	nameParts := strings.Split(runnable.Name, "-")

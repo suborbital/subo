@@ -11,7 +11,7 @@ import (
 )
 
 // CollectStaticFiles collects all of the files in the `static/` directory relative to cwd
-// and generates a map of their relative paths
+// and generates a map of their relative paths.
 func CollectStaticFiles(cwd string) (map[string]os.File, error) {
 	staticDir := filepath.Join(cwd, "static")
 

@@ -68,7 +68,7 @@ func getLatestReleaseCache() (*github.RepositoryRelease, error) {
 	if cachedTimestamp, err := getTimestampCache(); err != nil {
 		return nil, errors.Wrap(err, "failed to getTimestampCache")
 	} else if currentTimestamp := time.Now().UTC(); cachedTimestamp.IsZero() || currentTimestamp.After(cachedTimestamp.Add(time.Hour)) {
-		// check if 1 hour has passed since the last version check, and update the cached timestamp and latest release if so
+		// check if 1 hour has passed since the last version check, and update the cached timestamp and latest release if so.
 		if err := cacheTimestamp(currentTimestamp); err != nil {
 			return nil, errors.Wrap(err, "failed to cacheTimestamp")
 		}
@@ -147,7 +147,7 @@ func getLatestVersion() (*version.Version, error) {
 	return latestVersion, nil
 }
 
-// CheckForLatestVersion returns an error if SuboDotVersion does not match the latest GitHub release or if the check fails
+// CheckForLatestVersion returns an error if SuboDotVersion does not match the latest GitHub release or if the check fails.
 func CheckForLatestVersion() (string, error) {
 	if latestCmdVersion, err := getLatestVersion(); err != nil {
 		return "", errors.Wrap(err, "failed to getLatestVersion")

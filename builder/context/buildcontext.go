@@ -24,7 +24,7 @@ var dockerImageForLang = map[string]string{
 	"js":             "suborbital/builder-js",
 }
 
-// BuildContext describes the context under which the tool is being run
+// BuildContext describes the context under which the tool is being run.
 type BuildContext struct {
 	Cwd           string
 	CwdIsRunnable bool
@@ -38,7 +38,7 @@ type BuildContext struct {
 	BuilderTag    string
 }
 
-// RunnableDir represents a directory containing a Runnable
+// RunnableDir represents a directory containing a Runnable.
 type RunnableDir struct {
 	Name           string
 	UnderscoreName string
@@ -47,13 +47,13 @@ type RunnableDir struct {
 	CompilerFlags  string
 }
 
-// BundleRef contains information about a bundle in the current context
+// BundleRef contains information about a bundle in the current context.
 type BundleRef struct {
 	Exists   bool
 	Fullpath string
 }
 
-// ForDirectory returns the build context for the provided working directory
+// ForDirectory returns the build context for the provided working directory.
 func ForDirectory(dir string) (*BuildContext, error) {
 	fullDir, err := filepath.Abs(dir)
 	if err != nil {
@@ -101,7 +101,7 @@ func ForDirectory(dir string) (*BuildContext, error) {
 	return bctx, nil
 }
 
-// RunnableExists returns true if the context contains a runnable with name <name>
+// RunnableExists returns true if the context contains a runnable with name <name>.
 func (b *BuildContext) RunnableExists(name string) bool {
 	for _, r := range b.Runnables {
 		if r.Name == name {
@@ -112,7 +112,7 @@ func (b *BuildContext) RunnableExists(name string) bool {
 	return false
 }
 
-// ShouldBuildLang returns true if the provided language is safe-listed for building
+// ShouldBuildLang returns true if the provided language is safe-listed for building.
 func (b *BuildContext) ShouldBuildLang(lang string) bool {
 	if len(b.Langs) == 0 {
 		return true
@@ -147,13 +147,13 @@ func (b *BuildContext) Modules() ([]os.File, error) {
 func getRunnableDirs(cwd string) ([]RunnableDir, bool, error) {
 	runnables := []RunnableDir{}
 
-	// go through all of the dirs in the current dir
+	// Go through all of the dirs in the current dir.
 	topLvlFiles, err := ioutil.ReadDir(cwd)
 	if err != nil {
 		return nil, false, errors.Wrap(err, "failed to list directory")
 	}
 
-	// check to see if we're running from within a Runnable directory
+	// Check to see if we're running from within a Runnable directory
 	// and return true if so.
 	runnableDir, err := getRunnableFromFiles(cwd, topLvlFiles)
 	if err != nil {
@@ -170,7 +170,7 @@ func getRunnableDirs(cwd string) ([]RunnableDir, bool, error) {
 
 		dirPath := filepath.Join(cwd, tf.Name())
 
-		// determine if a .runnable file exists in that dir
+		// Determine if a .runnable file exists in that dir.
 		innerFiles, err := ioutil.ReadDir(dirPath)
 		if err != nil {
 			util.LogWarn(fmt.Sprintf("couldn't read files in %v", dirPath))
@@ -190,7 +190,7 @@ func getRunnableDirs(cwd string) ([]RunnableDir, bool, error) {
 	return runnables, false, nil
 }
 
-// containsRunnableYaml finds any .runnable file in a list of files
+// ContainsRunnableYaml finds any .runnable file in a list of files.
 func ContainsRunnableYaml(files []os.FileInfo) (string, bool) {
 	for _, f := range files {
 		if strings.HasPrefix(f.Name(), ".runnable.") {

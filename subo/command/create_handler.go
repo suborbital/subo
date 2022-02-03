@@ -46,7 +46,7 @@ func CreateHandlerCmd() *cobra.Command {
 				return errors.New("cannot create handler, Directive.yaml not found")
 			}
 
-			//Create a new handler object
+			// Create a new handler object.
 			handler := directive.Handler{
 				Input: directive.Input{
 					Type:     handlerType,
@@ -55,10 +55,10 @@ func CreateHandlerCmd() *cobra.Command {
 				},
 			}
 
-			//Add the handler object to the directive file
+			// Add the handler object to the directive file.
 			bctx.Directive.Handlers = append(bctx.Directive.Handlers, handler)
 
-			//Write Directive File which overwrites the entire file
+			// Write Directive File which overwrites the entire file.
 			if err := context.WriteDirectiveFile(bctx.Cwd, bctx.Directive); err != nil {
 				return errors.Wrap(err, "failed to WriteDirectiveFile")
 			}
