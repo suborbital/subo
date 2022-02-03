@@ -8,12 +8,13 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
+
 	"github.com/suborbital/atmo/directive"
 	"github.com/suborbital/subo/builder/context"
 	"github.com/suborbital/subo/builder/template"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
-	"gopkg.in/yaml.v2"
 )
 
 // validLangs are the available languages

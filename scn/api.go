@@ -10,6 +10,7 @@ import (
 	"net/url"
 
 	"github.com/pkg/errors"
+
 	"github.com/suborbital/subo/scn/types"
 )
 

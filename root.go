@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/spf13/cobra"
+
 	"github.com/suborbital/subo/subo/command"
 	"github.com/suborbital/subo/subo/features"
 	"github.com/suborbital/subo/subo/release"

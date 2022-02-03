@@ -9,9 +9,10 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"github.com/suborbital/subo/subo/util"
 	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v2"
+
+	"github.com/suborbital/subo/subo/util"
 )
 
 // DotSuboFile describes a .subo file for controlling releases

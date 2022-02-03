@@ -7,9 +7,10 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
+
 	"github.com/suborbital/atmo/directive"
 	"github.com/suborbital/subo/subo/util"
-	"gopkg.in/yaml.v2"
 )
 
 // WriteDirectiveFile writes a Directive to disk

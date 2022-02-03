@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
+
 	"github.com/suborbital/subo/scn/types"
 )
 
