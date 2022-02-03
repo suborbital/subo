@@ -11,12 +11,13 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"golang.org/x/mod/semver"
+
 	"github.com/suborbital/atmo/bundle"
 	"github.com/suborbital/atmo/directive"
 	"github.com/suborbital/subo/builder/context"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
-	"golang.org/x/mod/semver"
 )
 
 // Builder is capable of building Wasm modules from source
@@ -266,18 +267,12 @@ func (b *Builder) checkAndRunPreReqs(runnable context.RunnableDir, result *Build
 			if errors.Is(err, os.ErrNotExist) {
 				b.log.LogStart(fmt.Sprintf("missing %s, fixing...", p.File))
 
-				cmdTmpl, err := template.New("cmd").Parse(p.Command)
+				fullCmd, err := p.GetCommand(runnable)
 				if err != nil {
-					return errors.Wrapf(err, "failed to parse prerequisite Command string into template: %s", p.Command)
+					return errors.Wrap(err, "failed to get templated full command")
 				}
 
-				var fullCmd strings.Builder
-				err = cmdTmpl.Execute(&fullCmd, runnable)
-				if err != nil {
-					return errors.Wrap(err, "failed to execute prerequisite Command string with runnableDir")
-				}
-
-				outputLog, err := util.RunInDir(fullCmd.String(), runnable.Fullpath)
+				outputLog, err := util.RunInDir(fullCmd, runnable.Fullpath)
 
 				result.OutputLog += outputLog + "\n"
 
