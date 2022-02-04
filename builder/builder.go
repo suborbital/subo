@@ -269,16 +269,15 @@ func (b *Builder) checkAndRunPreReqs(runnable context.RunnableDir, result *Build
 
 				fullCmd, err := p.GetCommand(runnable)
 				if err != nil {
-					return errors.Wrap(err, "failed to get templated full command")
+					return errors.Wrap(err, "prereq.GetCommand")
 				}
 
 				outputLog, err := util.RunInDir(fullCmd, runnable.Fullpath)
+				if err != nil {
+					return errors.Wrapf(err, "util.RunInDir: %s", fullCmd)
+				}
 
 				result.OutputLog += outputLog + "\n"
-
-				if err != nil {
-					return errors.Wrapf(err, "failed to Run prerequisite: %s", p.Command)
-				}
 
 				b.log.LogDone("fixed!")
 			}
