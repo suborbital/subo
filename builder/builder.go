@@ -11,12 +11,13 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"golang.org/x/mod/semver"
+
 	"github.com/suborbital/atmo/bundle"
 	"github.com/suborbital/atmo/directive"
 	"github.com/suborbital/subo/builder/context"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
-	"golang.org/x/mod/semver"
 )
 
 // Builder is capable of building Wasm modules from source
@@ -259,19 +260,24 @@ func (b *Builder) checkAndRunPreReqs(runnable context.RunnableDir, result *Build
 	}
 
 	for _, p := range preReqs {
+
 		filepath := filepath.Join(runnable.Fullpath, p.File)
 
 		if _, err := os.Stat(filepath); err != nil {
 			if errors.Is(err, os.ErrNotExist) {
 				b.log.LogStart(fmt.Sprintf("missing %s, fixing...", p.File))
 
-				outputLog, err := util.RunInDir(p.Command, runnable.Fullpath)
+				fullCmd, err := p.GetCommand(runnable)
+				if err != nil {
+					return errors.Wrap(err, "prereq.GetCommand")
+				}
+
+				outputLog, err := util.RunInDir(fullCmd, runnable.Fullpath)
+				if err != nil {
+					return errors.Wrapf(err, "util.RunInDir: %s", fullCmd)
+				}
 
 				result.OutputLog += outputLog + "\n"
-
-				if err != nil {
-					return errors.Wrapf(err, "failed to Run prerequisite: %s", p.Command)
-				}
 
 				b.log.LogDone("fixed!")
 			}

@@ -18,4 +18,7 @@ subo/docker/publish:
 mod/replace/atmo:
 	go mod edit -replace github.com/suborbital/atmo=$(HOME)/Workspaces/suborbital/atmo
 
+tidy:
+	go mod tidy && go mod download && go mod vendor
+
 .PHONY: subo subo/docker

@@ -1,6 +1,13 @@
 package context
 
-// PreReq is a pre-requisite file paired with the native command needed to acquire that file (if it's missing)
+import (
+	"strings"
+	"text/template"
+
+	"github.com/pkg/errors"
+)
+
+// Prereq is a pre-requisite file paired with the native command needed to acquire that file (if it's missing).
 type Prereq struct {
 	File    string
 	Command string
@@ -18,7 +25,7 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 			},
 			Prereq{
 				File:    "_lib/_lib.tar.gz",
-				Command: "curl -L https://github.com/suborbital/reactr/archive/v0.13.0.tar.gz -o _lib/_lib.tar.gz",
+				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
 			},
 			Prereq{
 				File:    "_lib/suborbital",
@@ -49,7 +56,7 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 			},
 			Prereq{
 				File:    "_lib/_lib.tar.gz",
-				Command: "curl -L https://github.com/suborbital/reactr/archive/v0.13.0.tar.gz -o _lib/_lib.tar.gz",
+				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
 			},
 			Prereq{
 				File:    "_lib/suborbital",
@@ -70,4 +77,20 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 			},
 		},
 	},
+}
+
+// GetCommand takes a RunnableDir, and returns an executed template command string.
+func (p Prereq) GetCommand(r RunnableDir) (string, error) {
+	cmdTmpl, err := template.New("cmd").Parse(p.Command)
+	if err != nil {
+		return "", errors.Wrapf(err, "failed to parse prerequisite Command string into template: %s", p.Command)
+	}
+
+	var fullCmd strings.Builder
+	err = cmdTmpl.Execute(&fullCmd, r)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to execute prerequisite Command string with runnableDir")
+	}
+
+	return fullCmd.String(), nil
 }
