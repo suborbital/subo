@@ -12,12 +12,6 @@ import (
 	"github.com/suborbital/subo/subo/util"
 )
 
-type handlerData struct {
-	HandlerType string
-	Request     string
-	Method      string
-}
-
 func CreateHandlerCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "handler <resource>",
