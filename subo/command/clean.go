@@ -9,6 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+
 	"github.com/suborbital/subo/builder/context"
 	"github.com/suborbital/subo/subo/util"
 )
@@ -37,7 +38,7 @@ func CleanCmd() *cobra.Command {
 			util.LogStart(fmt.Sprintf("cleaning in %s", bctx.Cwd))
 
 			for _, r := range bctx.Runnables {
-				//delete target or .build folder
+				// Delete target or .build folder.
 				files, _ := ioutil.ReadDir(r.Fullpath)
 
 				for _, file := range files {

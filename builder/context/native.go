@@ -5,7 +5,7 @@ import (
 	"runtime"
 )
 
-// NativeBuildCommands returns the native build commands needed to build a Runnable of a particular language
+// NativeBuildCommands returns the native build commands needed to build a Runnable of a particular language.
 func NativeBuildCommands(lang string) ([]string, error) {
 	os := runtime.GOOS
 

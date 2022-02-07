@@ -9,15 +9,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Run runs a command, outputting to terminal and returning the full output and/or error
+// Run runs a command, outputting to terminal and returning the full output and/or error.
 func Run(cmd string) (string, error) {
 	return RunInDir(cmd, "")
 }
 
-// RunInDir runs a command in the specified directory and returns the full output or error
+// RunInDir runs a command in the specified directory and returns the full output or error.
 func RunInDir(cmd, dir string) (string, error) {
 	// you can uncomment this below if you want to see exactly the commands being run
-	// fmt.Println("▶️", cmd)
+	// fmt.Println("▶️", cmd).
 
 	command := exec.Command("sh", "-c", cmd)
 

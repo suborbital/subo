@@ -4,10 +4,11 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
+
 	"github.com/suborbital/subo/scn/types"
 )
 
-// SendHeartbeat sends a telemetry heartbeat request
+// SendHeartbeat sends a telemetry heartbeat request.
 func (e *EnvironmentAPI) SendHeartbeat(heartbeat *types.HeartbeatRequest) error {
 	uri := "/telemetry/v1/heartbeat"
 

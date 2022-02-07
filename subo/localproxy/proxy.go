@@ -6,14 +6,14 @@ import (
 	"net/http"
 )
 
-// Proxy is a proxy from the local machine to the cloud-hosted editor
+// Proxy is a proxy from the local machine to the cloud-hosted editor.
 type Proxy struct {
 	endpoint string
 	server   http.Server
 	client   *http.Client
 }
 
-// New creates a new local proxy
+// New creates a new local proxy.
 func New(endpoint string, listenPort string) *Proxy {
 	p := &Proxy{
 		endpoint: endpoint,
@@ -30,7 +30,7 @@ func New(endpoint string, listenPort string) *Proxy {
 	return p
 }
 
-// Start starts the local proxy server
+// Start starts the local proxy server.
 func (p *Proxy) Start() error {
 	fmt.Println("\nPROXY: local tunnel to function editor starting")
 

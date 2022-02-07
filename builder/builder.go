@@ -20,7 +20,7 @@ import (
 	"github.com/suborbital/subo/subo/util"
 )
 
-// Builder is capable of building Wasm modules from source
+// Builder is capable of building Wasm modules from source.
 type Builder struct {
 	Context *context.BuildContext
 
@@ -29,7 +29,7 @@ type Builder struct {
 	log util.FriendlyLogger
 }
 
-// BuildResult is the results of a build including the built module and logs
+// BuildResult is the results of a build including the built module and logs.
 type BuildResult struct {
 	Succeeded bool
 	OutputLog string
@@ -42,7 +42,7 @@ const (
 	ToolchainDocker = Toolchain("docker")
 )
 
-// ForDirectory creates a Builder bound to a particular directory
+// ForDirectory creates a Builder bound to a particular directory.
 func ForDirectory(logger util.FriendlyLogger, dir string) (*Builder, error) {
 	ctx, err := context.ForDirectory(dir)
 	if err != nil {
@@ -63,8 +63,8 @@ func (b *Builder) BuildWithToolchain(tcn Toolchain) error {
 
 	b.results = []BuildResult{}
 
-	// when building in Docker mode, just collect the langs we need to build, and then
-	// launch the associated builder images which will do the building
+	// When building in Docker mode, just collect the langs we need to build, and then
+	// launch the associated builder images which will do the building.
 	dockerLangs := map[string]bool{}
 
 	for _, r := range b.Context.Runnables {
@@ -89,8 +89,8 @@ func (b *Builder) BuildWithToolchain(tcn Toolchain) error {
 
 			err = b.doNativeBuildForRunnable(r, result)
 
-			// even if there was a failure, load the result into the builder
-			// since the logs of the failed build are useful
+			// Even if there was a failure, load the result into the builder
+			// since the logs of the failed build are useful.
 			b.results = append(b.results, *result)
 
 			if err != nil {
@@ -144,7 +144,7 @@ func (b *Builder) Bundle() error {
 	} else if b.Context.Directive.Headless {
 		b.log.LogInfo("updating Directive")
 
-		// bump the appVersion since we're in headless mode
+		// Bump the appVersion since we're in headless mode.
 		majorStr := strings.TrimPrefix(semver.Major(b.Context.Directive.AppVersion), "v")
 		major, _ := strconv.Atoi(majorStr)
 		new := fmt.Sprintf("v%d.0.0", major+1)
@@ -212,7 +212,7 @@ func (b *Builder) dockerBuildForLang(lang string) (*BuildResult, error) {
 	return result, nil
 }
 
-// results and resulting file are loaded into the BuildResult pointer
+// results and resulting file are loaded into the BuildResult pointer.
 func (b *Builder) doNativeBuildForRunnable(r context.RunnableDir, result *BuildResult) error {
 	cmds, err := context.NativeBuildCommands(r.Runnable.Lang)
 	if err != nil {
@@ -232,7 +232,7 @@ func (b *Builder) doNativeBuildForRunnable(r context.RunnableDir, result *BuildR
 
 		cmdString := strings.TrimSpace(fullCmd.String())
 
-		// Even if the command fails, still load the output into the result object
+		// Even if the command fails, still load the output into the result object.
 		outputLog, err := util.RunInDir(cmdString, r.Fullpath)
 
 		result.OutputLog += outputLog + "\n"
@@ -288,7 +288,7 @@ func (b *Builder) checkAndRunPreReqs(runnable context.RunnableDir, result *Build
 }
 
 // analyzeForCompilerFlags looks at the Runnable and determines if any additional compiler flags are needed
-// this is initially added to support AS-JSON in AssemblyScript with its need for the --transform flag
+// this is initially added to support AS-JSON in AssemblyScript with its need for the --transform flag.
 func (b *Builder) analyzeForCompilerFlags(runnable context.RunnableDir) (string, error) {
 	if runnable.Runnable.Lang == "assemblyscript" {
 		packageJSONBytes, err := ioutil.ReadFile(filepath.Join(runnable.Fullpath, "package.json"))

@@ -4,10 +4,11 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
+
 	"github.com/suborbital/subo/scn/types"
 )
 
-// CreateEnvironmentToken creates an environment token
+// CreateEnvironmentToken creates an environment token.
 func (a *VerifiedAPI) CreateEnvironmentToken() (*types.CreateEnvironmentTokenResponse, error) {
 	uri := "/auth/v1/token"
 

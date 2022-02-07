@@ -13,7 +13,7 @@ type Prereq struct {
 	Command string
 }
 
-// PreRequisiteCommands is a map of OS : language : preReq
+// PreRequisiteCommands is a map of OS : language : preReq.
 var PreRequisiteCommands = map[string]map[string][]Prereq{
 	"darwin": {
 		"rust":  {},

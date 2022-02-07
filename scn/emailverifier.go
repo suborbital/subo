@@ -4,10 +4,11 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
+
 	"github.com/suborbital/subo/scn/types"
 )
 
-// createEmailVerifier creates an emailverifier (used internally by API.Verify)
+// createEmailVerifier creates an emailverifier (used internally by API.Verify).
 func (a *API) createEmailVerifier(email string) (*types.EmailVerifier, error) {
 	uri := "/auth/v1/verifier"
 

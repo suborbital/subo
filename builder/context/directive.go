@@ -7,12 +7,13 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
+
 	"github.com/suborbital/atmo/directive"
 	"github.com/suborbital/subo/subo/util"
-	"gopkg.in/yaml.v2"
 )
 
-// WriteDirectiveFile writes a Directive to disk
+// WriteDirectiveFile writes a Directive to disk.
 func WriteDirectiveFile(cwd string, directive *directive.Directive) error {
 	filePath := filepath.Join(cwd, "Directive.yaml")
 
@@ -28,7 +29,7 @@ func WriteDirectiveFile(cwd string, directive *directive.Directive) error {
 	return nil
 }
 
-// readDirectiveFile finds a Directive from disk but does not validate it
+// readDirectiveFile finds a Directive from disk but does not validate it.
 func readDirectiveFile(cwd string) (*directive.Directive, error) {
 	filePath := filepath.Join(cwd, "Directive.yaml")
 
@@ -54,7 +55,7 @@ func readDirectiveFile(cwd string) (*directive.Directive, error) {
 	return directive, nil
 }
 
-// readQueriesFile finds a queries.yaml from disk
+// readQueriesFile finds a queries.yaml from disk.
 func readQueriesFile(cwd string) ([]directive.DBQuery, error) {
 	filePath := filepath.Join(cwd, "Queries.yaml")
 
@@ -76,7 +77,7 @@ func readQueriesFile(cwd string) ([]directive.DBQuery, error) {
 }
 
 // AugmentAndValidateDirectiveFns ensures that all functions referenced in a handler exist
-// in the project and then adds the function list to the provided directive
+// in the project and then adds the function list to the provided directive.
 func AugmentAndValidateDirectiveFns(dxe *directive.Directive, fns []RunnableDir) error {
 	fnMap := map[string]bool{}
 	for _, fn := range fns {
@@ -101,7 +102,7 @@ func AugmentAndValidateDirectiveFns(dxe *directive.Directive, fns []RunnableDir)
 	return nil
 }
 
-// getHandlerFnList gets a full list of all functions used in the directive's handlers
+// getHandlerFnList gets a full list of all functions used in the directive's handlers.
 func getHandlerFnList(dxe *directive.Directive) []string {
 	fnMap := map[string]bool{}
 

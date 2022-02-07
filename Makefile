@@ -3,16 +3,16 @@ include ./subo/release/release.mk
 
 GO_INSTALL=go install -ldflags $(RELEASE_FLAGS)
 
-subo:
+subo: lint
 	$(GO_INSTALL)
 
-subo/dev:
+subo/dev: lint
 	$(GO_INSTALL) -tags=development
 
-subo/docker:
+subo/docker: lint
 	docker build . -t suborbital/subo:dev
 
-subo/docker/publish:
+subo/docker/publish: lint
 	docker buildx build . --platform linux/amd64,linux/arm64 -t suborbital/subo:dev --push
 
 mod/replace/atmo:
@@ -20,5 +20,7 @@ mod/replace/atmo:
 
 tidy:
 	go mod tidy && go mod download && go mod vendor
+lint:
+	golangci-lint run ./...
 
-.PHONY: subo subo/docker
+.PHONY: subo subo/dev subo/docker subo/docker/publish mod/replace/atmo tidy lint

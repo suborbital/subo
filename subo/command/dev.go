@@ -6,11 +6,12 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+
 	"github.com/suborbital/subo/builder/context"
 	"github.com/suborbital/subo/subo/util"
 )
 
-// DevCmd returns the dev command
+// DevCmd returns the dev command.
 func DevCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "dev",

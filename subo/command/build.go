@@ -6,11 +6,12 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+
 	"github.com/suborbital/subo/builder"
 	"github.com/suborbital/subo/subo/util"
 )
 
-// BuildCmd returns the build command
+// BuildCmd returns the build command.
 func BuildCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "build [dir]",
@@ -49,13 +50,13 @@ func BuildCmd() *cobra.Command {
 			useNative, _ := cmd.Flags().GetBool("native")
 			makeTarget, _ := cmd.Flags().GetString("make")
 
-			// determine if a custom Docker mountpath and relpath were set
+			// Determine if a custom Docker mountpath and relpath were set.
 			mountPath, _ := cmd.Flags().GetString("mountpath")
 			relPath, _ := cmd.Flags().GetString("relpath")
 
 			if mountPath != "" {
 				if relPath == "" {
-					// fallback to the dir arg as that's usually a sane default
+					// Fallback to the dir arg as that's usually a sane default.
 					relPath = dir
 				}
 
@@ -84,8 +85,7 @@ func BuildCmd() *cobra.Command {
 				toolchain = builder.ToolchainDocker
 			}
 
-			// the builder does the majority of the work:
-
+			// The builder does the majority of the work.
 			if err := bdr.BuildWithToolchain(toolchain); err != nil {
 				return errors.Wrap(err, "failed to BuildWithToolchain")
 			}

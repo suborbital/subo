@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+
 	"github.com/suborbital/subo/subo/util"
 )
 
@@ -26,7 +27,7 @@ func TemplateFullPath(repo, branch string) (string, error) {
 	return filepath.Join(root, fmt.Sprintf("%s-%s", repoName, strings.ReplaceAll(branch, "/", "-")), "templates"), nil
 }
 
-// TemplateRootDir gets the template directory for subo and ensures it exists
+// TemplateRootDir gets the template directory for subo and ensures it exists.
 func TemplateRootDir() (string, error) {
 	config, err := os.UserConfigDir()
 	if err != nil {

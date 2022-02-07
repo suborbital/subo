@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// CacheDir returns the cache directory and creates it if it doesn't exist
+// CacheDir returns the cache directory and creates it if it doesn't exist.
 func CacheDir() (string, error) {
 	targetPath := filepath.Join(os.TempDir(), "suborbital", "subo")
 

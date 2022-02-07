@@ -15,9 +15,10 @@ import (
 	"github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
+
 	"github.com/suborbital/subo/builder/context"
 	"github.com/suborbital/subo/subo/util"
-	"gopkg.in/yaml.v2"
 )
 
 const suboAuthor = "Subo <subo@suborbital.dev>"
@@ -27,7 +28,7 @@ type parcelWrapper struct {
 	data   []byte
 }
 
-//PushCmd packages the current project into a Bindle and pushes it to a Bindle server
+//PushCmd packages the current project into a Bindle and pushes it to a Bindle server.
 func PushCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "push",
@@ -64,7 +65,7 @@ func PushCmd() *cobra.Command {
 
 			parcelsBySHA := map[string]parcelWrapper{}
 
-			// add the Directive as a parcel
+			// add the Directive as a parcel.
 			directiveBytes, err := yaml.Marshal(bctx.Directive)
 			if err != nil {
 				return errors.Wrap(err, "failed to Marshal Directive")
@@ -79,9 +80,9 @@ func PushCmd() *cobra.Command {
 				data:   directiveBytes,
 			}
 
-			// add each Runnable as a parcel
+			// add each Runnable as a parcel.
 			for _, r := range bctx.Runnables {
-				//delete target or .build folder
+				//delete target or .build folder.
 				files, err := ioutil.ReadDir(r.Fullpath)
 				if err != nil {
 					return errors.Wrapf(err, "failed to ReadDir for %s", r.Name)
@@ -199,7 +200,7 @@ func createOrReadKeypair(author string) (*types.SignatureKey, []byte, error) {
 		return sigKey, privKey, nil
 	}
 
-	// find the SignatureKey in the local Keyring
+	// find the SignatureKey in the local Keyring.
 	for i, k := range kr.Key {
 		if k.Label == author {
 			sigKey = &kr.Key[i]
@@ -207,7 +208,7 @@ func createOrReadKeypair(author string) (*types.SignatureKey, []byte, error) {
 		}
 	}
 
-	// read the privkey from the '.ssh' location
+	// read the privkey from the '.ssh' location.
 	privKey, err = keyring.ReadPrivKey(privKeyFilepath())
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "failed to ReadPrivKey")

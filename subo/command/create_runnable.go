@@ -8,15 +8,16 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
+
 	"github.com/suborbital/atmo/directive"
 	"github.com/suborbital/subo/builder/context"
 	"github.com/suborbital/subo/builder/template"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
-	"gopkg.in/yaml.v2"
 )
 
-// validLangs are the available languages
+// validLangs are the available languages.
 var validLangs = map[string]bool{
 	"rust":           true,
 	"swift":          true,
@@ -26,7 +27,7 @@ var validLangs = map[string]bool{
 	"js":             true,
 }
 
-// langAliases are aliases for languages
+// langAliases are aliases for languages.
 var langAliases = map[string]string{
 	"typescript": "assemblyscript",
 	"rs":         "rust",
@@ -35,13 +36,13 @@ var langAliases = map[string]string{
 	"ts":         "js",
 }
 
-// CreateRunnableError wraps errors for CreateRunnableCmd() failures
+// CreateRunnableError wraps errors for CreateRunnableCmd() failures.
 type CreateRunnableError struct {
 	Path  string // The ouput directory for build command CreateRunnableCmd().
 	error        // The original error.
 }
 
-// NewCreateRunnableError cleans up and returns CreateRunnableError for CreateRunnableCmd() failures
+// NewCreateRunnableError cleans up and returns CreateRunnableError for CreateRunnableCmd() failures.
 func NewCreateRunnableError(path string, err error) CreateRunnableError {
 	if cleanupErr := os.RemoveAll(path); cleanupErr != nil {
 		err = errors.Wrap(err, "failed to clean up runnable outputs")
@@ -49,7 +50,7 @@ func NewCreateRunnableError(path string, err error) CreateRunnableError {
 	return CreateRunnableError{Path: path, error: err}
 }
 
-// CreateRunnableCmd returns the build command
+// CreateRunnableCmd returns the build command.
 func CreateRunnableCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "runnable <name>",
@@ -99,7 +100,7 @@ func CreateRunnableCmd() *cobra.Command {
 			}
 
 			if err := template.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, runnable); err != nil {
-				// if the templates are missing, try updating them and exec again
+				// if the templates are missing, try updating them and exec again.
 				if err == template.ErrTemplateMissing {
 					templatesPath, err = template.UpdateTemplates(repo, branch)
 					if err != nil {

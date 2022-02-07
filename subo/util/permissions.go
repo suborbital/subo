@@ -5,6 +5,7 @@ import (
 )
 
 // These constants are meant to be used as reasonable default values for files and directories created by Subo.
+// nolint:godot
 const (
 	PermDirectory        fs.FileMode = 0755 // rwxr-xr-x
 	PermDirectoryPrivate fs.FileMode = 0700 // rwx------

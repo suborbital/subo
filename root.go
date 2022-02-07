@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/spf13/cobra"
+
 	"github.com/suborbital/subo/subo/command"
 	"github.com/suborbital/subo/subo/features"
 	"github.com/suborbital/subo/subo/release"
@@ -22,7 +23,7 @@ including building WebAssembly Runnables and Atmo projects.`,
 
 	cmd.SetVersionTemplate("Subo CLI v{{.Version}}\n")
 
-	// create commands
+	// create commands.
 	create := &cobra.Command{
 		Use:   "create",
 		Short: "create a runnable, project, or handler",
@@ -37,13 +38,12 @@ including building WebAssembly Runnables and Atmo projects.`,
 	create.AddCommand(command.CreateRunnableCmd())
 	create.AddCommand(command.CreateHandlerCmd())
 
-	// compute network related commands
+	// compute network related commands.
 	cmd.AddCommand(computeCommand())
 
-	// docs related commands
+	// docs related commands.
 	cmd.AddCommand(docsCommand())
 
-	// add top-level commands to root
 	cmd.AddCommand(create)
 	cmd.AddCommand(command.BuildCmd())
 	cmd.AddCommand(command.DevCmd())

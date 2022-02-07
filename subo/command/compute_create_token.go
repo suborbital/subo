@@ -2,18 +2,19 @@ package command
 
 import (
 	"fmt"
-	"github.com/suborbital/subo/subo/util"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+
 	"github.com/suborbital/subo/subo/input"
+	"github.com/suborbital/subo/subo/util"
 )
 
 const (
 	scnEndpointEnvKey = "SUBO_SCN_ENDPOINT"
 )
 
-// ComputeCreateTokenCommand returns the dev command
+// ComputeCreateTokenCommand returns the dev command.
 func ComputeCreateTokenCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "token [email]",
@@ -45,7 +46,7 @@ func ComputeCreateTokenCommand() *cobra.Command {
 	return cmd
 }
 
-// getVerifierCode gets the 6-character code from stdin
+// getVerifierCode gets the 6-character code from stdin.
 func getVerifierCode() (string, error) {
 	fmt.Print("A verification code was sent to your email address. Enter the code to continue: ")
 	code, err := input.ReadStdinString()
