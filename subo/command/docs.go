@@ -17,6 +17,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+
 	"github.com/suborbital/subo/subo/util"
 )
 
@@ -58,7 +59,7 @@ type exampleData struct {
 	Output string
 }
 
-// DocsBuildCmd returns the docs build command
+// DocsBuildCmd returns the docs build command.
 func DocsBuildCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "build [dir] [--output]",
@@ -89,7 +90,7 @@ func DocsBuildCmd() *cobra.Command {
 	return cmd
 }
 
-// DocsTestCmd returns the docs test command
+// DocsTestCmd returns the docs test command.
 func DocsTestCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "test [dir]",
@@ -114,20 +115,20 @@ func DocsTestCmd() *cobra.Command {
 	return cmd
 }
 
-// generateDocs generates new docs with inserted example code snippets
+// generateDocs generates new docs with inserted example code snippets.
 func generateDocs(dir string, outputDir string) error {
 	files, err := getMarkdownCodeData(dir)
 	if err != nil {
 		return errors.Wrap(err, "failed to getMarkdownCodeData")
 	}
 
-	// Generate docs with inserted code snippets
+	// Generate docs with inserted code snippets.
 	for fileName, fileContent := range files["md"] {
-		// Clean template actions
+		// Clean template actions.
 		r := regexp.MustCompile(cleanActionRegex)
 		fileContent = r.ReplaceAllStringFunc(fileContent,
 			func(src string) string {
-				// remove extra whitespaces from template actions
+				// remove extra whitespaces from template actions.
 				r := regexp.MustCompile(actionSuffixRegex)
 				if r.MatchString(src) {
 					src = r.ReplaceAllLiteralString(src, actionSuffix)
@@ -142,9 +143,9 @@ func generateDocs(dir string, outputDir string) error {
 			},
 		)
 		r = regexp.MustCompile(oldDocsRegex)
-		// Remove old documentation examples
+		// Remove old documentation examples.
 		fileContent = r.ReplaceAllLiteralString(fileContent, "")
-		// Generate new documentation examples
+		// Generate new documentation examples.
 		filePath := filepath.Join(outputDir, fileName)
 		fileDir := filepath.Dir(filePath)
 		if info, err := os.Stat(fileDir); os.IsNotExist(err) {
@@ -169,10 +170,10 @@ func generateDocs(dir string, outputDir string) error {
 		// `{{ Snippet "greetings:doNotDoThis" }}` => only package example `doNotDoThis` is  inserted from package `greeting`
 		// {{ Snippet "greetings/Hello" }} => all function  `Hello` examples are inserted from package `greetings`
 		// {{ Snippet "greetings/Hello:doThis" }} => only function  `Hello` example `doThis` is  inserted from package `greetings`
-		// Nonexistent examples for packages or functions will cause `doc` cmd to fail
+		// Nonexistent examples for packages or functions will cause `doc` cmd to fail.
 		tmpl, err := template.New(fileName).Funcs(template.FuncMap{
 			"Snippet": func(exampleKey string) (string, error) {
-				// Generate user template action for reinsertion
+				// Generate user template action for reinsertion.
 				tmpl, err := template.New("NestedTemplateAction").Delims(`[[`, `]]`).Parse(actionTemplate)
 				if err != nil {
 					return "", err
@@ -183,7 +184,7 @@ func generateDocs(dir string, outputDir string) error {
 					return "", err
 				}
 
-				// Check example key structure
+				// Check example key structure.
 				var pkgName, funcName string
 				keys := strings.Split(exampleKey, "/")
 				if len(keys) == 1 {
@@ -194,13 +195,13 @@ func generateDocs(dir string, outputDir string) error {
 					return "", errors.New("`Snippet` expects a non-empty string key `packageName/funcName:Example` or 'packageName:Example', where 'funcName' and 'Example' are both optional")
 				}
 
-				// Check if supportExt files, `go` files, where found
+				// Check if supportExt files, `go` files, where found.
 				examples, ok := files[supportExt]
 				if !ok {
 					return "", errors.New(fmt.Sprintf("Failed to `Snippet`, no files found with ext `%s`", supportExt))
 				}
 
-				// Check if example exists
+				// Check if example exists.
 				example, ok := examples[exampleKey]
 				if !ok {
 					if pkgName == "" {
@@ -219,7 +220,7 @@ func generateDocs(dir string, outputDir string) error {
 		if err != nil {
 			return errors.Wrap(err, "failed to Parse")
 		} else if err = tmpl.Execute(&buffer, ""); err != nil {
-			// Reset doc to its previous state
+			// Reset doc to its previous state.
 			if errWrite := ioutil.WriteFile(filePath, []byte(fileContent), os.ModePerm); errWrite != nil {
 				return errors.Wrap(errWrite, "failed to Write")
 			}
@@ -228,7 +229,7 @@ func generateDocs(dir string, outputDir string) error {
 		}
 
 		// weird behavior of text.templates, it adds new lines regardless of action delimiters
-		// This ReplaceAll compensates for it
+		// This ReplaceAll compensates for it.
 		r = regexp.MustCompile(cleanExtraNewLines)
 		fileContent = r.ReplaceAllLiteralString(buffer.String(), fmt.Sprintf("\n%s\n", docRegexEnd))
 		_, err = file.WriteString(fileContent)
@@ -240,7 +241,7 @@ func generateDocs(dir string, outputDir string) error {
 	return nil
 }
 
-// getMarkdownCodeData returns a mapping of markdown texts and go example code snippets
+// getMarkdownCodeData returns a mapping of markdown texts and go example code snippets.
 func getMarkdownCodeData(dir string) (map[string]map[string]string, error) {
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		return nil, errors.Wrap(err, fmt.Sprintf("dir %s does not exist", dir))
@@ -261,7 +262,7 @@ func getMarkdownCodeData(dir string) (map[string]map[string]string, error) {
 	return map[string]map[string]string{"md": mdTextss, "go": goSnippets}, nil
 }
 
-// getMarkdownTexts returns discovered markdown texts
+// getMarkdownTexts returns discovered markdown texts.
 func getMarkdownTexts(dir string) (map[string]string, error) {
 	mdTexts := make(map[string]string)
 	err := filepath.Walk(dir,
@@ -298,7 +299,7 @@ func getMarkdownTexts(dir string) (map[string]string, error) {
 	return mdTexts, nil
 }
 
-// getGoSnippets returns discovered go example code snippets
+// getGoSnippets returns discovered go example code snippets.
 func getGoSnippets(dir string) (map[string]string, error) {
 	goSnippets := make(map[string]string)
 	err := filepath.Walk(dir,
@@ -320,20 +321,20 @@ func getGoSnippets(dir string) (map[string]string, error) {
 				return errors.Wrap(err, "failed to ParseDir")
 			}
 
-			// Get and structure package and function examples from ast to text
+			// Get and structure package and function examples from ast to text.
 			for pkgName, pkg := range pkgs {
 				files := []*ast.File{}
 				for _, file := range pkg.Files {
 					files = append(files, file)
 				}
 
-				// Get special package and function asts that contain example metadata
+				// Get special package and function asts that contain example metadata.
 				pkgDoc, err := doc.NewFromFiles(fset, files, filepath.Join(path, pkgName), doc.AllDecls)
 				if err != nil {
 					return errors.Wrap(err, "failed to NewFromFiles")
 				}
 
-				// Process examples associated with the package
+				// Process examples associated with the package.
 				pkgData := codeData{
 					Ext:        "go",
 					RegexStart: docRegexStart,
@@ -350,7 +351,7 @@ func getGoSnippets(dir string) (map[string]string, error) {
 					goSnippets[exampleKey] = text
 				}
 
-				// Add all examples option for package
+				// Add all examples option for package.
 				exampleKey := getExampleKey(pkgName, "", "")
 				text, err := pkgData.getCodeText(exampleKey, docTemplate, actionTemplate, pkgDoc.Examples, fset)
 				if err != nil {
@@ -358,7 +359,7 @@ func getGoSnippets(dir string) (map[string]string, error) {
 				}
 
 				goSnippets[exampleKey] = text
-				// Process examples associated with this function or method
+				// Process examples associated with this function or method.
 				for _, funcNode := range pkgDoc.Funcs {
 					if len(funcNode.Examples) == 0 {
 						continue
@@ -381,7 +382,7 @@ func getGoSnippets(dir string) (map[string]string, error) {
 						goSnippets[exampleKey] = text
 					}
 
-					// Add all examples option for function
+					// Add all examples option for function.
 					exampleKey := getExampleKey(pkgName, funcNode.Name, "")
 					text, err := funcData.getCodeText(exampleKey, docTemplate, actionTemplate, funcNode.Examples, fset)
 					if err != nil {
@@ -402,7 +403,7 @@ func getGoSnippets(dir string) (map[string]string, error) {
 	return goSnippets, nil
 }
 
-// getExampleKey returns keys associated to examples
+// getExampleKey returns keys associated to examples.
 func getExampleKey(pkgName, funcName, exampleSuffix string) string {
 	key := pkgName
 	if funcName != "" {
@@ -417,14 +418,14 @@ func getExampleKey(pkgName, funcName, exampleSuffix string) string {
 	return key
 }
 
-// getCodeText returns code snippets generated from example asts
+// getCodeText returns code snippets generated from example asts.
 func (c *codeData) getCodeText(exampleKey, docTemplate, actionTemplate string, examples []*doc.Example, fset *token.FileSet) (string, error) {
 	err := c.getExampleData(examples, fset)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to getExampleData")
 	}
 
-	// Generate user template action for reinsertion
+	// Generate user template action for reinsertion.
 	tmpl, err := template.New("NestedTemplateAction").Delims(`[[`, `]]`).Parse(actionTemplate)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to Parse")
@@ -436,7 +437,7 @@ func (c *codeData) getCodeText(exampleKey, docTemplate, actionTemplate string, e
 	}
 
 	c.Action = buffer.String()
-	// Generate code snippets based on `docTemplate` templates
+	// Generate code snippets based on `docTemplate` templates.
 	tmpl, err = template.New("CodeText").Parse(docTemplate)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to Parse")
@@ -450,11 +451,11 @@ func (c *codeData) getCodeText(exampleKey, docTemplate, actionTemplate string, e
 	return buffer.String(), nil
 }
 
-// getExampleData loads example asts to codeData
+// getExampleData loads example asts to codeData.
 func (c *codeData) getExampleData(examples []*doc.Example, fset *token.FileSet) error {
 	c.Examples = nil
 	for i, example := range examples {
-		// Get example code snippets ast
+		// Get example code snippets ast.
 		var buffer bytes.Buffer
 		switch n := example.Code.(type) {
 		case *ast.BlockStmt:
@@ -467,7 +468,7 @@ func (c *codeData) getExampleData(examples []*doc.Example, fset *token.FileSet) 
 			}
 		}
 
-		// Get example code snippets metadata
+		// Get example code snippets metadata.
 		c.Examples = append(c.Examples,
 			&exampleData{
 				Suffix: example.Suffix,
