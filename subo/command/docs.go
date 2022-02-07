@@ -343,7 +343,7 @@ func getGoSnippets(dir string) (map[string]string, error) {
 				}
 				for _, example := range pkgDoc.Examples {
 					exampleKey := getExampleKey(pkgName, "", example.Suffix)
-					text, err := pkgData.getCodeText(exampleKey, docTemplate, actionTemplate, []*doc.Example{example}, fset)
+					text, err := pkgData.getCodeText(exampleKey, []*doc.Example{example}, fset)
 					if err != nil {
 						return errors.Wrap(err, "failed to getCodeText")
 					}
@@ -353,7 +353,7 @@ func getGoSnippets(dir string) (map[string]string, error) {
 
 				// Add all examples option for package.
 				exampleKey := getExampleKey(pkgName, "", "")
-				text, err := pkgData.getCodeText(exampleKey, docTemplate, actionTemplate, pkgDoc.Examples, fset)
+				text, err := pkgData.getCodeText(exampleKey, pkgDoc.Examples, fset)
 				if err != nil {
 					return errors.Wrap(err, "failed to getCodeText")
 				}
@@ -374,7 +374,7 @@ func getGoSnippets(dir string) (map[string]string, error) {
 					}
 					for _, example := range funcNode.Examples {
 						exampleKey := getExampleKey(pkgName, example.Name, example.Suffix)
-						text, err := funcData.getCodeText(exampleKey, docTemplate, actionTemplate, []*doc.Example{example}, fset)
+						text, err := funcData.getCodeText(exampleKey, []*doc.Example{example}, fset)
 						if err != nil {
 							return errors.Wrap(err, "failed to getCodeText")
 						}
@@ -384,7 +384,7 @@ func getGoSnippets(dir string) (map[string]string, error) {
 
 					// Add all examples option for function.
 					exampleKey := getExampleKey(pkgName, funcNode.Name, "")
-					text, err := funcData.getCodeText(exampleKey, docTemplate, actionTemplate, funcNode.Examples, fset)
+					text, err := funcData.getCodeText(exampleKey, funcNode.Examples, fset)
 					if err != nil {
 						return errors.Wrap(err, "failed to getCodeText")
 					}
@@ -419,7 +419,7 @@ func getExampleKey(pkgName, funcName, exampleSuffix string) string {
 }
 
 // getCodeText returns code snippets generated from example asts.
-func (c *codeData) getCodeText(exampleKey, docTemplate, actionTemplate string, examples []*doc.Example, fset *token.FileSet) (string, error) {
+func (c *codeData) getCodeText(exampleKey string, examples []*doc.Example, fset *token.FileSet) (string, error) {
 	err := c.getExampleData(examples, fset)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to getExampleData")
