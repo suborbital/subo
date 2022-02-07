@@ -3,16 +3,16 @@ include ./subo/release/release.mk
 
 GO_INSTALL=go install -ldflags $(RELEASE_FLAGS)
 
-subo: lint
+subo:
 	$(GO_INSTALL)
 
 subo/dev: lint
 	$(GO_INSTALL) -tags=development
 
-subo/docker: lint
+subo/docker:
 	docker build . -t suborbital/subo:dev
 
-subo/docker/publish: lint
+subo/docker/publish:
 	docker buildx build . --platform linux/amd64,linux/arm64 -t suborbital/subo:dev --push
 
 mod/replace/atmo:
