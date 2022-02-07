@@ -21,7 +21,12 @@ jobs:
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
-        
+
+      - name: Install golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.44.0
+
       - name: Build Subo
         run: |
           make subo
