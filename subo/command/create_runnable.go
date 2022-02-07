@@ -24,16 +24,16 @@ var validLangs = map[string]bool{
 	"assemblyscript": true,
 	"tinygo":         true,
 	"grain":          true,
-	"js":             true,
+	"typescript":     true,
 }
 
 // langAliases are aliases for languages.
 var langAliases = map[string]string{
-	"typescript": "assemblyscript",
-	"rs":         "rust",
-	"go":         "tinygo",
-	"gr":         "grain",
-	"ts":         "js",
+	"as": "assemblyscript",
+	"rs": "rust",
+	"go": "tinygo",
+	"gr": "grain",
+	"ts": "typescript",
 }
 
 // CreateRunnableError wraps errors for CreateRunnableCmd() failures.
