@@ -3,6 +3,7 @@ dotVersionFiles:
   - builder/.image-ver
 
 preMakeTargets:
+  - lint
   - subo/docker
 
 postMakeTargets:
