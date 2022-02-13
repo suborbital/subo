@@ -68,4 +68,14 @@ builder/docker/grain/publish:
 builder/docker/grain/dev/publish:
 	docker buildx build . -f builder/docker/grain/Dockerfile --platform linux/amd64 -t suborbital/builder-gr:dev --push
 
-.PHONY: builder/docker builder/docker/publish builder/docker/as builder/docker/as/publish builder/docker/rust builder/docker/rust/publish builder/docker/swift builder/docker/swift/publish builder/docker/tinygo builder/docker/tinygo/publish builder/docker/grain builder/docker/grain/publish
+# JavaScript docker targets
+builder/docker/javascript:
+	docker build . -f builder/docker/javascript/Dockerfile -t suborbital/builder-js:$(ver)
+
+builder/docker/javascript/publish:
+	docker buildx build . -f builder/docker/javascript/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-js:$(ver) --push
+
+builder/docker/javascript/dev/publish:
+	docker buildx build . -f builder/docker/javascript/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-js:dev --push
+
+.PHONY: builder/docker builder/docker/publish builder/docker/as builder/docker/as/publish builder/docker/rust builder/docker/rust/publish builder/docker/swift builder/docker/swift/publish builder/docker/tinygo builder/docker/tinygo/publish builder/docker/grain builder/docker/grain/publish builder/docker/javascript builder/docker/javascript/publish
