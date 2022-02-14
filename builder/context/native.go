@@ -38,7 +38,7 @@ var nativeCommandsForLang = map[string]map[string][]string{
 		"grain": {
 			"grain compile index.gr -I _lib -o {{ .Name }}.wasm",
 		},
-		"js": {
+		"typescript": {
 			"webpack",
 			"javy build/index.js -o {{ .Name }}.wasm",
 		},
@@ -65,7 +65,7 @@ var nativeCommandsForLang = map[string]map[string][]string{
 		"grain": {
 			"grain compile index.gr -I _lib -o {{ .Name }}.wasm",
 		},
-		"js": {
+		"typescript": {
 			"webpack",
 			"javy build/index.js -o {{ .Name }}.wasm",
 		},

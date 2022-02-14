@@ -39,7 +39,7 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 			},
 		},
 		"tinygo": {},
-		"js": {
+		"typescript": {
 			Prereq{
 				File:    "node_modules",
 				Command: "npm install --include=dev",
@@ -70,7 +70,7 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 			},
 		},
 		"tinygo": {},
-		"js": {
+		"typescript": {
 			Prereq{
 				File:    "node_modules",
 				Command: "npm install --include=dev",

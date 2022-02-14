@@ -3,11 +3,10 @@ name: Testapalooza
 on: pull_request
 
 jobs:
-
   build:
     strategy:
-        matrix:
-          golang: [1.17]
+      matrix:
+        golang: [1.17]
 
     name: Smoke
     runs-on: ubuntu-latest
@@ -38,9 +37,9 @@ jobs:
           subo create project smoketest
           subo create runnable rs-test --lang rust --dir ./smoketest
           subo create runnable swift-test --lang swift --dir ./smoketest
-          subo create runnable as-test --lang typescript --dir ./smoketest
+          subo create runnable as-test --lang assemblyscript --dir ./smoketest
           subo create runnable tinygo-test --lang tinygo --dir ./smoketest
-      
+
       - name: Build project
         run: |
           export PATH=$PATH:$(go env GOPATH)/bin

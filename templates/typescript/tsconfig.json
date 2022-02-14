@@ -10,7 +10,6 @@
     "rootDir": "src/",
     "types": [
       "node",
-      "jest"
     ],
     "lib": [
       "es2019"
