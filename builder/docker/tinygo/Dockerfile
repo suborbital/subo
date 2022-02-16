@@ -1,4 +1,4 @@
-FROM suborbital/tinygo-base:v0.21.0 as builder
+FROM suborbital/tinygo-base:v0.22.0 as builder
 FROM suborbital/subo:dev as subo
 
 FROM golang:bullseye

@@ -3,8 +3,8 @@ RUN apt-get update && apt-get install -y clang-11 llvm-11-dev lld-11 libclang-11
 
 WORKDIR /root
 RUN mkdir runnable
-RUN git clone --depth 1 --branch v0.21.0 https://github.com/tinygo-org/tinygo.git
-RUN git clone --depth 1 --branch version_103 https://github.com/WebAssembly/binaryen
+RUN git clone --depth 1 --branch v0.22.0 https://github.com/tinygo-org/tinygo.git
+RUN git clone --depth 1 --branch version_105 https://github.com/WebAssembly/binaryen
 RUN mkdir binaryen/build
 
 WORKDIR /root/tinygo
