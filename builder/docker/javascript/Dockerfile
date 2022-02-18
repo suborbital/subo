@@ -7,7 +7,7 @@ RUN apt-get update && \
     apt-get install pkg-config git build-essential libssl-dev clang cmake curl -y && \
     rustup target install wasm32-wasi && \
     cargo install wasmtime-cli cargo-wasi && \
-    git clone -b suborbital-v0.1.0 https://github.com/suborbital/javy.git && \
+    git clone -b suborbital-v0.2.0 https://github.com/suborbital/javy.git && \
     cd javy && \
     make
 
