@@ -28,10 +28,6 @@ func BuildCmd() *cobra.Command {
 				return errors.Wrap(err, "failed to builder.ForDirectory")
 			}
 
-			//if err = bdr.Context.Directive.Validate(); err != nil {
-			//	return errors.Wrapf(err, "failed to validate directive")
-			//}
-
 			if len(bdr.Context.Runnables) == 0 {
 				return errors.New("🚫 no runnables found in current directory (no .runnable.yaml files found)")
 			}

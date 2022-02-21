@@ -95,7 +95,7 @@ func AugmentAndValidateDirectiveFns(dxe *directive.Directive, fns []RunnableDir)
 
 	dxe.Runnables = dirRunnables
 
-	// validate augmented directive
+	// validate augmented directive.
 	return dxe.Validate()
 }
 
