@@ -73,7 +73,9 @@ func ForDirectory(dir string) (*BuildContext, error) {
 
 	directive, err := readDirectiveFile(fullDir)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to readDirectiveFile")
+		if !os.IsNotExist(errors.Cause(err)) {
+			return nil, errors.Wrap(err, "failed to readDirectiveFile")
+		}
 	}
 
 	queries, err := readQueriesFile(dir)

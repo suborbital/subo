@@ -16,7 +16,7 @@ func BuildCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "build [dir]",
 		Short: "build a WebAssembly runnable",
-		Long:  `build a WebAssembly runnable and/or create a Runable Bundle`,
+		Long:  `build a WebAssembly runnable and/or create a Runnable Bundle`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			dir := "."
 			if len(args) > 0 {
@@ -27,6 +27,10 @@ func BuildCmd() *cobra.Command {
 			if err != nil {
 				return errors.Wrap(err, "failed to builder.ForDirectory")
 			}
+
+			//if err = bdr.Context.Directive.Validate(); err != nil {
+			//	return errors.Wrapf(err, "failed to validate directive")
+			//}
 
 			if len(bdr.Context.Runnables) == 0 {
 				return errors.New("🚫 no runnables found in current directory (no .runnable.yaml files found)")
