@@ -31,3 +31,4 @@ subo create runnable rs-test --lang rust
 subo create runnable swift-test --lang swift
 subo create runnable as-test --lang assemblyscript
 subo create runnable tinygo-test --lang tinygo
+subo create runnable js-test --lang javascript
