@@ -27,5 +27,5 @@ jobs:
           file: builder/docker/javascript/Dockerfile
           platforms: linux/amd64,linux/arm64
           context: .
-          push: true
+          push: false
           tags: suborbital/builder-js:latest
