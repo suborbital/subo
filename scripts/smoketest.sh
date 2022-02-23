@@ -8,15 +8,15 @@ trap 'catch $? $LINENO' EXIT
 
 catch() {
   if [[ "$1" != "0" ]]; then
-    echo "Error $1 occurred on $2"
+    echo "An Error $1 occurred on $2"
   fi
 
   # return to origin, clear directory stack
   pushd -0 > /dev/null && dirs -c
 
   if [[ -d "$TEST_PROJECT" ]]; then
-    echo "cleaning up test artifacts"
-    rm -rf "$TEST_PROJECT"
+    echo "Cleaning up test artifacts..."
+    rm -rf "$TEST_PROJECT" || echo "Failed to clean up test artifacts, if this was a permissions error try using 'sudo rm -rf $TEST_PROJECT'"
   fi
 }
 
@@ -31,4 +31,8 @@ subo create runnable rs-test --lang rust
 subo create runnable swift-test --lang swift
 subo create runnable as-test --lang assemblyscript
 subo create runnable tinygo-test --lang tinygo
-subo create runnable js-test --lang javascript
+# TODO: uncomment when js builder is checked in
+#subo create runnable js-test --lang javascript
+
+# build project bundle
+subo build .

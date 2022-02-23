@@ -15,13 +15,8 @@ subo/docker:
 subo/docker/publish:
 	docker buildx build . --platform linux/amd64,linux/arm64 -t suborbital/subo:dev --push
 
-subo/sanity: subo/sanity/project subo/sanity/runnable
-
-subo/sanity/project: subo
-	./scripts/sanity_project.sh
-
-subo/sanity/runnable: subo
-	./scripts/sanity_runnable.sh
+subo/smoketest: subo
+	./scripts/smoketest.sh
 
 mod/replace/atmo:
 	go mod edit -replace github.com/suborbital/atmo=$(HOME)/Workspaces/suborbital/atmo
