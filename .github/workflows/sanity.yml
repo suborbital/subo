@@ -24,7 +24,7 @@ jobs:
       - name: Install golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
-          version: v1.44.0
+          version: v1.44.2
 
       - name: Build Subo
         run: |
