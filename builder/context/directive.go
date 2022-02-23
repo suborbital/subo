@@ -35,10 +35,6 @@ func readDirectiveFile(cwd string) (*directive.Directive, error) {
 
 	_, err := os.Stat(filePath)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, nil
-		}
-
 		return nil, errors.Wrap(err, "failed to Stat Directive")
 	}
 
@@ -99,7 +95,8 @@ func AugmentAndValidateDirectiveFns(dxe *directive.Directive, fns []RunnableDir)
 
 	dxe.Runnables = dirRunnables
 
-	return nil
+	// validate augmented directive.
+	return dxe.Validate()
 }
 
 // getHandlerFnList gets a full list of all functions used in the directive's handlers.

@@ -15,6 +15,9 @@ subo/docker:
 subo/docker/publish:
 	docker buildx build . --platform linux/amd64,linux/arm64 -t suborbital/subo:dev --push
 
+subo/smoketest: subo
+	./scripts/smoketest.sh
+
 mod/replace/atmo:
 	go mod edit -replace github.com/suborbital/atmo=$(HOME)/Workspaces/suborbital/atmo
 
@@ -23,4 +26,4 @@ tidy:
 lint:
 	golangci-lint run ./...
 
-.PHONY: subo subo/dev subo/docker subo/docker/publish mod/replace/atmo tidy lint
+.PHONY: subo subo/dev subo/docker subo/docker/publish subo/smoketest mod/replace/atmo tidy lint
