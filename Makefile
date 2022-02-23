@@ -26,4 +26,4 @@ tidy:
 lint:
 	golangci-lint run ./...
 
-.PHONY: subo subo/dev subo/docker subo/docker/publish subo/sanity subo/smoketest mod/replace/atmo tidy lint
+.PHONY: subo subo/dev subo/docker subo/docker/publish subo/smoketest mod/replace/atmo tidy lint
