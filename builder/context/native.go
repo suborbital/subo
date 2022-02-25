@@ -40,11 +40,9 @@ var nativeCommandsForLang = map[string]map[string][]string{
 		},
 		"typescript": {
 			"npm run build",
-			"javy build/index.js -o {{ .Name }}.wasm",
 		},
 		"javascript": {
 			"npm run build",
-			"javy build/index.js -o {{ .Name }}.wasm",
 		},
 	},
 	"linux": {
@@ -71,11 +69,9 @@ var nativeCommandsForLang = map[string]map[string][]string{
 		},
 		"typescript": {
 			"npm run build",
-			"javy build/index.js -o {{ .Name }}.wasm",
 		},
 		"javascript": {
 			"npm run build",
-			"javy build/index.js -o {{ .Name }}.wasm",
 		},
 	},
 }
