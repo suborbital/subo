@@ -1,22 +1,53 @@
-before:
-  hooks:
-    - go mod download
-
 builds:
-  - env:
-      - CGO_ENABLED=0
-    goos:
+  - goos:
       - linux
       - darwin
     goarch:
       - amd64
       - arm64
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+        - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
 
 changelog:
   skip: true
 
 checksum:
-  name_template: 'checksums.txt'
+  name_template: checksums.txt
 
 archives:
-  - name_template: '{{ .ProjectName }}-v{{ .Version }}-{{ .Os }}-{{ .Arch }}'
+  - name_template: subo-v{{ .Version }}-{{ .Os }}-{{ .Arch }}
+
+brews:
+  - name: subo
+    description: Suborbital CLI for building and deploying WebAssembly-based projects
+    homepage: https://suborbital.dev
+
+    install: |
+      bin.install "subo"
+
+      bash_output = Utils.safe_popen_read(bin/"subo", "completion", "bash")
+      (bash_completion/"subo").write bash_output
+
+      zsh_output = Utils.safe_popen_read(bin/"subo", "completion", "zsh")
+      (zsh_completion/"_subo").write zsh_output
+
+      fish_output = Utils.safe_popen_read(bin/"subo", "completion", "fish")
+      (fish_completion/"subo.fish").write fish_output
+
+    test: |
+      assert_match "Subo CLI v#{version}", shell_output("#{bin}/subo --version")
+
+    folder: Formula
+
+    tap:
+      owner: suborbital
+      name: homebrew-subo
+      token: '{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}'
+
+    commit_author:
+      name: '{{ .Env.GITHUB_ACTOR_NAME }}'
+      email: '{{ .Env.GITHUB_ACTOR_EMAIL }}'
+
+    commit_msg_template: Brew formula update for {{ .ProjectName }} version {{ .Tag }}
