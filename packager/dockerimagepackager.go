@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/pkg/errors"
+
 	"github.com/suborbital/subo/project"
 	"github.com/suborbital/subo/subo/util"
 )
@@ -19,12 +20,12 @@ func NewDockerImagePackageJob() PackageJob {
 	return b
 }
 
-// Type returns the job type
+// Type returns the job type.
 func (b *DockerImagePackageJob) Type() string {
 	return dockerImageJobType
 }
 
-// Package packages the application
+// Package packages the application.
 func (b *DockerImagePackageJob) Package(log util.FriendlyLogger, ctx *project.Context) error {
 	if err := ctx.HasDockerfile(); err != nil {
 		return errors.Wrap(err, "missing Dockerfile")
