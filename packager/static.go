@@ -1,8 +1,4 @@
-<<<<<<< HEAD:packager/static.go
 package packager
-=======
-package builder
->>>>>>> e5f4b37 (refactor builder/context into project package):builder/static.go
 
 import (
 	"os"
