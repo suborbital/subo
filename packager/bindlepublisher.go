@@ -14,9 +14,10 @@ import (
 	"github.com/deislabs/go-bindle/types"
 	"github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
+
 	"github.com/suborbital/subo/project"
 	"github.com/suborbital/subo/subo/util"
-	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -31,19 +32,19 @@ type parcelWrapper struct {
 	data   []byte
 }
 
-// NewBindlePublishJob returns a new PublishJob for Bindle
+// NewBindlePublishJob returns a new PublishJob for Bindle.
 func NewBindlePublishJob() PublishJob {
 	b := &BindlePublishJob{}
 
 	return b
 }
 
-// Type returns the publish job's type
+// Type returns the publish job's type.
 func (b *BindlePublishJob) Type() string {
 	return bindlePublishJobType
 }
 
-// Publish publishes the application
+// Publish publishes the application.
 func (b *BindlePublishJob) Publish(log util.FriendlyLogger, ctx *project.Context) error {
 	if ctx.Directive == nil {
 		return errors.New("🚫 cannot push without Directive.yaml file")

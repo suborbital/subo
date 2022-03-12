@@ -7,12 +7,13 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"golang.org/x/mod/semver"
+
 	"github.com/suborbital/atmo/bundle"
 	"github.com/suborbital/atmo/directive"
 	"github.com/suborbital/subo/project"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
-	"golang.org/x/mod/semver"
 )
 
 const bundleJobType = "bundle"
@@ -25,12 +26,12 @@ func NewBundlePackageJob() PackageJob {
 	return b
 }
 
-// Type returns the job type
+// Type returns the job type.
 func (b *BundlePackageJob) Type() string {
 	return bundleJobType
 }
 
-// Package packages the application
+// Package packages the application.
 func (b *BundlePackageJob) Package(log util.FriendlyLogger, ctx *project.Context) error {
 	for _, r := range ctx.Runnables {
 		if err := r.HasModule(); err != nil {
