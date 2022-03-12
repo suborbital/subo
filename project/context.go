@@ -148,6 +148,28 @@ func (b *Context) Modules() ([]os.File, error) {
 	return modules, nil
 }
 
+// HasDockerfile returns a nil error if the project's Dockerfile exists
+func (b *Context) HasDockerfile() error {
+	dockerfilePath := filepath.Join(b.Cwd, "Dockerfile")
+
+	if _, err := os.Stat(dockerfilePath); err != nil {
+		return errors.Wrap(err, "failed to Stat")
+	}
+
+	return nil
+}
+
+// HasModule returns a nil error if the Runnable's .wasm file exists
+func (r *RunnableDir) HasModule() error {
+	runnablePath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
+
+	if _, err := os.Stat(runnablePath); err != nil {
+		return errors.Wrap(err, "failed to Stat")
+	}
+
+	return nil
+}
+
 func getRunnableDirs(cwd string) ([]RunnableDir, bool, error) {
 	runnables := []RunnableDir{}
 
