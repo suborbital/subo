@@ -17,21 +17,21 @@ import (
 
 const bundleJobType = "bundle"
 
-type BundleJob struct{}
+type BundlePackageJob struct{}
 
-func NewBundleJob() PackageJob {
-	b := &BundleJob{}
+func NewBundlePackageJob() PackageJob {
+	b := &BundlePackageJob{}
 
 	return b
 }
 
 // Type returns the job type
-func (b *BundleJob) Type() string {
+func (b *BundlePackageJob) Type() string {
 	return bundleJobType
 }
 
 // Package packages the application
-func (b *BundleJob) Package(log util.FriendlyLogger, ctx *project.Context) error {
+func (b *BundlePackageJob) Package(log util.FriendlyLogger, ctx *project.Context) error {
 	for _, r := range ctx.Runnables {
 		if err := r.HasModule(); err != nil {
 			return errors.Wrap(err, "missing built module")
