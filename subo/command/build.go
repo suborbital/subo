@@ -2,12 +2,12 @@ package command
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/suborbital/subo/builder"
+	"github.com/suborbital/subo/packager"
 	"github.com/suborbital/subo/subo/util"
 )
 
@@ -90,26 +90,19 @@ func BuildCmd() *cobra.Command {
 				return errors.Wrap(err, "failed to BuildWithToolchain")
 			}
 
-			if shouldBundle {
-				if err := bdr.Bundle(); err != nil {
-					return errors.Wrap(err, "failed to Bundle")
-				}
+			pkgr := packager.New(&util.PrintLogger{})
+			pkgJobs := []packager.PackageJob{}
 
-				defer util.LogDone(fmt.Sprintf("bundle was created -> %s @ %s", bdr.Context.Bundle.Fullpath, bdr.Context.Directive.AppVersion))
+			if shouldBundle {
+				pkgJobs = append(pkgJobs, packager.NewBundleJob())
 			}
 
 			if shouldDockerBuild && !bdr.Context.CwdIsRunnable {
-				if bdr.Context.Directive == nil {
-					return errors.New("🚫 failed to open Directive.yaml")
-				}
+				pkgJobs = append(pkgJobs, packager.NewDockerImageJob())
+			}
 
-				os.Setenv("DOCKER_BUILDKIT", "0")
-
-				if _, err := util.Run(fmt.Sprintf("docker build . -t=%s:%s", bdr.Context.Directive.Identifier, bdr.Context.Directive.AppVersion)); err != nil {
-					return errors.Wrap(err, "🚫 failed to build Docker image")
-				}
-
-				util.LogDone(fmt.Sprintf("built Docker image -> %s:%s", bdr.Context.Directive.Identifier, bdr.Context.Directive.AppVersion))
+			if err := pkgr.Package(bdr.Context, pkgJobs...); err != nil {
+				return errors.Wrap(err, "failed to Package")
 			}
 
 			return nil
