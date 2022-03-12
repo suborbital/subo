@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/suborbital/atmo/directive"
-	"github.com/suborbital/subo/builder/context"
+	"github.com/suborbital/subo/project"
 	"github.com/suborbital/subo/subo/util"
 )
 
@@ -31,7 +31,7 @@ func CreateHandlerCmd() *cobra.Command {
 				return errors.Wrap(err, "failed to Getwd")
 			}
 
-			bctx, err := context.ForDirectory(cwd)
+			bctx, err := project.ForDirectory(cwd)
 			if err != nil {
 				return errors.Wrap(err, "🚫 failed to get CurrentBuildContext")
 			}
@@ -53,7 +53,7 @@ func CreateHandlerCmd() *cobra.Command {
 			bctx.Directive.Handlers = append(bctx.Directive.Handlers, handler)
 
 			// Write Directive File which overwrites the entire file.
-			if err := context.WriteDirectiveFile(bctx.Cwd, bctx.Directive); err != nil {
+			if err := project.WriteDirectiveFile(bctx.Cwd, bctx.Directive); err != nil {
 				return errors.Wrap(err, "failed to WriteDirectiveFile")
 			}
 

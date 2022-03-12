@@ -1,4 +1,4 @@
-package context
+package builder
 
 import (
 	"testing"
@@ -6,13 +6,14 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/suborbital/atmo/directive"
+	"github.com/suborbital/subo/project"
 )
 
 func TestPrereq_GetCommand(t *testing.T) {
 	tests := []struct {
 		name    string
 		prereq  Prereq
-		r       RunnableDir
+		r       project.RunnableDir
 		want    string
 		wantErr assert.ErrorAssertionFunc
 	}{
@@ -22,7 +23,7 @@ func TestPrereq_GetCommand(t *testing.T) {
 				File:    "_lib/_lib.tar.gz",
 				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
 			},
-			r: RunnableDir{
+			r: project.RunnableDir{
 				Runnable: &directive.Runnable{
 					APIVersion: "0.33.75",
 				},
@@ -36,7 +37,7 @@ func TestPrereq_GetCommand(t *testing.T) {
 				File:    "_lib/_lib.tar.gz",
 				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
 			},
-			r: RunnableDir{
+			r: project.RunnableDir{
 				Runnable: nil,
 			},
 			want:    "",
@@ -48,7 +49,7 @@ func TestPrereq_GetCommand(t *testing.T) {
 				File:    "_lib/_lib.tar.gz",
 				Command: "curl -L https://github.com/suborbital/reactr/archive/v2.tar.gz -o _lib/_lib.tar.gz",
 			},
-			r: RunnableDir{
+			r: project.RunnableDir{
 				Runnable: &directive.Runnable{
 					APIVersion: "0.33.75",
 				},

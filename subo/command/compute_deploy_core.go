@@ -12,8 +12,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/suborbital/subo/builder/context"
 	"github.com/suborbital/subo/builder/template"
+	"github.com/suborbital/subo/project"
 	"github.com/suborbital/subo/subo/input"
 	"github.com/suborbital/subo/subo/localproxy"
 	"github.com/suborbital/subo/subo/release"
@@ -58,7 +58,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 				return errors.Wrap(err, "failed to Getwd")
 			}
 
-			bctx, err := context.ForDirectory(cwd)
+			bctx, err := project.ForDirectory(cwd)
 			if err != nil {
 				return errors.Wrap(err, "🚫 failed to get CurrentBuildContext")
 			}
@@ -309,7 +309,7 @@ func createConfigMap(cwd string) error {
 	return nil
 }
 
-func manifestsExist(bctx *context.BuildContext) bool {
+func manifestsExist(bctx *project.Context) bool {
 	if _, err := os.Stat(filepath.Join(bctx.Cwd, ".suborbital")); err == nil {
 		return true
 	}
@@ -321,7 +321,7 @@ func manifestsExist(bctx *context.BuildContext) bool {
 	return false
 }
 
-func removeExistingManifests(bctx *context.BuildContext) error {
+func removeExistingManifests(bctx *project.Context) error {
 	// start with a clean slate.
 	if _, err := os.Stat(filepath.Join(bctx.Cwd, ".suborbital")); err == nil {
 		if err := os.RemoveAll(filepath.Join(bctx.Cwd, ".suborbital")); err != nil {

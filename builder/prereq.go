@@ -1,10 +1,11 @@
-package context
+package builder
 
 import (
 	"strings"
 	"text/template"
 
 	"github.com/pkg/errors"
+	"github.com/suborbital/subo/project"
 )
 
 // Prereq is a pre-requisite file paired with the native command needed to acquire that file (if it's missing).
@@ -92,7 +93,7 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 }
 
 // GetCommand takes a RunnableDir, and returns an executed template command string.
-func (p Prereq) GetCommand(r RunnableDir) (string, error) {
+func (p Prereq) GetCommand(r project.RunnableDir) (string, error) {
 	cmdTmpl, err := template.New("cmd").Parse(p.Command)
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to parse prerequisite Command string into template: %s", p.Command)
