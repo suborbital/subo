@@ -17,7 +17,7 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
-	"github.com/suborbital/subo/builder/context"
+	"github.com/suborbital/subo/project"
 	"github.com/suborbital/subo/subo/util"
 )
 
@@ -40,7 +40,7 @@ func PushCmd() *cobra.Command {
 				cwd = "$HOME"
 			}
 
-			bctx, err := context.ForDirectory(cwd)
+			bctx, err := project.ForDirectory(cwd)
 			if err != nil {
 				return errors.Wrap(err, "failed to get CurrentBuildContext")
 			}

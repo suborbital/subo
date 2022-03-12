@@ -6,7 +6,7 @@ GO_INSTALL=go install -ldflags $(RELEASE_FLAGS)
 subo:
 	$(GO_INSTALL)
 
-subo/dev: lint
+subo/dev:
 	$(GO_INSTALL) -tags=development
 
 subo/docker:

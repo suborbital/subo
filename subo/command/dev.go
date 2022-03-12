@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/suborbital/subo/builder/context"
+	"github.com/suborbital/subo/project"
 	"github.com/suborbital/subo/subo/util"
 )
 
@@ -23,7 +23,7 @@ func DevCmd() *cobra.Command {
 				cwd = "$HOME"
 			}
 
-			bctx, err := context.ForDirectory(cwd)
+			bctx, err := project.ForDirectory(cwd)
 			if err != nil {
 				return errors.Wrap(err, "failed to get CurrentBuildContext")
 			}
