@@ -94,11 +94,11 @@ func BuildCmd() *cobra.Command {
 			pkgJobs := []packager.PackageJob{}
 
 			if shouldBundle {
-				pkgJobs = append(pkgJobs, packager.NewBundleJob())
+				pkgJobs = append(pkgJobs, packager.NewBundlePackageJob())
 			}
 
 			if shouldDockerBuild && !bdr.Context.CwdIsRunnable {
-				pkgJobs = append(pkgJobs, packager.NewDockerImageJob())
+				pkgJobs = append(pkgJobs, packager.NewDockerImagePackageJob())
 			}
 
 			if err := pkgr.Package(bdr.Context, pkgJobs...); err != nil {

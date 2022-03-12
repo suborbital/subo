@@ -11,21 +11,21 @@ import (
 
 const dockerImageJobType = "docker"
 
-type DockerImageJob struct{}
+type DockerImagePackageJob struct{}
 
-func NewDockerImageJob() PackageJob {
-	b := &DockerImageJob{}
+func NewDockerImagePackageJob() PackageJob {
+	b := &DockerImagePackageJob{}
 
 	return b
 }
 
 // Type returns the job type
-func (b *DockerImageJob) Type() string {
+func (b *DockerImagePackageJob) Type() string {
 	return dockerImageJobType
 }
 
 // Package packages the application
-func (b *DockerImageJob) Package(log util.FriendlyLogger, ctx *project.Context) error {
+func (b *DockerImagePackageJob) Package(log util.FriendlyLogger, ctx *project.Context) error {
 	if err := ctx.HasDockerfile(); err != nil {
 		return errors.Wrap(err, "missing Dockerfile")
 	}
