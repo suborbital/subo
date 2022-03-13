@@ -2,7 +2,6 @@ package packager
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/suborbital/subo/project"
@@ -37,24 +36,13 @@ func (b *DockerPublishJob) Publish(log util.FriendlyLogger, ctx *project.Context
 		return errors.New("cannot publish without runnables.wasm.zip, run `subo build` first")
 	}
 
-	imagesCmd := "docker images --format '{{ .Repository }}:{{ .Tag }}'"
-
-	imagesOutput, err := util.RunSilent(imagesCmd)
-	if err != nil {
-		return errors.Wrap(err, "failed to Run images command")
-	}
-
 	imageName, err := project.DockerNameFromDirective(ctx.Directive)
 	if err != nil {
 		return errors.Wrap(err, "failed to dockerNameFromDirective")
 	}
 
-	if !strings.Contains(imagesOutput, imageName) {
-		return fmt.Errorf("image %s not found, run `subo build --docker` first", imageName)
-	}
-
-	if _, err := util.Run(fmt.Sprintf("docker push %s", imageName)); err != nil {
-		return errors.Wrap(err, "failed to Run docker push")
+	if _, err := util.Run(fmt.Sprintf("docker buildx build . --platform linux/amd64,linux/arm64 -t %s --push", imageName)); err != nil {
+		return errors.Wrap(err, "failed to Run docker")
 	}
 
 	util.LogDone(fmt.Sprintf("pushed Docker image -> %s", imageName))
