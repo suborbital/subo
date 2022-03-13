@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
@@ -121,4 +122,18 @@ func getHandlerFnList(dxe *directive.Directive) []string {
 	}
 
 	return fns
+}
+
+func DockerNameFromDirective(d *directive.Directive) (string, error) {
+	identParts := strings.Split(d.Identifier, ".")
+	if len(identParts) != 3 {
+		return "", errors.New("ident has incorrect number of parts")
+	}
+
+	org := identParts[1]
+	repo := identParts[2]
+
+	name := fmt.Sprintf("%s/%s:%s", org, repo, d.AppVersion)
+
+	return name, nil
 }

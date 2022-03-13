@@ -17,4 +17,5 @@ const (
 	resetFlag           = "reset"
 	localFlag           = "local"
 	proxyPortFlag       = "proxy-port"
+	domainFlag          = "domain"
 )
