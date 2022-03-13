@@ -14,6 +14,7 @@ import (
 
 var validPublishTypes = map[string]bool{
 	"bindle": true,
+	"docker": true,
 }
 
 //PushCmd packages the current project into a Bindle and pushes it to a Bindle server.
@@ -45,6 +46,8 @@ func PushCmd() *cobra.Command {
 			switch publishType {
 			case "bindle":
 				pubJob = packager.NewBindlePublishJob()
+			case "docker":
+				pubJob = packager.NewDockerPublishJob()
 			}
 
 			if err := pkgr.Publish(ctx, pubJob); err != nil {

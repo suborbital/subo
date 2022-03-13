@@ -150,7 +150,7 @@ func (b *BindlePublishJob) Publish(log util.FriendlyLogger, ctx *project.Context
 		return errors.Wrap(err, "failed to WriteFile for Invoice.toml")
 	}
 
-	util.LogDone("pushed")
+	util.LogDone("pushed bindle")
 
 	return nil
 }
