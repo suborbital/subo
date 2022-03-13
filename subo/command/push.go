@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
+	"github.com/suborbital/subo/packager"
 	"github.com/suborbital/subo/project"
 	"github.com/suborbital/subo/publisher"
 	"github.com/suborbital/subo/subo/util"
@@ -14,6 +15,7 @@ import (
 
 var validPublishTypes = map[string]bool{
 	"bindle": true,
+	"docker": true,
 }
 
 //PushCmd packages the current project into a Bindle and pushes it to a Bindle server.
@@ -45,6 +47,8 @@ func PushCmd() *cobra.Command {
 			switch publishType {
 			case publisher.BindlePublishJobType:
 				pubJob = publisher.NewBindlePublishJob()
+			case publisher.DockerPackageJobType:
+				pubJob = packager.NewDockerPublishJob()
 			default:
 				return fmt.Errorf("invalid push destination %s", publishType)
 			}

@@ -28,7 +28,7 @@ func CollectStaticFiles(cwd string) (map[string]os.File, error) {
 
 	files := map[string]os.File{}
 
-	filepath.Walk(staticDir, func(path string, info os.FileInfo, err error) error {
+	filepath.Walk(staticDir, func(path string, info os.FileInfo, _ error) error {
 		if info.IsDir() {
 			return nil
 		}
