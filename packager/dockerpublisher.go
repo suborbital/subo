@@ -44,7 +44,7 @@ func (b *DockerPublishJob) Publish(log util.FriendlyLogger, ctx *project.Context
 		return errors.Wrap(err, "failed to Run images command")
 	}
 
-	imageName, err := dockerNameFromDirective(ctx.Directive)
+	imageName, err := project.DockerNameFromDirective(ctx.Directive)
 	if err != nil {
 		return errors.Wrap(err, "failed to dockerNameFromDirective")
 	}

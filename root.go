@@ -46,6 +46,7 @@ including building WebAssembly Runnables and Atmo projects.`,
 
 	cmd.AddCommand(create)
 	cmd.AddCommand(command.BuildCmd())
+	cmd.AddCommand(command.DeployCmd())
 	cmd.AddCommand(command.DevCmd())
 	cmd.AddCommand(command.CleanCmd())
 

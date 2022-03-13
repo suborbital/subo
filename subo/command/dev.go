@@ -25,7 +25,7 @@ func DevCmd() *cobra.Command {
 
 			bctx, err := project.ForDirectory(cwd)
 			if err != nil {
-				return errors.Wrap(err, "failed to get CurrentBuildContext")
+				return errors.Wrap(err, "failed to project.ForDirectory")
 			}
 
 			if bctx.Directive == nil {
