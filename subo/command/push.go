@@ -22,8 +22,8 @@ var validPublishTypes = map[string]bool{
 func PushCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "push",
-		Short: "publish the project",
-		Long:  "publish the current project to a remote server",
+		Short: "publish a project",
+		Long:  "publish the current project to a remote server (Docker, Bindle, etc.)",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			publishType := args[0]
