@@ -17,7 +17,7 @@ var validDeployTypes = map[string]bool{
 	"k8s":        true,
 }
 
-//DeployCmd deploys the current project
+//DeployCmd deploys the current project.
 func DeployCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "deploy",
