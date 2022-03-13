@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+
 	"github.com/suborbital/subo/builder/template"
 	"github.com/suborbital/subo/project"
 	"github.com/suborbital/subo/subo/util"
@@ -63,7 +64,7 @@ func (k *K8sDeployJob) Deploy(log util.FriendlyLogger, ctx *project.Context) err
 
 	if err := os.RemoveAll(filepath.Join(ctx.Cwd, ".deployment")); err != nil {
 		if os.IsNotExist(err) {
-			//that's fine
+			//that's fine.
 		} else {
 			return errors.Wrap(err, "failed to RemoveAll")
 		}
@@ -101,7 +102,7 @@ func (k *K8sDeployJob) Deploy(log util.FriendlyLogger, ctx *project.Context) err
 		}
 	}
 
-	// if this fails, that's ok (the ns may already exist)
+	// if this fails, that's ok (the ns may already exist).
 	util.Run("kubectl create ns suborbital")
 
 	if _, err := util.Run("kubectl apply -f .deployment/"); err != nil {

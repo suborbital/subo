@@ -19,7 +19,7 @@ func RunInDir(cmd, dir string) (string, error) {
 	return run(cmd, dir, false)
 }
 
-// RunSilent runs a command without printing to stdout and returns the full output or error
+// RunSilent runs a command without printing to stdout and returns the full output or error.
 func RunSilent(cmd string) (string, error) {
 	return run(cmd, "", true)
 }
