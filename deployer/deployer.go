@@ -2,6 +2,7 @@ package deployer
 
 import (
 	"github.com/pkg/errors"
+
 	"github.com/suborbital/subo/project"
 	"github.com/suborbital/subo/subo/util"
 )
@@ -15,7 +16,7 @@ type DeployJob interface {
 	Deploy(util.FriendlyLogger, *project.Context) error
 }
 
-// New creates a new Deployer
+// New creates a new Deployer.
 func New(log util.FriendlyLogger) *Deployer {
 	d := &Deployer{
 		log: log,
