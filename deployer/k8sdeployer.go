@@ -3,6 +3,7 @@ package deployer
 import (
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/suborbital/subo/builder/template"
@@ -54,7 +55,7 @@ func (k *K8sDeployJob) Deploy(log util.FriendlyLogger, ctx *project.Context) err
 	}
 
 	data := deploymentData{
-		Identifier: ctx.Directive.Identifier,
+		Identifier: strings.Replace(ctx.Directive.Identifier, ".", "-", -1),
 		AppVersion: ctx.Directive.AppVersion,
 		ImageName:  imageName,
 		Domain:     k.domain,
@@ -68,7 +69,7 @@ func (k *K8sDeployJob) Deploy(log util.FriendlyLogger, ctx *project.Context) err
 		}
 	}
 
-	if err := os.MkdirAll(filepath.Join(ctx.Cwd, ".deployment"), 0666); err != nil {
+	if err := os.MkdirAll(filepath.Join(ctx.Cwd, ".deployment"), 0700); err != nil {
 		return errors.Wrap(err, "failed to MkdirAll")
 	}
 
