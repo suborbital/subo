@@ -8,7 +8,7 @@ var SuboDotVersion = "0.4.1"
 var FFIVersion = "0.15.0"
 
 // AtmoVersion is the default version of Atmo that will be used for new projects.
-var AtmoVersion = "0.4.3"
+var AtmoVersion = "0.4.4"
 
 // SCCTag is the docker tag used for creating new compute core deployments.
 var SCCTag = "v0.2.0"
