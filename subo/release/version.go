@@ -5,7 +5,7 @@ package release
 var SuboDotVersion = "0.4.1"
 
 // FFIVersion is the FFI version used by this version of subo.
-var FFIVersion = "0.15.0"
+var FFIVersion = "0.15.1"
 
 // AtmoVersion is the default version of Atmo that will be used for new projects.
 var AtmoVersion = "0.4.3"
