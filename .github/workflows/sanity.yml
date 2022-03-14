@@ -39,6 +39,9 @@ jobs:
           subo create runnable swift-test --lang swift --dir ./smoketest
           subo create runnable as-test --lang assemblyscript --dir ./smoketest
           subo create runnable tinygo-test --lang tinygo --dir ./smoketest
+          subo create runnable js-test --lang js --dir ./smoketest
+          subo create runnable ts-test --lang ts --dir ./smoketest
+          subo create runnable gr-test --lang gr --dir ./smoketest
 
       - name: Build project
         run: |
