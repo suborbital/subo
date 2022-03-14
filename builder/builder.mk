@@ -4,7 +4,7 @@ tinygo_ver = $(shell cat ./builder/docker/tinygo/.tinygo-ver)
 
 builder/docker: subo/docker builder/docker/rust builder/docker/swift builder/docker/as builder/docker/tinygo builder/docker/grain builder/docker/javascript
 
-builder/docker/publish: subo/docker/publish builder/docker/rust/publish builder/docker/swift/publish builder/docker/as/publish builder/docker/tinygo/publish builder/docker/grain/publish
+builder/docker/publish: subo/docker/publish builder/docker/rust/publish builder/docker/swift/publish builder/docker/as/publish builder/docker/tinygo/publish builder/docker/grain/publish builder/docker/javascript/publish
 
 builder/docker/dev/publish: subo/docker/publish builder/docker/rust/dev/publish builder/docker/swift/dev/publish builder/docker/as/dev/publish builder/docker/tinygo/dev/publish builder/docker/grain/dev/publish builder/docker/javascript/dev/publish
 
