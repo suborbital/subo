@@ -46,12 +46,12 @@ including building WebAssembly Runnables and Atmo projects.`,
 
 	cmd.AddCommand(create)
 	cmd.AddCommand(command.BuildCmd())
-	cmd.AddCommand(command.DeployCmd())
 	cmd.AddCommand(command.DevCmd())
 	cmd.AddCommand(command.CleanCmd())
 
 	if features.EnableRegistryCommands {
 		cmd.AddCommand(command.PushCmd())
+		cmd.AddCommand(command.DeployCmd())
 	}
 
 	return cmd
