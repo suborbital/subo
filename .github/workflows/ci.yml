@@ -1,0 +1,115 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    tags:
+      - v*
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.44.0
+
+  test:
+    strategy:
+      matrix:
+        golang: [1.17]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.golang }}
+
+      - name: Cache Go mods
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - run: go mod download
+
+      - name: Build Subo
+        run: |
+          make subo
+
+      - name: Create project and runnable
+        run: |
+          export PATH=$PATH:$(go env GOPATH)/bin
+          git config --global init.defaultBranch main
+          subo create project smoketest
+          subo create runnable rs-test --lang rust --dir ./smoketest
+          subo create runnable swift-test --lang swift --dir ./smoketest
+          subo create runnable as-test --lang assemblyscript --dir ./smoketest
+          subo create runnable tinygo-test --lang tinygo --dir ./smoketest
+
+      - name: Build project
+        run: |
+          export PATH=$PATH:$(go env GOPATH)/bin
+          subo build ./smoketest --builder-tag dev
+
+      - name: Check TinyGo version number consistency
+        run: |
+          builder/docker/tinygo/sanity.sh
+
+  # only run if reference is a tag
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.17
+
+      - name: Cache Go mods
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - run: go mod download
+
+      - uses: tibdex/github-app-token@v1
+        id: generate_token
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Get committer name and email
+        id: committer
+        run: |
+          echo "::set-output name=name::$(git --no-pager log -s --format="%an" -1)"
+          echo "::set-output name=email::$(git --no-pager log -s --format="%ae" -1)"
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+          GITHUB_ACTOR_NAME: ${{ steps.committer.outputs.name }}
+          GITHUB_ACTOR_EMAIL: ${{ steps.committer.outputs.email }}
