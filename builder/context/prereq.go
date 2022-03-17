@@ -35,20 +35,20 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 		"assemblyscript": {
 			Prereq{
 				File:    "node_modules",
-				Command: "npm install --include=dev",
+				Command: "yarn",
 			},
 		},
 		"tinygo": {},
 		"typescript": {
 			Prereq{
 				File:    "node_modules",
-				Command: "npm install --include=dev",
+				Command: "yarn",
 			},
 		},
 		"javascript": {
 			Prereq{
 				File:    "node_modules",
-				Command: "npm install --include=dev",
+				Command: "yarn",
 			},
 		},
 	},
@@ -72,20 +72,20 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 		"assemblyscript": {
 			Prereq{
 				File:    "node_modules",
-				Command: "npm install --include=dev",
+				Command: "yarn",
 			},
 		},
 		"tinygo": {},
 		"typescript": {
 			Prereq{
 				File:    "node_modules",
-				Command: "npm install --include=dev",
+				Command: "yarn",
 			},
 		},
 		"javascript": {
 			Prereq{
 				File:    "node_modules",
-				Command: "npm install --include=dev",
+				Command: "yarn",
 			},
 		},
 	},
