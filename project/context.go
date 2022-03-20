@@ -10,10 +10,13 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
+	"github.com/suborbital/atmo/atmo/appsource"
 	"github.com/suborbital/atmo/directive"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
 )
+
+const runnablePath = "runnables.wasm.zip"
 
 // ValidLangs are the available languages.
 var ValidLangs = map[string]bool{
@@ -38,6 +41,7 @@ type Context struct {
 	MountPath     string
 	RelDockerPath string
 	BuilderTag    string
+	AppSource     appsource.AppSource
 }
 
 // RunnableDir represents a directory containing a Runnable.
@@ -69,8 +73,10 @@ func ForDirectory(dir string) (*Context, error) {
 
 	bundle, err := bundleTargetPath(fullDir)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to bundleIfExists")
+		return nil, errors.Wrap(err, "failed to bundleTargetPath")
 	}
+
+	appSource := appsource.NewBundleSource(runnablePath)
 
 	directive, err := readDirectiveFile(fullDir)
 	if err != nil {
@@ -96,6 +102,7 @@ func ForDirectory(dir string) (*Context, error) {
 		MountPath:     fullDir,
 		RelDockerPath: ".",
 		BuilderTag:    fmt.Sprintf("v%s", release.SuboDotVersion),
+		AppSource:     appSource,
 	}
 
 	if directive != nil {
@@ -271,7 +278,7 @@ func getRunnableFromFiles(wd string, files []os.FileInfo) (*RunnableDir, error) 
 }
 
 func bundleTargetPath(cwd string) (*BundleRef, error) {
-	path := filepath.Join(cwd, "runnables.wasm.zip")
+	path := filepath.Join(cwd, runnablePath)
 
 	b := &BundleRef{
 		Fullpath: path,
