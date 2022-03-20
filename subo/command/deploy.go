@@ -15,6 +15,8 @@ import (
 var validDeployTypes = map[string]bool{
 	"kubernetes": true,
 	"k8s":        true,
+	"cloudflare": true,
+	"cf":         true,
 }
 
 //DeployCmd deploys the current project.
@@ -51,6 +53,8 @@ func DeployCmd() *cobra.Command {
 			switch deployType {
 			case "kubernetes", "k8s":
 				deployJob = deployer.NewK8sDeployJob(repo, branch, domain, updateTemplates)
+			case "cloudflare", "cf":
+				deployJob = deployer.NewCloudflareDeployer(repo, branch, domain, updateTemplates)
 			}
 
 			if err := dplyr.Deploy(ctx, deployJob); err != nil {

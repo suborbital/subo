@@ -9,7 +9,7 @@ require (
 	github.com/pelletier/go-toml v1.9.4
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.2.1
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.7.1
 	github.com/suborbital/atmo v0.4.4
 	golang.org/x/mod v0.5.1
 	gopkg.in/yaml.v2 v2.4.0
@@ -17,6 +17,7 @@ require (
 
 require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/cloudflare/cloudflare-go v0.35.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-redis/redis/v8 v8.11.4 // indirect
@@ -44,5 +45,8 @@ require (
 	golang.org/x/crypto v0.0.0-20220307211146-efcb8507fb70 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
+
+replace github.com/cloudflare/cloudflare-go => ./deps/cloudflare-go
