@@ -36,8 +36,9 @@ type Builder struct {
 
 // BuildResult is the results of a build including the built module and logs.
 type BuildResult struct {
-	Succeeded bool
-	OutputLog string
+	RunnableName string `json:"runnableName"`
+	Succeeded    bool   `json:"succeeded"`
+	OutputLog    string `json:"outputLog"`
 }
 
 type Toolchain string
@@ -45,6 +46,7 @@ type Toolchain string
 const (
 	ToolchainNative = Toolchain("native")
 	ToolchainDocker = Toolchain("docker")
+	ToolchainRemote = Toolchain("remote")
 )
 
 // ForDirectory creates a Builder bound to a particular directory.
@@ -80,7 +82,9 @@ func (b *Builder) BuildWithToolchain(tcn Toolchain) error {
 		if tcn == ToolchainNative {
 			b.log.LogStart(fmt.Sprintf("building runnable: %s (%s)", r.Name, r.Runnable.Lang))
 
-			result := &BuildResult{}
+			result := &BuildResult{
+				RunnableName: r.Name,
+			}
 
 			if err := b.checkAndRunPreReqs(r, result); err != nil {
 				return errors.Wrap(err, "🚫 failed to checkAndRunPreReqs")
@@ -118,6 +122,12 @@ func (b *Builder) BuildWithToolchain(tcn Toolchain) error {
 			}
 
 			b.results = append(b.results, *result)
+		}
+	}
+
+	if tcn == ToolchainRemote {
+		if err := b.doRemoteBuild(); err != nil {
+			return errors.Wrap(err, "failed to doRemoteBuild")
 		}
 	}
 
