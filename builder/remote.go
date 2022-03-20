@@ -123,9 +123,9 @@ func (b *Builder) doRemoteBuild() error {
 
 	for _, result := range finalStatus.Results {
 		if result.Succeeded {
-			b.log.LogInfo("built:\n" + result.OutputLog)
+			b.log.LogDone("built " + result.RunnableName + ":\n" + result.OutputLog)
 		} else {
-			b.log.LogFail("failed:\n" + result.OutputLog)
+			b.log.LogFail("failed to build " + result.RunnableName + ":\n" + result.OutputLog)
 		}
 	}
 
