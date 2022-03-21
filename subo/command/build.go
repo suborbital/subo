@@ -90,7 +90,7 @@ func BuildCmd() *cobra.Command {
 				util.LogInfo("📡 using remote toolchain")
 				toolchain = builder.ToolchainRemote
 
-				// remote builder generates a bundle, so we should not attempt to do it again
+				// remote builder generates a bundle, so we should not attempt to do it again.
 				shouldBundle = false
 			} else {
 				util.LogInfo("🐳 using Docker toolchain")

@@ -13,10 +13,11 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+
 	"github.com/suborbital/subo/subo/util"
 )
 
-// BuildStatus represents the status of a build
+// BuildStatus represents the status of a build.
 type BuildStatus struct {
 	UUID      string `json:"uuid"`
 	Status    string `json:"status"`
@@ -25,7 +26,7 @@ type BuildStatus struct {
 	Results []BuildResult `json:"results"`
 }
 
-// buildStartedResponse is a response to a build started request
+// buildStartedResponse is a response to a build started request.
 type buildStartedResponse struct {
 	UUID string `json:"uuid"`
 }
@@ -96,7 +97,7 @@ func (b *Builder) doRemoteBuild() error {
 		if status.Status == "completed" || status.Status == "failed" {
 			break
 		} else if status.Status == "started" {
-			// something to show it isn't stalled
+			// something to show it isn't stalled.
 			fmt.Print(".")
 		}
 
@@ -190,7 +191,7 @@ func archiveForCwd(cwd string) (*bytes.Buffer, error) {
 			return errors.Wrap(err, "failed to Create")
 		}
 
-		// just creating the file is enough for directories
+		// just creating the file is enough for directories.
 		if d.IsDir() {
 			return nil
 		}
