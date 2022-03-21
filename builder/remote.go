@@ -88,12 +88,16 @@ func (b *Builder) doRemoteBuild() error {
 		}
 
 		if newStatus.Status != status.Status {
+			fmt.Print("\n")
 			b.log.LogInfo("build has " + newStatus.Status)
 			status = *newStatus
 		}
 
 		if status.Status == "completed" || status.Status == "failed" {
 			break
+		} else if status.Status == "started" {
+			// something to show it isn't stalled
+			fmt.Print(".")
 		}
 
 		time.Sleep(time.Second * 3)
