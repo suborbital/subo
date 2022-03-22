@@ -88,6 +88,10 @@ func (b *BundlePackageJob) Package(log util.FriendlyLogger, ctx *project.Context
 		return errors.Wrap(err, "failed to Modules for build")
 	}
 
+	for i := range modules {
+		defer modules[i].Close()
+	}
+
 	if err := bundle.Write(directiveBytes, modules, static, ctx.Bundle.Fullpath); err != nil {
 		return errors.Wrap(err, "🚫 failed to WriteBundle")
 	}
