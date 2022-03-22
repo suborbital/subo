@@ -36,7 +36,7 @@ func PushCmd() *cobra.Command {
 
 			ctx, err := project.ForDirectory(cwd)
 			if err != nil {
-				return errors.Wrap(err, "failed to get CurrentBuildContext")
+				return errors.Wrap(err, "failed to project.ForDirectory")
 			}
 
 			pkgr := packager.New(&util.PrintLogger{})

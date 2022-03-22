@@ -59,7 +59,7 @@ func CreateRunnableCmd() *cobra.Command {
 			dir, _ := cmd.Flags().GetString(dirFlag)
 			bctx, err := project.ForDirectory(dir)
 			if err != nil {
-				return errors.Wrap(err, "🚫 failed to get CurrentBuildContext")
+				return errors.Wrap(err, "🚫 failed to project.ForDirectory")
 			}
 
 			if bctx.RunnableExists(name) {
