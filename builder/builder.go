@@ -51,7 +51,7 @@ const (
 func ForDirectory(logger util.FriendlyLogger, dir string) (*Builder, error) {
 	ctx, err := project.ForDirectory(dir)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to project.FirDirectory")
+		return nil, errors.Wrap(err, "failed to project.ForDirectory")
 	}
 
 	b := &Builder{
