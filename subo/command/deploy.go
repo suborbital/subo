@@ -50,7 +50,7 @@ func DeployCmd() *cobra.Command {
 
 			switch deployType {
 			case "kubernetes", "k8s":
-				deployJob = deployer.NewK8sDeployJon(repo, branch, domain, updateTemplates)
+				deployJob = deployer.NewK8sDeployJob(repo, branch, domain, updateTemplates)
 			}
 
 			if err := dplyr.Deploy(ctx, deployJob); err != nil {
