@@ -32,7 +32,7 @@ type deploymentData struct {
 }
 
 // NewK8sDeployJob creates a new deploy job.
-func NewK8sDeployJon(repo, branch, domain string, updateTemplates bool) DeployJob {
+func NewK8sDeployJob(repo, branch, domain string, updateTemplates bool) DeployJob {
 	k := &K8sDeployJob{
 		repo:            repo,
 		branch:          branch,
