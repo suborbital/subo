@@ -140,7 +140,7 @@ func (b *Builder) doRemoteBuild() error {
 
 	b.log.LogInfo("downloading build result")
 
-	bundleReq, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost:8082/api/v1/build/source/%s/bundle?shouldDelete=true", build.UUID), nil)
+	bundleReq, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost:8082/api/v1/build/source/%s/bundle", build.UUID), nil)
 	if err != nil {
 		return errors.Wrap(err, "failed to NewRequest")
 	}
@@ -151,7 +151,7 @@ func (b *Builder) doRemoteBuild() error {
 	}
 
 	if bundleResp.StatusCode != http.StatusOK {
-		b.log.LogWarn(fmt.Sprintf("status check failed: %d... will retry", bundleResp.StatusCode))
+		return fmt.Errorf("bundle download failed: %d", bundleResp.StatusCode)
 	}
 
 	defer bundleResp.Body.Close()
@@ -163,6 +163,20 @@ func (b *Builder) doRemoteBuild() error {
 
 	if _, err := io.Copy(bundleFile, bundleResp.Body); err != nil {
 		return errors.Wrap(err, "failed to Copy")
+	}
+
+	deleteReq, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("http://localhost:8082/api/v1/build/source/%s", build.UUID), nil)
+	if err != nil {
+		return errors.Wrap(err, "failed to NewRequest")
+	}
+
+	deleteResp, err := http.DefaultClient.Do(deleteReq)
+	if err != nil {
+		return errors.Wrap(err, "failed to Do")
+	}
+
+	if deleteResp.StatusCode != http.StatusOK {
+		b.log.LogWarn(fmt.Sprintf("build deletion failed: %d", deleteResp.StatusCode))
 	}
 
 	b.log.LogDone("remote build complete")
