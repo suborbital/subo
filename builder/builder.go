@@ -135,9 +135,9 @@ func (b *Builder) Results() ([]BuildResult, error) {
 }
 
 func (b *Builder) dockerBuildForLang(lang string) (*BuildResult, error) {
-	img := ImageForLang(lang, b.Context.BuilderTag)
-	if img == "" {
-		return nil, fmt.Errorf("%q is not a supported language", lang)
+	img, err := ImageForLang(lang, b.Context.BuilderTag)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to ImageForLang")
 	}
 
 	result := &BuildResult{}
@@ -192,13 +192,14 @@ func (b *Builder) doNativeBuildForRunnable(r project.RunnableDir, result *BuildR
 	return nil
 }
 
-func ImageForLang(lang, tag string) string {
+// ImageForLang returns the Docker image:tag builder for the given language.
+func ImageForLang(lang, tag string) (string, error) {
 	img, ok := dockerImageForLang[lang]
 	if !ok {
-		return ""
+		return "", fmt.Errorf("%s is an unsupported language")
 	}
 
-	return fmt.Sprintf("%s:%s", img, tag)
+	return fmt.Sprintf("%s:%s", img, tag), nil
 }
 
 func (b *Builder) checkAndRunPreReqs(runnable project.RunnableDir, result *BuildResult) error {

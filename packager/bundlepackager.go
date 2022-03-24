@@ -16,7 +16,7 @@ import (
 	"github.com/suborbital/subo/subo/util"
 )
 
-const bundleJobType = "bundle"
+const bundlePackageJobType = "bundle"
 
 type BundlePackageJob struct{}
 
@@ -28,7 +28,7 @@ func NewBundlePackageJob() PackageJob {
 
 // Type returns the job type.
 func (b *BundlePackageJob) Type() string {
-	return bundleJobType
+	return bundlePackageJobType
 }
 
 // Package packages the application.
@@ -41,8 +41,7 @@ func (b *BundlePackageJob) Package(log util.FriendlyLogger, ctx *project.Context
 
 	if ctx.Directive == nil {
 		ctx.Directive = &directive.Directive{
-			Identifier: "com.suborbital.app",
-			// TODO: insert some git smarts here?
+			Identifier:  "com.suborbital.app",
 			AppVersion:  "v0.0.1",
 			AtmoVersion: fmt.Sprintf("v%s", release.AtmoVersion),
 		}
@@ -51,10 +50,12 @@ func (b *BundlePackageJob) Package(log util.FriendlyLogger, ctx *project.Context
 
 		// Bump the appVersion since we're in headless mode.
 		majorStr := strings.TrimPrefix(semver.Major(ctx.Directive.AppVersion), "v")
-		major, _ := strconv.Atoi(majorStr)
-		new := fmt.Sprintf("v%d.0.0", major+1)
+		major, err := strconv.Atoi(majorStr)
+		if err != nil {
+			return errors.Wrap(err, "failed to Atoi major version")
+		}
 
-		ctx.Directive.AppVersion = new
+		ctx.Directive.AppVersion = fmt.Sprintf("v%d.0.0", major+1)
 
 		if err := project.WriteDirectiveFile(ctx.Cwd, ctx.Directive); err != nil {
 			return errors.Wrap(err, "failed to WriteDirectiveFile")
@@ -74,7 +75,7 @@ func (b *BundlePackageJob) Package(log util.FriendlyLogger, ctx *project.Context
 		return errors.Wrap(err, "failed to CollectStaticFiles")
 	}
 
-	if static != nil {
+	if len(static) > 0 {
 		log.LogInfo("adding static files to bundle")
 	}
 

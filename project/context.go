@@ -15,15 +15,15 @@ import (
 	"github.com/suborbital/subo/subo/util"
 )
 
-// ValidLangs are the available languages.
-var ValidLangs = map[string]bool{
-	"rust":           true,
-	"swift":          true,
-	"assemblyscript": true,
-	"tinygo":         true,
-	"grain":          true,
-	"typescript":     true,
-	"javascript":     true,
+// validLangs are the available languages.
+var validLangs = map[string]struct{}{
+	"rust":           {},
+	"swift":          {},
+	"assemblyscript": {},
+	"tinygo":         {},
+	"grain":          {},
+	"typescript":     {},
+	"javascript":     {},
 }
 
 // Context describes the context under which the tool is being run.
@@ -153,7 +153,7 @@ func (b *Context) HasDockerfile() error {
 	dockerfilePath := filepath.Join(b.Cwd, "Dockerfile")
 
 	if _, err := os.Stat(dockerfilePath); err != nil {
-		return errors.Wrap(err, "failed to Stat")
+		return errors.Wrap(err, "failed to Stat Dockerfile")
 	}
 
 	return nil
@@ -164,7 +164,7 @@ func (r *RunnableDir) HasModule() error {
 	runnablePath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
 
 	if _, err := os.Stat(runnablePath); err != nil {
-		return errors.Wrap(err, "failed to Stat")
+		return errors.Wrapf(err, "failed to Stat %s", runnablePath)
 	}
 
 	return nil
@@ -227,6 +227,13 @@ func ContainsRunnableYaml(files []os.FileInfo) (string, bool) {
 	return "", false
 }
 
+// IsValidLang returns true if a language is valid.
+func IsValidLang(lang string) bool {
+	_, exists := validLangs[lang]
+
+	return exists
+}
+
 func getRunnableFromFiles(wd string, files []os.FileInfo) (*RunnableDir, error) {
 	filename, exists := ContainsRunnableYaml(files)
 	if !exists {
@@ -251,7 +258,7 @@ func getRunnableFromFiles(wd string, files []os.FileInfo) (*RunnableDir, error) 
 		runnable.Namespace = "default"
 	}
 
-	if _, exists := ValidLangs[runnable.Lang]; !exists {
+	if ok := IsValidLang(runnable.Lang); !ok {
 		return nil, fmt.Errorf("(%s) %s is not a valid lang", runnable.Name, runnable.Lang)
 	}
 
