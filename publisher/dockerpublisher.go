@@ -15,7 +15,7 @@ const (
 
 type DockerPublishJob struct{}
 
-// NewDockerPublishJob returns a new PublishJob for Bindle.
+// NewDockerPublishJob returns a new PublishJob for Docker images.
 func NewDockerPublishJob() PublishJob {
 	d := &DockerPublishJob{}
 
