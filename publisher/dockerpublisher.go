@@ -1,4 +1,4 @@
-package packager
+package publisher
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	dockerPublishJobType = "docker"
+	DockerPublishJobType = "docker"
 )
 
 type DockerPublishJob struct{}
@@ -24,7 +24,7 @@ func NewDockerPublishJob() PublishJob {
 
 // Type returns the publish job's type.
 func (b *DockerPublishJob) Type() string {
-	return dockerPublishJobType
+	return DockerPublishJobType
 }
 
 // Publish publishes the application.

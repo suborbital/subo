@@ -196,7 +196,7 @@ func (b *Builder) doNativeBuildForRunnable(r project.RunnableDir, result *BuildR
 func ImageForLang(lang, tag string) (string, error) {
 	img, ok := dockerImageForLang[lang]
 	if !ok {
-		return "", fmt.Errorf("%s is an unsupported language")
+		return "", fmt.Errorf("%s is an unsupported language", lang)
 	}
 
 	return fmt.Sprintf("%s:%s", img, tag), nil
