@@ -1,8 +1,6 @@
-FROM suborbital/subo:dev as subo
-
 FROM ghcr.io/swiftwasm/swift:focal
 
-COPY --from=subo /go/bin/subo /usr/local/bin
+COPY --from=suborbital/subo:dev  /go/bin/subo /usr/local/bin
 
 RUN mkdir -p /root/runnable
 

@@ -1,17 +1,6 @@
-FROM suborbital/tinygo-base:v0.22.0 as builder
-FROM suborbital/subo:dev as subo
+ARG BUILDER_VERSION
+FROM suborbital/build-pack:${BUILDER_VERSION}
 
-FROM golang:bullseye
+ENV PATH=$PATH:/usr/local/go/bin
 
-COPY --from=subo /go/bin/subo /usr/local/bin
-COPY --from=builder /root/tinygo/build/release.tar.gz /usr/local/.
-WORKDIR /usr/local
-RUN tar -xzf release.tar.gz \
-    && rm release.tar.gz
-
-RUN ln -s /usr/local/tinygo/bin/tinygo /usr/local/bin/tinygo
-RUN ln -s /usr/local/tinygo/bin/wasm-opt /usr/local/bin/wasm-opt
-
-WORKDIR /root/runnable
-
-RUN go mod download github.com/suborbital/reactr@latest
+RUN /root/install.sh tinygo

@@ -1,16 +1,18 @@
 include ./builder/builder.mk
 include ./subo/release/release.mk
 
+image_ver = $(shell git describe --tags --dirty)
+
 GO_INSTALL=go install -ldflags $(RELEASE_FLAGS)
 
 subo:
 	$(GO_INSTALL)
 
-subo/dev: lint
+subo/dev:
 	$(GO_INSTALL) -tags=development
 
 subo/docker:
-	docker build . -t suborbital/subo:dev
+	docker build . -t suborbital/subo:$(image_ver)
 
 subo/docker/publish:
 	docker buildx build . --platform linux/amd64,linux/arm64 -t suborbital/subo:dev --push

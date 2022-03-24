@@ -1,15 +1,8 @@
-FROM suborbital/subo:dev as subo
+ARG BUILDER_VERSION
+FROM suborbital/build-pack:${BUILDER_VERSION}
 
-FROM rust:1.56.1-slim-buster
+ENV CARGO_HOME=/usr/local/cargo\
+    RUSTUP_HOME=/usr/local/rustup\
+    PATH=/usr/local/cargo/bin:$PATH
 
-WORKDIR /root
-RUN mkdir runnable; mkdir suborbital
-
-# install the wasm target and then install something that
-# doesn't exist (and ignore the error) to update the crates.io index
-RUN rustup target install wasm32-wasi
-RUN cargo install lazy_static; exit 0
-
-COPY --from=subo /go/bin/subo /usr/local/bin
-
-WORKDIR /root/runnable
+RUN /root/install.sh rust
