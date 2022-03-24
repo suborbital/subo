@@ -78,9 +78,9 @@ func CreateRunnableCmd() *cobra.Command {
 				return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to writeDotRunnable")
 			}
 
-			templatesPath, err := template.TemplateFullPath(repo, branch)
+			templatesPath, err := template.FullPath(repo, branch)
 			if err != nil {
-				return errors.Wrap(NewCreateRunnableError(path, err), "failed to TemplateDir")
+				return errors.Wrap(NewCreateRunnableError(path, err), "failed to template.FullPath")
 			}
 
 			if update, _ := cmd.Flags().GetBool(updateTemplatesFlag); update {
@@ -132,7 +132,7 @@ func writeDotRunnable(cwd, name, lang, namespace string) (*directive.Runnable, e
 		lang = actual
 	}
 
-	if _, valid := project.ValidLangs[lang]; !valid {
+	if valid := project.IsValidLang(lang); !valid {
 		return nil, fmt.Errorf("%s is not an available language", lang)
 	}
 

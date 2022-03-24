@@ -10,7 +10,7 @@ import (
 	"github.com/suborbital/subo/subo/util"
 )
 
-const dockerImageJobType = "docker"
+const dockerImagePackageJobType = "docker"
 
 type DockerImagePackageJob struct{}
 
@@ -22,7 +22,7 @@ func NewDockerImagePackageJob() PackageJob {
 
 // Type returns the job type.
 func (b *DockerImagePackageJob) Type() string {
-	return dockerImageJobType
+	return dockerImagePackageJobType
 }
 
 // Package packages the application.
@@ -40,7 +40,9 @@ func (b *DockerImagePackageJob) Package(log util.FriendlyLogger, ctx *project.Co
 		return errors.Wrap(err, "failed to dockerNameFromDirective")
 	}
 
-	os.Setenv("DOCKER_BUILDKIT", "0")
+	if err := os.Setenv("DOCKER_BUILDKIT", "0"); err != nil {
+		util.LogWarn("DOCKER_BUILDKIT=0 could not be set, Docker build may be problematic on M1 Macs.")
+	}
 
 	if _, err := util.Run(fmt.Sprintf("docker build . -t=%s", imageName)); err != nil {
 		return errors.Wrap(err, "🚫 failed to build Docker image")

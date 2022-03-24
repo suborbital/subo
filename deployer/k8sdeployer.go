@@ -1,6 +1,7 @@
 package deployer
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -63,20 +64,18 @@ func (k *K8sDeployJob) Deploy(log util.FriendlyLogger, ctx *project.Context) err
 	}
 
 	if err := os.RemoveAll(filepath.Join(ctx.Cwd, ".deployment")); err != nil {
-		if os.IsNotExist(err) {
-			//that's fine.
-		} else {
-			return errors.Wrap(err, "failed to RemoveAll")
+		if !os.IsNotExist(err) {
+			return errors.Wrap(err, "failed to RemoveAll deployment files")
 		}
 	}
 
-	if err := os.MkdirAll(filepath.Join(ctx.Cwd, ".deployment"), 0700); err != nil {
-		return errors.Wrap(err, "failed to MkdirAll")
+	if err := os.MkdirAll(filepath.Join(ctx.Cwd, ".deployment"), util.PermDirectory); err != nil {
+		return errors.Wrap(err, "failed to MkdirAll .deployment")
 	}
 
-	templatesPath, err := template.TemplateFullPath(k.repo, k.branch)
+	templatesPath, err := template.FullPath(k.repo, k.branch)
 	if err != nil {
-		return errors.Wrap(err, "failed to TemplateDir")
+		return errors.Wrap(err, "failed to template.FullPath")
 	}
 
 	if k.updateTemplates {
@@ -102,8 +101,9 @@ func (k *K8sDeployJob) Deploy(log util.FriendlyLogger, ctx *project.Context) err
 		}
 	}
 
-	// if this fails, that's ok (the ns may already exist).
-	util.Run("kubectl create ns suborbital")
+	if out, err := util.Run("kubectl create ns suborbital"); err != nil {
+		log.LogWarn(fmt.Sprintf("failed to create `suborbital` namespace (may alrady exist): %s", out))
+	}
 
 	if _, err := util.Run("kubectl apply -f .deployment/"); err != nil {
 		return errors.Wrap(err, "failed to Run kubectl apply")

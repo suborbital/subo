@@ -13,7 +13,7 @@ type Deployer struct {
 
 type DeployJob interface {
 	Type() string
-	Deploy(util.FriendlyLogger, *project.Context) error
+	Deploy(logger util.FriendlyLogger, pctx *project.Context) error
 }
 
 // New creates a new Deployer.
