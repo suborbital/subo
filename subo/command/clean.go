@@ -23,7 +23,7 @@ func CleanCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cwd, err := os.Getwd()
 			if err != nil {
-				cwd = "$HOME"
+				return errors.Wrap(err, "failed to Getwd")
 			}
 
 			bctx, err := project.ForDirectory(cwd)

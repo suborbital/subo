@@ -11,7 +11,7 @@ import (
 	"github.com/suborbital/subo/subo/util"
 )
 
-func TemplateFullPath(repo, branch string) (string, error) {
+func FullPath(repo, branch string) (string, error) {
 	repoParts := strings.Split(repo, "/")
 	if len(repoParts) != 2 {
 		return "", fmt.Errorf("repo is invalid, contains %d parts", len(repoParts))

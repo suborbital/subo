@@ -56,9 +56,9 @@ func CreateProjectCmd() *cobra.Command {
 			environment, _ := cmd.Flags().GetString(environmentFlag)
 			headless, _ := cmd.Flags().GetBool(headlessFlag)
 
-			templatesPath, err := template.TemplateFullPath(defaultRepo, branch)
+			templatesPath, err := template.FullPath(defaultRepo, branch)
 			if err != nil {
-				return errors.Wrap(err, "🚫 failed to TemplateFullPath")
+				return errors.Wrap(err, "🚫 failed to template.FullPath")
 			}
 
 			if update, _ := cmd.Flags().GetBool(updateTemplatesFlag); update {

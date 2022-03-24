@@ -32,7 +32,7 @@ func PushCmd() *cobra.Command {
 
 			cwd, err := os.Getwd()
 			if err != nil {
-				cwd = "$HOME"
+				return errors.Wrap(err, "failed to Getwd")
 			}
 
 			ctx, err := project.ForDirectory(cwd)
