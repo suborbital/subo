@@ -28,7 +28,7 @@ var nativeCommandsForLang = map[string]map[string][]string{
 			"cp .build/debug/{{ .Name }}.wasm .",
 		},
 		"assemblyscript": {
-			"yarn run asbuild",
+			"npm run asbuild",
 		},
 		"tinygo": {
 			"go get -d",
@@ -39,10 +39,10 @@ var nativeCommandsForLang = map[string]map[string][]string{
 			"grain compile index.gr -I _lib -o {{ .Name }}.wasm",
 		},
 		"typescript": {
-			"yarn run build",
+			"npm run build",
 		},
 		"javascript": {
-			"yarn run build",
+			"npm run build",
 		},
 	},
 	"linux": {
@@ -68,10 +68,10 @@ var nativeCommandsForLang = map[string]map[string][]string{
 			"grain compile index.gr -I _lib -o {{ .Name }}.wasm",
 		},
 		"typescript": {
-			"yarn run build",
+			"npm run build",
 		},
 		"javascript": {
-			"yarn run build",
+			"npm run build",
 		},
 	},
 }
