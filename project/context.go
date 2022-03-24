@@ -227,7 +227,7 @@ func ContainsRunnableYaml(files []os.FileInfo) (string, bool) {
 	return "", false
 }
 
-// IsValidLang returns true if a language is valid
+// IsValidLang returns true if a language is valid.
 func IsValidLang(lang string) bool {
 	_, exists := validLangs[lang]
 

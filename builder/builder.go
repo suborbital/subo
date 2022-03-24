@@ -192,7 +192,7 @@ func (b *Builder) doNativeBuildForRunnable(r project.RunnableDir, result *BuildR
 	return nil
 }
 
-// ImageForLang returns the Docker image:tag builder for the given language
+// ImageForLang returns the Docker image:tag builder for the given language.
 func ImageForLang(lang, tag string) (string, error) {
 	img, ok := dockerImageForLang[lang]
 	if !ok {
