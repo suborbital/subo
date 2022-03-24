@@ -7,8 +7,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/suborbital/subo/packager"
 	"github.com/suborbital/subo/project"
+	"github.com/suborbital/subo/publisher"
 	"github.com/suborbital/subo/subo/util"
 )
 
@@ -39,15 +39,17 @@ func PushCmd() *cobra.Command {
 				return errors.Wrap(err, "failed to project.ForDirectory")
 			}
 
-			pkgr := packager.New(&util.PrintLogger{})
-			var pubJob packager.PublishJob
+			pshr := publisher.New(&util.PrintLogger{})
+			var pubJob publisher.PublishJob
 
 			switch publishType {
-			case "bindle":
-				pubJob = packager.NewBindlePublishJob()
+			case publisher.BindlePublishJobType:
+				pubJob = publisher.NewBindlePublishJob()
+			default:
+				return fmt.Errorf("invalid push destination %s", publishType)
 			}
 
-			if err := pkgr.Publish(ctx, pubJob); err != nil {
+			if err := pshr.Publish(ctx, pubJob); err != nil {
 				return errors.Wrap(err, "failed to Publish")
 			}
 

@@ -132,7 +132,7 @@ func writeDotRunnable(cwd, name, lang, namespace string) (*directive.Runnable, e
 		lang = actual
 	}
 
-	if _, valid := project.ValidLangs[lang]; !valid {
+	if valid := project.IsValidLang(lang); !valid {
 		return nil, fmt.Errorf("%s is not an available language", lang)
 	}
 
