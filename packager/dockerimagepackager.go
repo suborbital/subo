@@ -39,11 +39,16 @@ func (b *DockerImagePackageJob) Package(log util.FriendlyLogger, ctx *project.Co
 		util.LogWarn("DOCKER_BUILDKIT=0 could not be set, Docker build may be problematic on M1 Macs.")
 	}
 
-	if _, err := util.Run(fmt.Sprintf("docker build . -t=%s:%s", ctx.Directive.Identifier, ctx.Directive.AppVersion)); err != nil {
+	imageName, err := project.DockerNameFromDirective(ctx.Directive)
+	if err != nil {
+		return errors.Wrap(err, "failed to dockerNameFromDirective")
+	}
+
+	if _, err := util.Run(fmt.Sprintf("docker build . -t=%s", imageName)); err != nil {
 		return errors.Wrap(err, "🚫 failed to build Docker image")
 	}
 
-	util.LogDone(fmt.Sprintf("built Docker image -> %s:%s", ctx.Directive.Identifier, ctx.Directive.AppVersion))
+	util.LogDone(fmt.Sprintf("built Docker image -> %s", imageName))
 
 	return nil
 }

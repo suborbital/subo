@@ -14,14 +14,15 @@ import (
 
 var validPublishTypes = map[string]bool{
 	"bindle": true,
+	"docker": true,
 }
 
 //PushCmd packages the current project into a Bindle and pushes it to a Bindle server.
 func PushCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "push",
-		Short: "publish the project",
-		Long:  "publish the current project to a remote server",
+		Short: "publish a project",
+		Long:  "publish the current project to a remote server (Docker, Bindle, etc.)",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			publishType := args[0]
@@ -31,7 +32,7 @@ func PushCmd() *cobra.Command {
 
 			cwd, err := os.Getwd()
 			if err != nil {
-				cwd = "$HOME"
+				return errors.Wrap(err, "failed to Getwd")
 			}
 
 			ctx, err := project.ForDirectory(cwd)
@@ -45,6 +46,8 @@ func PushCmd() *cobra.Command {
 			switch publishType {
 			case publisher.BindlePublishJobType:
 				pubJob = publisher.NewBindlePublishJob()
+			case publisher.DockerPublishJobType:
+				pubJob = publisher.NewDockerPublishJob()
 			default:
 				return fmt.Errorf("invalid push destination %s", publishType)
 			}
