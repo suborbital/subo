@@ -7,22 +7,27 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
-	"golang.org/x/mod/semver"
 
-	"github.com/suborbital/atmo/bundle"
-	"github.com/suborbital/atmo/directive"
-	"github.com/suborbital/subo/builder/context"
-	"github.com/suborbital/subo/subo/release"
+	"github.com/suborbital/subo/project"
 	"github.com/suborbital/subo/subo/util"
 )
 
+var dockerImageForLang = map[string]string{
+	"rust":           "suborbital/builder-rs",
+	"swift":          "suborbital/builder-swift",
+	"assemblyscript": "suborbital/builder-as",
+	"tinygo":         "suborbital/builder-tinygo",
+	"grain":          "--platform linux/amd64 suborbital/builder-gr",
+	"typescript":     "suborbital/builder-js",
+	"javascript":     "suborbital/builder-js",
+}
+
 // Builder is capable of building Wasm modules from source.
 type Builder struct {
-	Context *context.BuildContext
+	Context *project.Context
 
 	results []BuildResult
 
@@ -44,9 +49,9 @@ const (
 
 // ForDirectory creates a Builder bound to a particular directory.
 func ForDirectory(logger util.FriendlyLogger, dir string) (*Builder, error) {
-	ctx, err := context.ForDirectory(dir)
+	ctx, err := project.ForDirectory(dir)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to context.FirDirectory")
+		return nil, errors.Wrap(err, "failed to project.ForDirectory")
 	}
 
 	b := &Builder{
@@ -129,71 +134,10 @@ func (b *Builder) Results() ([]BuildResult, error) {
 	return b.results, nil
 }
 
-func (b *Builder) Bundle() error {
-	if b.results == nil || len(b.results) == 0 {
-		return errors.New("must build before calling Bundle")
-	}
-
-	if b.Context.Directive == nil {
-		b.Context.Directive = &directive.Directive{
-			Identifier: "com.suborbital.app",
-			// TODO: insert some git smarts here?
-			AppVersion:  "v0.0.1",
-			AtmoVersion: fmt.Sprintf("v%s", release.AtmoVersion),
-		}
-	} else if b.Context.Directive.Headless {
-		b.log.LogInfo("updating Directive")
-
-		// Bump the appVersion since we're in headless mode.
-		majorStr := strings.TrimPrefix(semver.Major(b.Context.Directive.AppVersion), "v")
-		major, _ := strconv.Atoi(majorStr)
-		new := fmt.Sprintf("v%d.0.0", major+1)
-
-		b.Context.Directive.AppVersion = new
-
-		if err := context.WriteDirectiveFile(b.Context.Cwd, b.Context.Directive); err != nil {
-			return errors.Wrap(err, "failed to WriteDirectiveFile")
-		}
-	}
-
-	if err := context.AugmentAndValidateDirectiveFns(b.Context.Directive, b.Context.Runnables); err != nil {
-		return errors.Wrap(err, "🚫 failed to AugmentAndValidateDirectiveFns")
-	}
-
-	if err := b.Context.Directive.Validate(); err != nil {
-		return errors.Wrap(err, "🚫 failed to Validate Directive")
-	}
-
-	static, err := context.CollectStaticFiles(b.Context.Cwd)
-	if err != nil {
-		return errors.Wrap(err, "failed to CollectStaticFiles")
-	}
-
-	if static != nil {
-		b.log.LogInfo("adding static files to bundle")
-	}
-
-	directiveBytes, err := b.Context.Directive.Marshal()
-	if err != nil {
-		return errors.Wrap(err, "failed to Directive.Marshal")
-	}
-
-	modules, err := b.Context.Modules()
-	if err != nil {
-		return errors.Wrap(err, "failed to Modules for build")
-	}
-
-	if err := bundle.Write(directiveBytes, modules, static, b.Context.Bundle.Fullpath); err != nil {
-		return errors.Wrap(err, "🚫 failed to WriteBundle")
-	}
-
-	return nil
-}
-
 func (b *Builder) dockerBuildForLang(lang string) (*BuildResult, error) {
-	img := context.ImageForLang(lang, b.Context.BuilderTag)
-	if img == "" {
-		return nil, fmt.Errorf("%q is not a supported language", lang)
+	img, err := ImageForLang(lang, b.Context.BuilderTag)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to ImageForLang")
 	}
 
 	result := &BuildResult{}
@@ -213,8 +157,8 @@ func (b *Builder) dockerBuildForLang(lang string) (*BuildResult, error) {
 }
 
 // results and resulting file are loaded into the BuildResult pointer.
-func (b *Builder) doNativeBuildForRunnable(r context.RunnableDir, result *BuildResult) error {
-	cmds, err := context.NativeBuildCommands(r.Runnable.Lang)
+func (b *Builder) doNativeBuildForRunnable(r project.RunnableDir, result *BuildResult) error {
+	cmds, err := NativeBuildCommands(r.Runnable.Lang)
 	if err != nil {
 		return errors.Wrap(err, "failed to NativeBuildCommands")
 	}
@@ -248,8 +192,18 @@ func (b *Builder) doNativeBuildForRunnable(r context.RunnableDir, result *BuildR
 	return nil
 }
 
-func (b *Builder) checkAndRunPreReqs(runnable context.RunnableDir, result *BuildResult) error {
-	preReqLangs, ok := context.PreRequisiteCommands[runtime.GOOS]
+// ImageForLang returns the Docker image:tag builder for the given language.
+func ImageForLang(lang, tag string) (string, error) {
+	img, ok := dockerImageForLang[lang]
+	if !ok {
+		return "", fmt.Errorf("%s is an unsupported language")
+	}
+
+	return fmt.Sprintf("%s:%s", img, tag), nil
+}
+
+func (b *Builder) checkAndRunPreReqs(runnable project.RunnableDir, result *BuildResult) error {
+	preReqLangs, ok := PreRequisiteCommands[runtime.GOOS]
 	if !ok {
 		return fmt.Errorf("unsupported OS: %s", runtime.GOOS)
 	}
@@ -289,7 +243,7 @@ func (b *Builder) checkAndRunPreReqs(runnable context.RunnableDir, result *Build
 
 // analyzeForCompilerFlags looks at the Runnable and determines if any additional compiler flags are needed
 // this is initially added to support AS-JSON in AssemblyScript with its need for the --transform flag.
-func (b *Builder) analyzeForCompilerFlags(runnable context.RunnableDir) (string, error) {
+func (b *Builder) analyzeForCompilerFlags(runnable project.RunnableDir) (string, error) {
 	if runnable.Runnable.Lang == "assemblyscript" {
 		packageJSONBytes, err := ioutil.ReadFile(filepath.Join(runnable.Fullpath, "package.json"))
 		if err != nil {

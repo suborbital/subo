@@ -1,4 +1,4 @@
-package context
+package project
 
 import (
 	"fmt"
@@ -15,18 +15,19 @@ import (
 	"github.com/suborbital/subo/subo/util"
 )
 
-var dockerImageForLang = map[string]string{
-	"rust":           "suborbital/builder-rs",
-	"swift":          "suborbital/builder-swift",
-	"assemblyscript": "suborbital/builder-as",
-	"tinygo":         "suborbital/builder-tinygo",
-	"grain":          "--platform linux/amd64 suborbital/builder-gr",
-	"typescript":     "suborbital/builder-js",
-	"javascript":     "suborbital/builder-js",
+// validLangs are the available languages.
+var validLangs = map[string]struct{}{
+	"rust":           {},
+	"swift":          {},
+	"assemblyscript": {},
+	"tinygo":         {},
+	"grain":          {},
+	"typescript":     {},
+	"javascript":     {},
 }
 
-// BuildContext describes the context under which the tool is being run.
-type BuildContext struct {
+// Context describes the context under which the tool is being run.
+type Context struct {
 	Cwd           string
 	CwdIsRunnable bool
 	Runnables     []RunnableDir
@@ -55,7 +56,7 @@ type BundleRef struct {
 }
 
 // ForDirectory returns the build context for the provided working directory.
-func ForDirectory(dir string) (*BuildContext, error) {
+func ForDirectory(dir string) (*Context, error) {
 	fullDir, err := filepath.Abs(dir)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get Abs path")
@@ -85,7 +86,7 @@ func ForDirectory(dir string) (*BuildContext, error) {
 		directive.Queries = queries
 	}
 
-	bctx := &BuildContext{
+	bctx := &Context{
 		Cwd:           fullDir,
 		CwdIsRunnable: cwdIsRunnable,
 		Runnables:     runnables,
@@ -105,7 +106,7 @@ func ForDirectory(dir string) (*BuildContext, error) {
 }
 
 // RunnableExists returns true if the context contains a runnable with name <name>.
-func (b *BuildContext) RunnableExists(name string) bool {
+func (b *Context) RunnableExists(name string) bool {
 	for _, r := range b.Runnables {
 		if r.Name == name {
 			return true
@@ -116,7 +117,7 @@ func (b *BuildContext) RunnableExists(name string) bool {
 }
 
 // ShouldBuildLang returns true if the provided language is safe-listed for building.
-func (b *BuildContext) ShouldBuildLang(lang string) bool {
+func (b *Context) ShouldBuildLang(lang string) bool {
 	if len(b.Langs) == 0 {
 		return true
 	}
@@ -130,7 +131,7 @@ func (b *BuildContext) ShouldBuildLang(lang string) bool {
 	return false
 }
 
-func (b *BuildContext) Modules() ([]os.File, error) {
+func (b *Context) Modules() ([]os.File, error) {
 	modules := []os.File{}
 
 	for _, r := range b.Runnables {
@@ -145,6 +146,28 @@ func (b *BuildContext) Modules() ([]os.File, error) {
 	}
 
 	return modules, nil
+}
+
+// HasDockerfile returns a nil error if the project's Dockerfile exists.
+func (b *Context) HasDockerfile() error {
+	dockerfilePath := filepath.Join(b.Cwd, "Dockerfile")
+
+	if _, err := os.Stat(dockerfilePath); err != nil {
+		return errors.Wrap(err, "failed to Stat Dockerfile")
+	}
+
+	return nil
+}
+
+// HasModule returns a nil error if the Runnable's .wasm file exists.
+func (r *RunnableDir) HasModule() error {
+	runnablePath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
+
+	if _, err := os.Stat(runnablePath); err != nil {
+		return errors.Wrapf(err, "failed to Stat %s", runnablePath)
+	}
+
+	return nil
 }
 
 func getRunnableDirs(cwd string) ([]RunnableDir, bool, error) {
@@ -204,6 +227,13 @@ func ContainsRunnableYaml(files []os.FileInfo) (string, bool) {
 	return "", false
 }
 
+// IsValidLang returns true if a language is valid.
+func IsValidLang(lang string) bool {
+	_, exists := validLangs[lang]
+
+	return exists
+}
+
 func getRunnableFromFiles(wd string, files []os.FileInfo) (*RunnableDir, error) {
 	filename, exists := ContainsRunnableYaml(files)
 	if !exists {
@@ -228,7 +258,7 @@ func getRunnableFromFiles(wd string, files []os.FileInfo) (*RunnableDir, error) 
 		runnable.Namespace = "default"
 	}
 
-	if _, exists := dockerImageForLang[runnable.Lang]; !exists {
+	if ok := IsValidLang(runnable.Lang); !ok {
 		return nil, fmt.Errorf("(%s) %s is not a valid lang", runnable.Name, runnable.Lang)
 	}
 
@@ -245,15 +275,6 @@ func getRunnableFromFiles(wd string, files []os.FileInfo) (*RunnableDir, error) 
 	}
 
 	return runnableDir, nil
-}
-
-func ImageForLang(lang, tag string) string {
-	img, ok := dockerImageForLang[lang]
-	if !ok {
-		return ""
-	}
-
-	return fmt.Sprintf("%s:%s", img, tag)
 }
 
 func bundleTargetPath(cwd string) (*BundleRef, error) {

@@ -7,8 +7,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/suborbital/subo/builder/context"
 	"github.com/suborbital/subo/builder/template"
+	"github.com/suborbital/subo/project"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
 )
@@ -40,9 +40,9 @@ func CreateProjectCmd() *cobra.Command {
 				return errors.Wrap(err, "failed to Getwd")
 			}
 
-			bctx, err := context.ForDirectory(cwd)
+			bctx, err := project.ForDirectory(cwd)
 			if err != nil {
-				return errors.Wrap(err, "🚫 failed to get CurrentBuildContext")
+				return errors.Wrap(err, "🚫 failed to project.ForDirectory")
 			}
 
 			util.LogStart(fmt.Sprintf("creating project %s", name))

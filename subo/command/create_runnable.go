@@ -11,22 +11,11 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/suborbital/atmo/directive"
-	"github.com/suborbital/subo/builder/context"
 	"github.com/suborbital/subo/builder/template"
+	"github.com/suborbital/subo/project"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
 )
-
-// validLangs are the available languages.
-var validLangs = map[string]bool{
-	"rust":           true,
-	"swift":          true,
-	"assemblyscript": true,
-	"tinygo":         true,
-	"grain":          true,
-	"typescript":     true,
-	"javascript":     true,
-}
 
 // langAliases are aliases for languages.
 var langAliases = map[string]string{
@@ -68,9 +57,9 @@ func CreateRunnableCmd() *cobra.Command {
 			branch, _ := cmd.Flags().GetString(branchFlag)
 
 			dir, _ := cmd.Flags().GetString(dirFlag)
-			bctx, err := context.ForDirectory(dir)
+			bctx, err := project.ForDirectory(dir)
 			if err != nil {
-				return errors.Wrap(err, "🚫 failed to get CurrentBuildContext")
+				return errors.Wrap(err, "🚫 failed to project.ForDirectory")
 			}
 
 			if bctx.RunnableExists(name) {
@@ -143,7 +132,7 @@ func writeDotRunnable(cwd, name, lang, namespace string) (*directive.Runnable, e
 		lang = actual
 	}
 
-	if _, valid := validLangs[lang]; !valid {
+	if valid := project.IsValidLang(lang); !valid {
 		return nil, fmt.Errorf("%s is not an available language", lang)
 	}
 
