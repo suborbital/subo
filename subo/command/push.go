@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/suborbital/subo/packager"
 	"github.com/suborbital/subo/project"
 	"github.com/suborbital/subo/publisher"
 	"github.com/suborbital/subo/subo/util"
@@ -47,8 +46,8 @@ func PushCmd() *cobra.Command {
 			switch publishType {
 			case publisher.BindlePublishJobType:
 				pubJob = publisher.NewBindlePublishJob()
-			case publisher.DockerPackageJobType:
-				pubJob = packager.NewDockerPublishJob()
+			case publisher.DockerPublishJobType:
+				pubJob = publisher.NewDockerPublishJob()
 			default:
 				return fmt.Errorf("invalid push destination %s", publishType)
 			}
