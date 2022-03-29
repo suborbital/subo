@@ -65,7 +65,7 @@ jobs:
 
       - name: Check TinyGo version number consistency
         run: |
-          builder/docker/tinygo/sanity.sh
+          builder/docker/tinygo/smoke.sh
 
   # only run if reference is a tag
   release:
