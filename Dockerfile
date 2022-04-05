@@ -10,7 +10,12 @@ RUN go mod download
 # then everything else
 COPY subo ./subo
 COPY builder ./builder
+COPY deployer ./deployer
+COPY packager ./packager
+COPY publisher ./publisher
+COPY project ./project
 COPY scn ./scn
+
 COPY *.go ./
 COPY Makefile .
 
