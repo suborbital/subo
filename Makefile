@@ -28,4 +28,4 @@ lint:
 test:
 	go test ./...
 
-.PHONY: subo subo/dev subo/docker subo/docker/publish subo/smoketest mod/replace/atmo tidy lint
+.PHONY: subo subo/dev subo/docker subo/docker/publish subo/smoketest mod/replace/atmo tidy lint test
