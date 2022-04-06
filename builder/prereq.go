@@ -27,7 +27,7 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 			},
 			Prereq{
 				File:    "_lib/_lib.tar.gz",
-				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
+				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .RunnableDir.Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
 			},
 			Prereq{
 				File:    "_lib/suborbital",
@@ -37,20 +37,20 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 		"assemblyscript": {
 			Prereq{
 				File:    "node_modules",
-				Command: "npm install --include=dev",
+				Command: "{{ .BuildConfig.JsToolchain }} install",
 			},
 		},
 		"tinygo": {},
 		"typescript": {
 			Prereq{
 				File:    "node_modules",
-				Command: "npm install --include=dev",
+				Command: "{{ .BuildConfig.JsToolchain }} install",
 			},
 		},
 		"javascript": {
 			Prereq{
 				File:    "node_modules",
-				Command: "npm install --include=dev",
+				Command: "{{ .BuildConfig.JsToolchain }} install",
 			},
 		},
 	},
@@ -64,7 +64,7 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 			},
 			Prereq{
 				File:    "_lib/_lib.tar.gz",
-				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
+				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .RunnableDir.Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
 			},
 			Prereq{
 				File:    "_lib/suborbital",
@@ -74,34 +74,44 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 		"assemblyscript": {
 			Prereq{
 				File:    "node_modules",
-				Command: "npm install --include=dev",
+				Command: "{{ .BuildConfig.JsToolchain }} install",
 			},
 		},
 		"tinygo": {},
 		"typescript": {
 			Prereq{
 				File:    "node_modules",
-				Command: "npm install --include=dev",
+				Command: "{{ .BuildConfig.JsToolchain }} install",
 			},
 		},
 		"javascript": {
 			Prereq{
 				File:    "node_modules",
-				Command: "npm install --include=dev",
+				Command: "{{ .BuildConfig.JsToolchain }} install",
 			},
 		},
 	},
 }
 
 // GetCommand takes a RunnableDir, and returns an executed template command string.
-func (p Prereq) GetCommand(r project.RunnableDir) (string, error) {
+func (p Prereq) GetCommand(b BuildConfig, r project.RunnableDir) (string, error) {
 	cmdTmpl, err := template.New("cmd").Parse(p.Command)
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to parse prerequisite Command string into template: %s", p.Command)
 	}
 
+	type TemplateParams struct {
+		RunnableDir project.RunnableDir
+		BuildConfig
+	}
+
+	data := TemplateParams{
+		RunnableDir: r,
+		BuildConfig: b,
+	}
+
 	var fullCmd strings.Builder
-	err = cmdTmpl.Execute(&fullCmd, r)
+	err = cmdTmpl.Execute(&fullCmd, data)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to execute prerequisite Command string with runnableDir")
 	}

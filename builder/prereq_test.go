@@ -21,7 +21,7 @@ func TestPrereq_GetCommand(t *testing.T) {
 			name: "successfully expands template",
 			prereq: Prereq{
 				File:    "_lib/_lib.tar.gz",
-				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
+				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .RunnableDir.Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
 			},
 			r: project.RunnableDir{
 				Runnable: &directive.Runnable{
@@ -35,7 +35,7 @@ func TestPrereq_GetCommand(t *testing.T) {
 			name: "errors due to missing data to expand with",
 			prereq: Prereq{
 				File:    "_lib/_lib.tar.gz",
-				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
+				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .RunnableDir.Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
 			},
 			r: project.RunnableDir{
 				Runnable: nil,
@@ -60,7 +60,7 @@ func TestPrereq_GetCommand(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.prereq.GetCommand(tt.r)
+			got, err := tt.prereq.GetCommand(DefaultBuildConfig, tt.r)
 
 			tt.wantErr(t, err)
 			assert.Equal(t, tt.want, got)
