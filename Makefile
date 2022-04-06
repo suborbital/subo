@@ -25,5 +25,7 @@ tidy:
 	go mod tidy && go mod download && go mod vendor
 lint:
 	golangci-lint run ./...
+test:
+	go test ./...
 
 .PHONY: subo subo/dev subo/docker subo/docker/publish subo/smoketest mod/replace/atmo tidy lint
