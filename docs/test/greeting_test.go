@@ -20,10 +20,3 @@ func Example() {
 	Hello("Foo Bar")
 	// Output: Hello, Foo Bar!
 }
-
-// This comment is associated with the package example Example_doNotDoThis.
-// This is showing you how to use Hello.
-func Example_doNotDoThis() {
-	Hello("boo!")
-	// Output: Hello, Bar Foo!
-}
