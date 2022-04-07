@@ -6,6 +6,7 @@ import (
 
 	cp "github.com/otiai10/copy"
 	"github.com/pkg/errors"
+
 	"github.com/suborbital/subo/subo/util"
 )
 
@@ -14,7 +15,7 @@ import (
 func migrateCache() {
 	userCachePath, err := os.UserCacheDir()
 	if err != nil {
-		// migration not possible
+		// migration not possible.
 		return
 	}
 

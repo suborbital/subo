@@ -16,7 +16,7 @@ func CacheDir(subdirectories ...string) (string, error) {
 	basePath, err := os.UserCacheDir()
 
 	if err != nil {
-		// fallback if $HOME is not set
+		// fallback if $HOME is not set.
 		basePath = tmpPath
 	}
 
