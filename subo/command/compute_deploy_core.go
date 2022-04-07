@@ -220,19 +220,29 @@ Are you ready to continue? (y/N): `)
 
 // getEnvToken gets the environment token from stdin.
 func getEnvToken() (string, error) {
-	buf, err := util.ReadEnvironmentToken()
+	existing, err := util.ReadEnvironmentToken()
 	if err == nil {
-		return buf, nil
+		util.LogInfo("using cached environment token")
+		return existing, nil
 	}
 
 	fmt.Print("Enter your environment token: ")
 	token, err := input.ReadStdinString()
+
 	if err != nil {
 		return "", errors.Wrap(err, "failed to ReadStdinString")
 	}
 
 	if len(token) != 32 {
 		return "", errors.New("token must be 32 characters in length")
+	}
+
+	if err := util.WriteEnvironmentToken(token); err != nil {
+		util.LogWarn(err.Error())
+		return token, nil
+
+	} else {
+		util.LogInfo("saved environment token to cache")
 	}
 
 	return token, nil

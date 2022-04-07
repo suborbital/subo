@@ -37,7 +37,7 @@ func ComputeCreateTokenCommand() *cobra.Command {
 			fmt.Println(token.Token)
 
 			if err := util.WriteEnvironmentToken(token.Token); err != nil {
-				return errors.Wrap(err, "failed to WriteEnvironmentToken for token")
+				return errors.Wrap(err, "failed to WriteEnvironmentToken")
 			}
 			return nil
 		},

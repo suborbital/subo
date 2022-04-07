@@ -12,6 +12,8 @@ import (
 const checkVersionTimeout = 500 * time.Millisecond
 
 func main() {
+	migrateCache()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	versionChan := checkVersion(ctx)

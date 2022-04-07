@@ -36,6 +36,7 @@ require (
 	github.com/jmoiron/sqlx v1.3.4 // indirect
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
 	github.com/kr/pretty v0.2.1 // indirect
+	github.com/otiai10/copy v1.7.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sethvargo/go-envconfig v0.5.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
