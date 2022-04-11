@@ -198,7 +198,7 @@ BEFORE YOU CONTINUE:
 	- You must be able to set up DNS records for the builder service after this installation completes
 			- Choose the DNS name you'd like to use before continuing, e.g. builder.acmeco.com
 
-	- Subo will attempt to determine the default storage class for your Kubernetes cluster, 
+	- Subo will attempt to determine the default storage class for your Kubernetes cluster,
 	  but if is unable to do so you will need to provide one
 			- See the Compute documentation for more details
 
