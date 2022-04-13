@@ -9,6 +9,9 @@ subo:
 subo/dev:
 	$(GO_INSTALL) -tags=development
 
+subo/docker-bin:
+	$(GO_INSTALL) -tags=docker
+
 subo/docker:
 	docker build . -t suborbital/subo:dev
 
@@ -28,4 +31,4 @@ lint:
 test:
 	go test ./...
 
-.PHONY: subo subo/dev subo/docker subo/docker/publish subo/smoketest mod/replace/atmo tidy lint test
+.PHONY: subo subo/dev subo/docker-bin subo/docker subo/docker/publish subo/smoketest mod/replace/atmo tidy lint test
