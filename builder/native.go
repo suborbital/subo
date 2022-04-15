@@ -20,7 +20,7 @@ func NativeBuildCommands(lang string) ([]string, error) {
 var nativeCommandsForLang = map[string]map[string][]string{
 	"darwin": {
 		"rust": {
-			"cargo build --target wasm32-wasi --lib --release",
+			"cargo vendor && cargo build --target wasm32-wasi --lib --release",
 			"cp target/wasm32-wasi/release/{{ .UnderscoreName }}.wasm ./{{ .Name }}.wasm",
 		},
 		"swift": {
@@ -47,7 +47,7 @@ var nativeCommandsForLang = map[string]map[string][]string{
 	},
 	"linux": {
 		"rust": {
-			"cargo build --target wasm32-wasi --lib --release",
+			"cargo vendor && cargo build --target wasm32-wasi --lib --release",
 			"cp target/wasm32-wasi/release/{{ .UnderscoreName }}.wasm ./{{ .Name }}.wasm",
 		},
 		"swift": {
