@@ -7,7 +7,7 @@ import (
 func main() {
 	rootCmd := rootCommand()
 	if err := rootCmd.Execute(); err != nil {
-		os.Exit(-1)
+		os.Exit(1)
 	}
 
 	checkForUpdates()
