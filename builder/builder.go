@@ -3,6 +3,7 @@ package builder
 import (
 	"fmt"
 	"html/template"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -31,7 +32,8 @@ type Builder struct {
 
 	results []BuildResult
 
-	log util.FriendlyLogger
+	log    util.FriendlyLogger
+	writer io.Writer
 }
 
 // BuildResult is the results of a build including the built module and logs.
@@ -48,7 +50,7 @@ const (
 )
 
 // ForDirectory creates a Builder bound to a particular directory.
-func ForDirectory(logger util.FriendlyLogger, dir string) (*Builder, error) {
+func ForDirectory(logger util.FriendlyLogger, writer io.Writer, dir string) (*Builder, error) {
 	ctx, err := project.ForDirectory(dir)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to project.ForDirectory")
@@ -58,6 +60,7 @@ func ForDirectory(logger util.FriendlyLogger, dir string) (*Builder, error) {
 		Context: ctx,
 		results: []BuildResult{},
 		log:     logger,
+		writer:  writer,
 	}
 
 	return b, nil
@@ -177,7 +180,7 @@ func (b *Builder) doNativeBuildForRunnable(r project.RunnableDir, result *BuildR
 		cmdString := strings.TrimSpace(fullCmd.String())
 
 		// Even if the command fails, still load the output into the result object.
-		outputLog, err := util.RunInDir(cmdString, r.Fullpath)
+		outputLog, err := util.RunWithWriter(cmdString, r.Fullpath, b.writer)
 
 		result.OutputLog += outputLog + "\n"
 
@@ -226,7 +229,7 @@ func (b *Builder) checkAndRunPreReqs(runnable project.RunnableDir, result *Build
 					return errors.Wrap(err, "prereq.GetCommand")
 				}
 
-				outputLog, err := util.RunInDir(fullCmd, runnable.Fullpath)
+				outputLog, err := util.RunWithWriter(fullCmd, runnable.Fullpath, b.writer)
 				if err != nil {
 					return errors.Wrapf(err, "util.RunInDir: %s", fullCmd)
 				}
