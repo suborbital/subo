@@ -23,7 +23,7 @@ func WriteEnvironmentToken(tokenStr string) error {
 	}
 
 	if err := ioutil.WriteFile(tokenPath, []byte(tokenStr), PermFilePrivate); err != nil {
-		return errors.Wrap(err, "failed to write "+tokenPath)
+		return errors.Wrapf(err, "failed to write %s "+tokenPath)
 	}
 
 	return nil
