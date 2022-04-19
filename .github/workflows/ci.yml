@@ -17,22 +17,20 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version: 1.18
+
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.45
-  test:
-    strategy:
-      matrix:
-        golang: [1.18]
 
+  test:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version: ${{ matrix.golang }}
+          go-version: 1.18
 
       - name: Cache Go mods
         uses: actions/cache@v2
@@ -53,19 +51,20 @@ jobs:
         run: |
           make subo
 
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v5.2
+
       - name: Create project and runnable
         run: |
-          export PATH=$PATH:$(go env GOPATH)/bin
-          git config --global init.defaultBranch main
           subo create project smoketest
-          subo create runnable rs-test --lang rust --dir ./smoketest
-          subo create runnable swift-test --lang swift --dir ./smoketest
-          subo create runnable as-test --lang assemblyscript --dir ./smoketest
-          subo create runnable tinygo-test --lang tinygo --dir ./smoketest
+          subo create runnable rs-test --branch ${{ steps.branch-name.outputs.current_branch }} --lang rust --dir ./smoketest
+          subo create runnable swift-test --branch ${{ steps.branch-name.outputs.current_branch }} --lang swift --dir ./smoketest
+          subo create runnable as-test --branch ${{ steps.branch-name.outputs.current_branch }} --lang assemblyscript --dir ./smoketest
+          subo create runnable tinygo-test --branch ${{ steps.branch-name.outputs.current_branch }} --lang tinygo --dir ./smoketest
 
       - name: Build project
         run: |
-          export PATH=$PATH:$(go env GOPATH)/bin
           subo build ./smoketest --builder-tag dev
 
       - name: Check TinyGo version number consistency
