@@ -1,7 +1,7 @@
 FROM suborbital/tinygo-base:v0.22.0 as builder
 FROM suborbital/subo:dev as subo
 
-FROM golang:bullseye
+FROM golang:1.17-bullseye
 
 COPY --from=subo /go/bin/subo /usr/local/bin
 COPY --from=builder /root/tinygo/build/release.tar.gz /usr/local/.
