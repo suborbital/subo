@@ -72,7 +72,7 @@ func ForDirectory(dir string) (*Context, error) {
 		return nil, errors.Wrap(err, "failed to bundleIfExists")
 	}
 
-	directive, err := readDirectiveFile(fullDir)
+	directiveVar, err := readDirectiveFile(fullDir)
 	if err != nil {
 		if !os.IsNotExist(errors.Cause(err)) {
 			return nil, errors.Wrap(err, "failed to readDirectiveFile")
@@ -83,7 +83,7 @@ func ForDirectory(dir string) (*Context, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to readQueriesFile")
 	} else if len(queries) > 0 {
-		directive.Queries = queries
+		directiveVar.Queries = queries
 	}
 
 	bctx := &Context{
@@ -91,15 +91,15 @@ func ForDirectory(dir string) (*Context, error) {
 		CwdIsRunnable: cwdIsRunnable,
 		Runnables:     runnables,
 		Bundle:        *bundle,
-		Directive:     directive,
+		Directive:     directiveVar,
 		Langs:         []string{},
 		MountPath:     fullDir,
 		RelDockerPath: ".",
 		BuilderTag:    fmt.Sprintf("v%s", release.SuboDotVersion),
 	}
 
-	if directive != nil {
-		bctx.AtmoVersion = directive.AtmoVersion
+	if directiveVar != nil {
+		bctx.AtmoVersion = directiveVar.AtmoVersion
 	}
 
 	return bctx, nil
