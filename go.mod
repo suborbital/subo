@@ -10,7 +10,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.2.1
 	github.com/stretchr/testify v1.7.0
-	github.com/suborbital/atmo v0.4.4
+	github.com/suborbital/atmo v0.4.6
 	golang.org/x/mod v0.5.1
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -41,7 +41,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/suborbital/reactr v0.15.1 // indirect
 	github.com/suborbital/vektor v0.5.3-0.20220302142328-fb4fc3951eb1 // indirect
-	golang.org/x/crypto v0.0.0-20220307211146-efcb8507fb70 // indirect
+	golang.org/x/crypto v0.0.0-20220313003712-b769efc7c000 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
