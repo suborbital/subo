@@ -78,7 +78,7 @@ func (b *Builder) BuildWithToolchain(tcn Toolchain) error {
 		}
 
 		if tcn == ToolchainNative {
-			b.log.LogStart(fmt.Sprintf("building runnable: %s (%s)", r.Name, r.Runnable.Lang))
+			b.log.LogStart(fmt.Sprintf("building Runnable: %s (%s)", r.Name, r.Runnable.Lang))
 
 			result := &BuildResult{}
 

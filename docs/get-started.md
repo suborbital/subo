@@ -46,11 +46,11 @@ Usage:
 
 Flags:
       --branch string      git branch to download templates from (default "main")
-      --dir string         the directory to put the new runnable in (default "/Users/cohix-16/Workspaces/suborbital/subo")
+      --dir string         the directory to put the new Runnable in (default "/Users/cohix-16/Workspaces/suborbital/subo")
   -h, --help               help for create
-      --lang string        the language of the new runnable (default "rust")
-      --namespace string   the namespace for the new runnable (default "default")
-      --update-templates   update with the newest runnable templates
+      --lang string        the language of the new Runnable (default "rust")
+      --namespace string   the namespace for the new Runnable (default "default")
+      --update-templates   update with the newest Runnable templates
 ```
 
 ## Building Wasm Runnables
@@ -60,7 +60,7 @@ To build your Runnable into a Wasm module for Reactr or Atmo, use the build comm
 ```
 > subo build .
 ```
-If the current working directory is a Runnable, subo will build it. If the current directory contains many runnables, subo will build them all. Any directory with a `.runnable.yaml` file is considered a Runnable and will be built. Building Runnables is not fully tested on Windows.
+If the current working directory is a Runnable, subo will build it. If the current directory contains many Runnables, subo will build them all. Any directory with a `.runnable.yaml` file is considered a Runnable and will be built. Building Runnables is not fully tested on Windows.
 
 ## Bundles
 By default, subo will write all of the Runnables in the current directory into a bundle. Atmo uses Runnable bundles to help you build powerful web services by composing Runnables declaratively. If you want to skip bundling, you can pass `--no-bundle` to `subo build`
@@ -75,7 +75,7 @@ Usage:
 Flags:
       --docker      pass --docker to automatically build a Docker image based on your project's Dockerfile. It will be tagged with the 'identifier' and 'appVersion' from your Directive
   -h, --help        help for build
-      --native      if passed, build runnables using native toolchain rather than Docker
+      --native      if passed, build Runnables using native toolchain rather than Docker
       --no-bundle   if passed, a .wasm.zip bundle will not be generated
 ```
 

@@ -36,7 +36,7 @@ type CreateRunnableError struct {
 // NewCreateRunnableError cleans up and returns CreateRunnableError for CreateRunnableCmd() failures.
 func NewCreateRunnableError(path string, err error) CreateRunnableError {
 	if cleanupErr := os.RemoveAll(path); cleanupErr != nil {
-		err = errors.Wrap(err, "failed to clean up runnable outputs")
+		err = errors.Wrap(err, "failed to clean up Runnable outputs")
 	}
 	return CreateRunnableError{Path: path, error: err}
 }
@@ -63,10 +63,10 @@ func CreateRunnableCmd() *cobra.Command {
 			}
 
 			if bctx.RunnableExists(name) {
-				return fmt.Errorf("🚫 runnable %s already exists", name)
+				return fmt.Errorf("🚫 Runnable %s already exists", name)
 			}
 
-			util.LogStart(fmt.Sprintf("creating runnable %s", name))
+			util.LogStart(fmt.Sprintf("creating Runnable %s", name))
 
 			path, err := util.Mkdir(bctx.Cwd, name)
 			if err != nil {
@@ -117,12 +117,12 @@ func CreateRunnableCmd() *cobra.Command {
 		cwd = "$HOME"
 	}
 
-	cmd.Flags().String(dirFlag, cwd, "the directory to put the new runnable in")
-	cmd.Flags().String(langFlag, "rust", "the language of the new runnable")
-	cmd.Flags().String(namespaceFlag, "default", "the namespace for the new runnable")
+	cmd.Flags().String(dirFlag, cwd, "the directory to put the new Runnable in")
+	cmd.Flags().String(langFlag, "rust", "the language of the new Runnable")
+	cmd.Flags().String(namespaceFlag, "default", "the namespace for the new Runnable")
 	cmd.Flags().String(repoFlag, "suborbital/subo", "git repo to download templates from")
 	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
-	cmd.Flags().Bool(updateTemplatesFlag, false, "update with the newest runnable templates")
+	cmd.Flags().Bool(updateTemplatesFlag, false, "update with the newest Runnable templates")
 
 	return cmd
 }
@@ -145,13 +145,13 @@ func writeDotRunnable(cwd, name, lang, namespace string) (*directive.Runnable, e
 
 	bytes, err := yaml.Marshal(runnable)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to Marshal runnable")
+		return nil, errors.Wrap(err, "failed to Marshal Runnable")
 	}
 
 	path := filepath.Join(cwd, name, ".runnable.yaml")
 
 	if err := ioutil.WriteFile(path, bytes, util.PermFilePrivate); err != nil {
-		return nil, errors.Wrap(err, "failed to WriteFile runnable")
+		return nil, errors.Wrap(err, "failed to WriteFile Runnable")
 	}
 
 	return runnable, nil

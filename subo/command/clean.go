@@ -32,7 +32,7 @@ func CleanCmd() *cobra.Command {
 			}
 
 			if len(bctx.Runnables) == 0 {
-				return errors.New("🚫 no runnables found in current directory (no .runnable yaml files found)")
+				return errors.New("🚫 no Runnables found in current directory (no .runnable yaml files found)")
 			}
 
 			util.LogStart(fmt.Sprintf("cleaning in %s", bctx.Cwd))

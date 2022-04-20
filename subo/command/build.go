@@ -15,8 +15,8 @@ import (
 func BuildCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "build [dir]",
-		Short: "build a WebAssembly runnable",
-		Long:  `build a WebAssembly runnable and/or create a Runnable Bundle`,
+		Short: "build a Runnable",
+		Long:  `build a Runnable and/or create an Runnable Bundle`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			dir := "."
 			if len(args) > 0 {
@@ -29,11 +29,11 @@ func BuildCmd() *cobra.Command {
 			}
 
 			if len(bdr.Context.Runnables) == 0 {
-				return errors.New("🚫 no runnables found in current directory (no .runnable.yaml files found)")
+				return errors.New("🚫 no Runnables found in current directory (no .runnable.yaml files found)")
 			}
 
 			if bdr.Context.CwdIsRunnable {
-				util.LogInfo("building single Runnable (run from project root to create bundle)")
+				util.LogInfo("building single Runnable (run from project root to create Bundle)")
 			}
 
 			langs, _ := cmd.Flags().GetStringSlice("langs")
@@ -109,11 +109,11 @@ func BuildCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().Bool("no-bundle", false, "if passed, a .wasm.zip bundle will not be generated")
+	cmd.Flags().Bool("no-bundle", false, "if passed, a .wasm.zip Bundle will not be generated")
 	cmd.Flags().Bool("native", false, "use native (locally installed) toolchain rather than Docker")
-	cmd.Flags().String("make", "", "execute the provided Make target before building the project bundle")
+	cmd.Flags().String("make", "", "execute the provided make target before building the project's Bundle")
 	cmd.Flags().Bool("docker", false, "build your project's Dockerfile. It will be tagged {identifier}:{appVersion}")
-	cmd.Flags().StringSlice("langs", []string{}, "build only Runnables for the listed languages (comma-seperated)")
+	cmd.Flags().StringSlice("langs", []string{}, "build only Runnables for the listed languages (comma-separated)")
 	cmd.Flags().String("mountpath", "", "if passed, the Docker builders will mount their volumes at the provided path")
 	cmd.Flags().String("relpath", "", "if passed, the Docker builders will run `subo build` using the provided path, relative to '--mountpath'")
 	cmd.Flags().String("builder-tag", "", "use the provided tag for builder images")

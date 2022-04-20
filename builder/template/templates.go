@@ -86,7 +86,7 @@ func TemplatesExist(repo, branch string) (string, error) {
 	return tmplPath, nil
 }
 
-// ExecRunnableTmplStr executes a template string with the runnable's data.
+// ExecRunnableTmplStr executes a template string with the Runnable's data.
 func ExecRunnableTmplStr(templateStr string, runnable *directive.Runnable) (string, error) {
 	templateData := makeTemplateData(runnable)
 
