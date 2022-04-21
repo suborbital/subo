@@ -41,7 +41,7 @@ func DevCmd() *cobra.Command {
 				envvar = "-e ATMO_LOG_LEVEL=debug"
 			}
 
-			//dockerCmd stores the Docker command to be displayed and executed
+			//dockerCmd stores the Docker command to be displayed and executed.
 			dockerCmd := fmt.Sprintf("docker run -v=%s:/home/atmo -e=ATMO_HTTP_PORT=%s %s -p=%s:%s suborbital/atmo:%s atmo", bctx.Cwd, port, envvar, port, port, bctx.AtmoVersion)
 			fmt.Printf("\nRunning Docker command :\n%s\n\n", dockerCmd)
 
