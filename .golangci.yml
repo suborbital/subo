@@ -13,11 +13,14 @@ linters:
     - deadcode
     - gci
     - godot
-    - unparam
-    - unused
 
 linters-settings:
   gci:
-    local-prefixes: github.com/suborbital
+    no-inline-comments: true
+    no-prefix-comments: true
+    sections:
+      - standard
+      - default
+      - prefix(github.com/suborbital)
   godot:
     scope: all
