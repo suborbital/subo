@@ -37,7 +37,7 @@ func DevCmd() *cobra.Command {
 
 			envvar := ""
 
-			if verbose == true {
+			if verbose {
 				envvar = "-e ATMO_LOG_LEVEL=debug"
 			}
 
@@ -45,7 +45,7 @@ func DevCmd() *cobra.Command {
 			dockerCmd := fmt.Sprintf("docker run -v=%s:/home/atmo -e=ATMO_HTTP_PORT=%s %s -p=%s:%s suborbital/atmo:%s atmo", bctx.Cwd, port, envvar, port, port, bctx.AtmoVersion)
 			fmt.Printf("\nRunning Docker command :\n%s\n\n", dockerCmd)
 
-			_, err = util.Run(fmt.Sprintf("docker run -v=%s:/home/atmo -e=ATMO_HTTP_PORT=%s %s -p=%s:%s suborbital/atmo:%s atmo", bctx.Cwd, port, envvar, port, port, bctx.AtmoVersion))
+			_, err = util.Run(dockerCmd)
 			if err != nil {
 				return errors.Wrap(err, "🚫 failed to run dev server")
 			}
