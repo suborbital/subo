@@ -19,4 +19,4 @@ COPY scn ./scn
 COPY *.go ./
 COPY Makefile .
 
-RUN make subo
+RUN make subo/docker-bin
