@@ -5,11 +5,11 @@ go 1.18
 require (
 	github.com/deislabs/go-bindle v0.1.1-0.20220201013943-612c59d27f42
 	github.com/google/go-github/v41 v41.0.0
-	github.com/hashicorp/go-version v1.3.0
+	github.com/hashicorp/go-version v1.4.0
 	github.com/pelletier/go-toml v1.9.4
 	github.com/pkg/errors v0.9.1
-	github.com/spf13/cobra v1.2.1
-	github.com/stretchr/testify v1.7.0
+	github.com/spf13/cobra v1.4.0
+	github.com/stretchr/testify v1.7.1
 	github.com/suborbital/atmo v0.4.6
 	golang.org/x/mod v0.5.1
 	gopkg.in/yaml.v2 v2.4.0
