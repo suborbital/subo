@@ -10,7 +10,7 @@ builder/docker/dev/publish: subo/docker/publish builder/docker/rust/dev/publish 
 
 # AssemblyScript docker targets
 builder/docker/as:
-	docker build . -f builder/docker/assemblyscript/Dockerfile -t suborbital/builder-as:$(ver)
+	DOCKER_BUILDKIT=1 docker build . -f builder/docker/assemblyscript/Dockerfile -t suborbital/builder-as:$(ver)
 
 builder/docker/as/publish:
 	docker buildx build . -f builder/docker/assemblyscript/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-as:$(ver) --push
@@ -20,7 +20,7 @@ builder/docker/as/dev/publish:
 
 # Rust docker targets
 builder/docker/rust:
-	docker build . -f builder/docker/rust/Dockerfile -t suborbital/builder-rs:$(ver)
+	DOCKER_BUILDKIT=1 docker build . -f builder/docker/rust/Dockerfile -t suborbital/builder-rs:$(ver)
 
 builder/docker/rust/publish:
 	docker buildx build . -f builder/docker/rust/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-rs:$(ver) --push
@@ -30,7 +30,7 @@ builder/docker/rust/dev/publish:
 
 # Swift docker targets
 builder/docker/swift:
-	docker build . -f builder/docker/swift/Dockerfile -t suborbital/builder-swift:$(ver)
+	DOCKER_BUILDKIT=1 docker build . -f builder/docker/swift/Dockerfile -t suborbital/builder-swift:$(ver)
 
 builder/docker/swift/publish:
 	docker buildx build . -f builder/docker/swift/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-swift:$(ver) --push
@@ -40,7 +40,7 @@ builder/docker/swift/dev/publish:
 
 # TinyGo (base) docker targets
 builder/docker/tinygo-base:
-	docker build . -f builder/docker/tinygo/Dockerfile.base -t suborbital/tinygo-base:$(tinygo_ver)
+	DOCKER_BUILDKIT=1 docker build . -f builder/docker/tinygo/Dockerfile.base -t suborbital/tinygo-base:$(tinygo_ver)
 
 builder/docker/tinygo-base/publish:
 	docker buildx build . -f builder/docker/tinygo/Dockerfile.base --platform linux/amd64,linux/arm64 -t suborbital/tinygo-base:$(tinygo_ver) --push
@@ -50,7 +50,7 @@ builder/docker/tinygo-base/dev/publish:
 
 # TinyGo (slim) docker targets
 builder/docker/tinygo: builder/docker/tinygo-base
-	docker build . -f builder/docker/tinygo/Dockerfile -t suborbital/builder-tinygo:$(ver)
+	DOCKER_BUILDKIT=1 docker build . -f builder/docker/tinygo/Dockerfile -t suborbital/builder-tinygo:$(ver)
 
 builder/docker/tinygo/publish:
 	docker buildx build . -f builder/docker/tinygo/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-tinygo:$(ver) --push
@@ -70,7 +70,7 @@ builder/docker/grain/dev/publish:
 
 # JavaScript docker targets
 builder/docker/javascript:
-	docker build . -f builder/docker/javascript/Dockerfile -t suborbital/builder-js:$(ver)
+	DOCKER_BUILDKIT=1 docker build . -f builder/docker/javascript/Dockerfile -t suborbital/builder-js:$(ver)
 
 builder/docker/javascript/publish:
 	docker buildx build . -f builder/docker/javascript/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-js:$(ver) --push
