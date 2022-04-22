@@ -30,8 +30,8 @@ type CommandLineExecutor struct {
 var Command = &CommandLineExecutor{}
 
 // NewCommandLineExecutor
-func NewCommandLineExecutor(silent silentOutput, writer io.Writer) CommandLineExecutor {
-	return CommandLineExecutor{
+func NewCommandLineExecutor(silent silentOutput, writer io.Writer) *CommandLineExecutor {
+	return &CommandLineExecutor{
 		silent: silent,
 		writer: writer,
 	}

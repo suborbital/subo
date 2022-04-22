@@ -11,7 +11,7 @@ func TestCommandRunner_Run(t *testing.T) {
 	tests := []struct {
 		name    string
 		cmd     string
-		runner  func() (CommandLineExecutor, *bytes.Buffer)
+		runner  func() (CommandRunner, *bytes.Buffer)
 		want    string
 		wantErr assert.ErrorAssertionFunc
 		wantBuf []byte
@@ -20,7 +20,7 @@ func TestCommandRunner_Run(t *testing.T) {
 		{
 			name: "writes to a supplied io.Writer",
 			cmd:  "echo 'the mitochondria is the powerhouse of the cell'",
-			runner: func() (CommandLineExecutor, *bytes.Buffer) {
+			runner: func() (CommandRunner, *bytes.Buffer) {
 				buf := new(bytes.Buffer)
 				return NewCommandLineExecutor(NormalOutput, buf), buf
 			},
@@ -31,7 +31,7 @@ func TestCommandRunner_Run(t *testing.T) {
 		{
 			name: "writes nothing to a supplied io.Writer when silent",
 			cmd:  "echo 'the mitochondria is the powerhouse of the cell'",
-			runner: func() (CommandLineExecutor, *bytes.Buffer) {
+			runner: func() (CommandRunner, *bytes.Buffer) {
 				buf := new(bytes.Buffer)
 				return NewCommandLineExecutor(SilentOutput, buf), buf
 			},
@@ -42,7 +42,7 @@ func TestCommandRunner_Run(t *testing.T) {
 		{
 			name: "accepts a nil io.Writer",
 			cmd:  "echo 'the mitochondria is the powerhouse of the cell'",
-			runner: func() (CommandLineExecutor, *bytes.Buffer) {
+			runner: func() (CommandRunner, *bytes.Buffer) {
 				return NewCommandLineExecutor(SilentOutput, nil), new(bytes.Buffer)
 			},
 			want:    "the mitochondria is the powerhouse of the cell\n",
@@ -52,8 +52,8 @@ func TestCommandRunner_Run(t *testing.T) {
 		{
 			name: "performs with the default executor",
 			cmd:  "echo 'the mitochondria is the powerhouse of the cell'",
-			runner: func() (CommandLineExecutor, *bytes.Buffer) {
-				return *Command, new(bytes.Buffer)
+			runner: func() (CommandRunner, *bytes.Buffer) {
+				return Command, new(bytes.Buffer)
 			},
 			want:    "the mitochondria is the powerhouse of the cell\n",
 			wantErr: assert.NoError,
