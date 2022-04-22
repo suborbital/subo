@@ -13,7 +13,7 @@ subo/docker-bin:
 	$(GO_INSTALL) -tags=docker
 
 subo/docker:
-	docker build . -t suborbital/subo:dev
+	DOCKER_BUILDKIT=1 docker build . -t suborbital/subo:dev
 
 subo/docker/publish:
 	docker buildx build . --platform linux/amd64,linux/arm64 -t suborbital/subo:dev --push
