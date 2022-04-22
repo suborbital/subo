@@ -9,27 +9,45 @@ import (
 	"github.com/pkg/errors"
 )
 
+type CommandRunner interface {
+	Run(cmd string) (string, error)
+	RunInDir(cmd, dir string) (string, error)
+}
+
+type silentOutput bool
+
+const (
+	SilentOutput = true
+	NormalOutput = false
+)
+
+type CommandLineExecutor struct {
+	silent silentOutput
+	writer io.Writer
+}
+
+// Command
+var Command = &CommandLineExecutor{}
+
+// NewCommandLineExecutor
+func NewCommandLineExecutor(silent silentOutput, writer io.Writer) CommandLineExecutor {
+	return CommandLineExecutor{
+		silent: silent,
+		writer: writer,
+	}
+}
+
 // Run runs a command, outputting to terminal and returning the full output and/or error.
-func Run(cmd string) (string, error) {
-	return run(cmd, "", false, nil)
+func (d *CommandLineExecutor) Run(cmd string) (string, error) {
+	return run(cmd, "", d.silent, d.writer)
 }
 
 // RunInDir runs a command in the specified directory and returns the full output or error.
-func RunInDir(cmd, dir string) (string, error) {
-	return run(cmd, dir, false, nil)
+func (d *CommandLineExecutor) RunInDir(cmd, dir string) (string, error) {
+	return run(cmd, dir, d.silent, d.writer)
 }
 
-// RunWithWriter runs a command in the specified directory, writing all command output to the writer and returns the full output or error.
-func RunWithWriter(cmd, dir string, writer io.Writer) (string, error) {
-	return run(cmd, dir, false, writer)
-}
-
-// RunSilent runs a command without printing to stdout and returns the full output or error.
-func RunSilent(cmd string) (string, error) {
-	return run(cmd, "", true, nil)
-}
-
-func run(cmd, dir string, silent bool, writer io.Writer) (string, error) {
+func run(cmd, dir string, silent silentOutput, writer io.Writer) (string, error) {
 	// you can uncomment this below if you want to see exactly the commands being run
 	// fmt.Println("▶️", cmd).
 

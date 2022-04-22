@@ -250,7 +250,7 @@ func extractZip(filePath, destPath, branchDirName string) (string, error) {
 		}
 	}
 
-	if _, err := util.Run(fmt.Sprintf("unzip -q %s -d %s", escapedFilepath, escapedDestPath)); err != nil {
+	if _, err := util.Command.Run(fmt.Sprintf("unzip -q %s -d %s", escapedFilepath, escapedDestPath)); err != nil {
 		return "", errors.Wrap(err, "failed to Run unzip")
 	}
 
