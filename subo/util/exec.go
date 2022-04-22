@@ -26,10 +26,10 @@ type CommandLineExecutor struct {
 	writer io.Writer
 }
 
-// Command
+// Command is a barebones command executor.
 var Command = &CommandLineExecutor{}
 
-// NewCommandLineExecutor
+// NewCommandLineExecutor creates a new CommandLineExecutor with the given configuration.
 func NewCommandLineExecutor(silent silentOutput, writer io.Writer) *CommandLineExecutor {
 	return &CommandLineExecutor{
 		silent: silent,
