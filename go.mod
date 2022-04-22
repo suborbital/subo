@@ -6,7 +6,7 @@ require (
 	github.com/deislabs/go-bindle v0.1.1-0.20220201013943-612c59d27f42
 	github.com/google/go-github/v41 v41.0.0
 	github.com/hashicorp/go-version v1.4.0
-	github.com/pelletier/go-toml v1.9.4
+	github.com/pelletier/go-toml v1.9.5
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.1
