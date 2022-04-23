@@ -208,7 +208,7 @@ jobs:
 
   release-bin:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [image, lint, test, smoke]
+    needs: [image, lint, smoke, test]
     runs-on: ubuntu-latest
 
     steps:
@@ -253,7 +253,7 @@ jobs:
 
   release-image-subo:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [image, lint, test, smoke]
+    needs: [image, lint, smoke, test]
     runs-on: ubuntu-latest
 
     steps:
