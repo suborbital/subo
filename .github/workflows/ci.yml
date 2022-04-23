@@ -206,11 +206,9 @@ jobs:
         if: matrix.language == 'tinygo'
         run: builder/docker/tinygo/smoke.sh
 
-  # only run if reference is a tag
-  release:
+  release-bin:
     if: startsWith(github.ref, 'refs/tags/v')
-
-    needs: [image, lint, smoke, test]
+    needs: [image, lint, test, smoke]
     runs-on: ubuntu-latest
 
     steps:
@@ -252,3 +250,120 @@ jobs:
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
           GITHUB_ACTOR_NAME: ${{ steps.committer.outputs.name }}
           GITHUB_ACTOR_EMAIL: ${{ steps.committer.outputs.email }}
+
+  release-image-subo:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [image, lint, test, smoke]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v2
+
+      - uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/metadata-action@v3
+        id: docker_meta
+        with:
+          images: suborbital/subo,ghcr.io/suborbital/subo
+          tags: |
+            type=match,pattern=(v.*)
+          flavor: |
+            latest=auto
+
+      - name: Build subo image
+        uses: docker/build-push-action@v3
+        with:
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          file: Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
+
+  release-image:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [image, lint, test, smoke, release-image-subo]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image:
+          - builder-as
+          - builder-gr
+          - builder-js
+          - builder-rs
+          - builder-swift
+          - builder-tinygo
+          - builder-wat
+        include:
+          - image: builder-as
+            dockerfile: builder/docker/assemblyscript/Dockerfile
+          - image: builder-gr
+            dockerfile: builder/docker/grain/Dockerfile
+          - image: builder-js
+            dockerfile: builder/docker/javascript/Dockerfile
+          - image: builder-rs
+            dockerfile: builder/docker/rust/Dockerfile
+          - image: builder-swift
+            dockerfile: builder/docker/swift/Dockerfile
+          - image: builder-tinygo
+            dockerfile: builder/docker/tinygo/Dockerfile
+          - image: builder-wat
+            dockerfile: builder/docker/wat/Dockerfile
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v2
+
+      - uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/metadata-action@v3
+        id: subo_meta
+        with:
+          images: ghcr.io/suborbital/subo
+          tags: |
+            type=match,pattern=(v.*)
+          flavor: |
+            latest=false
+      - uses: docker/metadata-action@v3
+        id: docker_meta
+        with:
+          images: suborbital/${{ matrix.image }},ghcr.io/suborbital/${{ matrix.image }}
+          tags: |
+            type=match,pattern=(v.*)
+          flavor: |
+            latest=auto
+          labels: |
+            org.opencontainers.image.title=${{ matrix.image }}
+
+      - name: Build ${{ matrix.image }} image
+        uses: docker/build-push-action@v3
+        with:
+          build-contexts: |
+            suborbital/subo:dev=docker-image://${{ steps.subo_meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          file: ${{ matrix.dockerfile }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
