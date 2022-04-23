@@ -1,17 +1,31 @@
-FROM golang:bullseye
-RUN apt-get update && apt-get install -y clang-11 llvm-11-dev lld-11 libclang-11-dev build-essential git cmake ninja-build
-
+FROM golang:1.17-bullseye as llvm
 WORKDIR /root
-RUN mkdir runnable
-RUN git clone --depth 1 --branch v0.22.0 https://github.com/tinygo-org/tinygo.git
-RUN git clone --depth 1 --branch version_105 https://github.com/WebAssembly/binaryen
-RUN mkdir binaryen/build
-
-WORKDIR /root/tinygo
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    clang-11 \
+    llvm-11-dev \
+    lld-11 \
+    libclang-11-dev \
+    build-essential \
+    git \
+    cmake \
+    ninja-build \
+    && rm -rf /var/lib/apt/lists/*
+ADD https://raw.githubusercontent.com/tinygo-org/tinygo/v0.22.0/Makefile ./Makefile
 RUN make llvm-source
-RUN git submodule update --init --remote lib/wasi-libc
+
+FROM llvm AS llvm-build
+WORKDIR /root
 RUN export CC=clang-11 && export CXX=clang++-11 && make llvm-build
+
+FROM llvm-build
+WORKDIR /root/tinygo
+RUN git clone --depth 1 --branch v0.22.0 https://github.com/tinygo-org/tinygo.git /root/tinygo && \
+    git clone --depth 1 --branch version_105 https://github.com/WebAssembly/binaryen /root/binaryen && \
+    mkdir /root/binaryen/build && \
+    mkdir /root/runnable && \
+    git submodule update --init && \
+    mv Makefile Makefile.old && \
+    cat Makefile.old | sed "s/\.\/build\/tinygo build-library -target=/.\/build\/release\/tinygo\/bin\/tinygo build-library -target=/" > Makefile
 RUN make wasi-libc
-RUN make
-RUN git submodule update --init
-RUN make release
+RUN make LLVM_BUILDDIR=/root/llvm-build LLVM_PROJECTDIR=/root/llvm-project
+RUN make LLVM_BUILDDIR=/root/llvm-build LLVM_PROJECTDIR=/root/llvm-project release
