@@ -2,11 +2,11 @@
 ver = $(shell cat ./builder/.image-ver)
 tinygo_ver = $(shell cat ./builder/docker/tinygo/.tinygo-ver)
 
-builder/docker: subo/docker builder/docker/rust builder/docker/swift builder/docker/as builder/docker/tinygo builder/docker/grain builder/docker/javascript
+builder/docker: subo/docker builder/docker/rust builder/docker/swift builder/docker/as builder/docker/tinygo builder/docker/grain builder/docker/javascript builder/docker/wat
 
-builder/docker/publish: subo/docker/publish builder/docker/rust/publish builder/docker/swift/publish builder/docker/as/publish builder/docker/tinygo/publish builder/docker/grain/publish builder/docker/javascript/publish
+builder/docker/publish: subo/docker/publish builder/docker/rust/publish builder/docker/swift/publish builder/docker/as/publish builder/docker/tinygo/publish builder/docker/grain/publish builder/docker/javascript/publish builder/docker/wat/publish
 
-builder/docker/dev/publish: subo/docker/publish builder/docker/rust/dev/publish builder/docker/swift/dev/publish builder/docker/as/dev/publish builder/docker/tinygo/dev/publish builder/docker/grain/dev/publish builder/docker/javascript/dev/publish
+builder/docker/dev/publish: subo/docker/publish builder/docker/rust/dev/publish builder/docker/swift/dev/publish builder/docker/as/dev/publish builder/docker/tinygo/dev/publish builder/docker/grain/dev/publish builder/docker/javascript/dev/publish builder/docker/wat/dev/publish
 
 # AssemblyScript docker targets
 builder/docker/as:
@@ -78,4 +78,14 @@ builder/docker/javascript/publish:
 builder/docker/javascript/dev/publish:
 	docker buildx build . -f builder/docker/javascript/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-js:dev --push
 
-.PHONY: builder/docker builder/docker/publish builder/docker/as builder/docker/as/publish builder/docker/rust builder/docker/rust/publish builder/docker/swift builder/docker/swift/publish builder/docker/tinygo builder/docker/tinygo/publish builder/docker/grain builder/docker/grain/publish builder/docker/javascript builder/docker/javascript/publish
+# wat docker targets
+builder/docker/wat:
+	DOCKER_BUILDKIT=1 docker build . -f builder/docker/wat/Dockerfile -t suborbital/builder-wat:$(ver)
+
+builder/docker/wat/publish:
+	docker buildx build . -f builder/docker/wat/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-wat:$(ver) --push
+
+builder/docker/wat/dev/publish:
+	docker buildx build . -f builder/docker/wat/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-wat:dev --push
+
+.PHONY: builder/docker builder/docker/publish builder/docker/as builder/docker/as/publish builder/docker/rust builder/docker/rust/publish builder/docker/swift builder/docker/swift/publish builder/docker/tinygo builder/docker/tinygo/publish builder/docker/grain builder/docker/grain/publish builder/docker/javascript builder/docker/javascript/publish builder/docker/wat builder/docker/wat/publish

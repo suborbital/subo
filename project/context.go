@@ -24,6 +24,7 @@ var validLangs = map[string]struct{}{
 	"grain":          {},
 	"typescript":     {},
 	"javascript":     {},
+	"wat":            {},
 }
 
 // Context describes the context under which the tool is being run.
