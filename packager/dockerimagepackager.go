@@ -44,7 +44,7 @@ func (b *DockerImagePackageJob) Package(log util.FriendlyLogger, ctx *project.Co
 		return errors.Wrap(err, "failed to dockerNameFromDirective")
 	}
 
-	if _, err := util.Run(fmt.Sprintf("docker build . -t=%s", imageName)); err != nil {
+	if _, err := util.Command.Run(fmt.Sprintf("docker build . -t=%s", imageName)); err != nil {
 		return errors.Wrap(err, "🚫 failed to build Docker image")
 	}
 

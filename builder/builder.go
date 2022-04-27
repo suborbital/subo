@@ -31,7 +31,8 @@ type Builder struct {
 
 	results []BuildResult
 
-	log util.FriendlyLogger
+	log           util.FriendlyLogger
+	commandRunner util.CommandRunner
 }
 
 // BuildResult is the results of a build including the built module and logs.
@@ -48,16 +49,17 @@ const (
 )
 
 // ForDirectory creates a Builder bound to a particular directory.
-func ForDirectory(logger util.FriendlyLogger, dir string) (*Builder, error) {
+func ForDirectory(logger util.FriendlyLogger, commandRunner util.CommandRunner, dir string) (*Builder, error) {
 	ctx, err := project.ForDirectory(dir)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to project.ForDirectory")
 	}
 
 	b := &Builder{
-		Context: ctx,
-		results: []BuildResult{},
-		log:     logger,
+		Context:       ctx,
+		results:       []BuildResult{},
+		log:           logger,
+		commandRunner: commandRunner,
 	}
 
 	return b, nil
@@ -142,7 +144,7 @@ func (b *Builder) dockerBuildForLang(lang string) (*BuildResult, error) {
 
 	result := &BuildResult{}
 
-	outputLog, err := util.Run(fmt.Sprintf("docker run --rm --mount type=bind,source=%s,target=/root/runnable %s subo build %s --native --langs %s", b.Context.MountPath, img, b.Context.RelDockerPath, lang))
+	outputLog, err := b.commandRunner.Run(fmt.Sprintf("docker run --rm --mount type=bind,source=%s,target=/root/runnable %s subo build %s --native --langs %s", b.Context.MountPath, img, b.Context.RelDockerPath, lang))
 
 	result.OutputLog = outputLog
 
@@ -177,7 +179,7 @@ func (b *Builder) doNativeBuildForRunnable(r project.RunnableDir, result *BuildR
 		cmdString := strings.TrimSpace(fullCmd.String())
 
 		// Even if the command fails, still load the output into the result object.
-		outputLog, err := util.RunInDir(cmdString, r.Fullpath)
+		outputLog, err := b.commandRunner.RunInDir(cmdString, r.Fullpath)
 
 		result.OutputLog += outputLog + "\n"
 
@@ -226,9 +228,9 @@ func (b *Builder) checkAndRunPreReqs(runnable project.RunnableDir, result *Build
 					return errors.Wrap(err, "prereq.GetCommand")
 				}
 
-				outputLog, err := util.RunInDir(fullCmd, runnable.Fullpath)
+				outputLog, err := b.commandRunner.RunInDir(fullCmd, runnable.Fullpath)
 				if err != nil {
-					return errors.Wrapf(err, "util.RunInDir: %s", fullCmd)
+					return errors.Wrapf(err, "commandRunner.RunInDir: %s", fullCmd)
 				}
 
 				result.OutputLog += outputLog + "\n"

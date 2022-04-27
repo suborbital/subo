@@ -101,11 +101,11 @@ func (k *K8sDeployJob) Deploy(log util.FriendlyLogger, ctx *project.Context) err
 		}
 	}
 
-	if out, err := util.Run("kubectl create ns suborbital"); err != nil {
+	if out, err := util.Command.Run("kubectl create ns suborbital"); err != nil {
 		log.LogWarn(fmt.Sprintf("failed to create `suborbital` namespace (may alrady exist): %s", out))
 	}
 
-	if _, err := util.Run("kubectl apply -f .deployment/"); err != nil {
+	if _, err := util.Command.Run("kubectl apply -f .deployment/"); err != nil {
 		return errors.Wrap(err, "failed to Run kubectl apply")
 	}
 

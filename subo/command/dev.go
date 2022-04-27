@@ -34,7 +34,7 @@ func DevCmd() *cobra.Command {
 
 			port, _ := cmd.Flags().GetString("port")
 
-			_, err = util.Run(fmt.Sprintf("docker run -v=%s:/home/atmo -e=ATMO_HTTP_PORT=%s -p=%s:%s suborbital/atmo:%s atmo", bctx.Cwd, port, port, port, bctx.AtmoVersion))
+			_, err = util.Command.Run(fmt.Sprintf("docker run -v=%s:/home/atmo -e=ATMO_HTTP_PORT=%s -p=%s:%s suborbital/atmo:%s atmo", bctx.Cwd, port, port, port, bctx.AtmoVersion))
 			if err != nil {
 				return errors.Wrap(err, "🚫 failed to run dev server")
 			}
