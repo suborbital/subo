@@ -53,6 +53,7 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 				Command: "npm install --include=dev",
 			},
 		},
+		"wat": {},
 	},
 	"linux": {
 		"rust":  {},
@@ -90,6 +91,7 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 				Command: "npm install --include=dev",
 			},
 		},
+		"wat": {},
 	},
 }
 

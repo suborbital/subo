@@ -23,6 +23,7 @@ var dockerImageForLang = map[string]string{
 	"grain":          "--platform linux/amd64 suborbital/builder-gr",
 	"typescript":     "suborbital/builder-js",
 	"javascript":     "suborbital/builder-js",
+	"wat":            "suborbital/builder-wat",
 }
 
 // Builder is capable of building Wasm modules from source.
