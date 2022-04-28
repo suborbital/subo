@@ -218,9 +218,9 @@ func (b *Builder) checkAndRunPreReqs(runnable project.RunnableDir, result *Build
 
 	for _, p := range preReqs {
 
-		filepath := filepath.Join(runnable.Fullpath, p.File)
+		filepathVar := filepath.Join(runnable.Fullpath, p.File)
 
-		if _, err := os.Stat(filepath); err != nil {
+		if _, err := os.Stat(filepathVar); err != nil {
 			if errors.Is(err, os.ErrNotExist) {
 				b.log.LogStart(fmt.Sprintf("missing %s, fixing...", p.File))
 
