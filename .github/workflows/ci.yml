@@ -51,31 +51,89 @@ jobs:
         run: |
           make subo
 
+      - uses: actions/upload-artifact@v3
+        with:
+          name: subo
+          path: ~/go/bin/subo
+          if-no-files-found: error
+
+  smoke:
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language:
+          - assemblyscript
+          # - grain
+          # - javascript
+          - rust
+          - swift
+          - tinygo
+          # - typescript
+        include:
+          - language: assemblyscript
+            image: builder-as
+            dockerfile: builder/docker/assemblyscript/Dockerfile
+          # - language: grain
+          #   image: builder-gr
+          #   dockerfile: builder/docker/grain/Dockerfile
+          # - language: javascript
+          #   image: builder-js
+          #   dockerfile: builder/docker/javascript/Dockerfile
+          - language: rust
+            image: builder-rs
+            dockerfile: builder/docker/rust/Dockerfile
+          - language: swift
+            image: builder-swift
+            dockerfile: builder/docker/swift/Dockerfile
+          - language: tinygo
+            image: builder-tinygo
+            dockerfile: builder/docker/tinygo/Dockerfile
+          # - language: typescript
+          #   image: builder-js
+          #   dockerfile: builder/docker/javascript/Dockerfile
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v1
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: subo
+          path: ~/bin
+      - run: |
+          chmod +x $HOME/bin/subo
+          echo "$HOME/bin" >> $GITHUB_PATH
+
       - name: Get branch name
         id: branch-name
         uses: tj-actions/branch-names@v5.2
 
-      - name: Create project and runnable
-        run: |
-          subo create project smoketest
-          subo create runnable rs-test --branch ${{ steps.branch-name.outputs.current_branch }} --lang rust --dir ./smoketest
-          subo create runnable swift-test --branch ${{ steps.branch-name.outputs.current_branch }} --lang swift --dir ./smoketest
-          subo create runnable as-test --branch ${{ steps.branch-name.outputs.current_branch }} --lang assemblyscript --dir ./smoketest
-          subo create runnable tinygo-test --branch ${{ steps.branch-name.outputs.current_branch }} --lang tinygo --dir ./smoketest
+      - name: Build ${{ matrix.image }}:dev image
+        uses: docker/build-push-action@v2
+        with:
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          file: ${{ matrix.dockerfile }}
+          load: true
+          tags: suborbital/${{ matrix.image }}:dev
 
-      - name: Build project
-        run: |
-          subo build ./smoketest --builder-tag dev
+      - name: Create runnable
+        run: subo create runnable ${{ matrix.language }}-test --lang ${{ matrix.language }} --branch ${{ steps.branch-name.outputs.current_branch }}
+
+      - name: Run subo build
+        run: subo build ${{ matrix.language }}-test --builder-tag dev
 
       - name: Check TinyGo version number consistency
-        run: |
-          builder/docker/tinygo/smoke.sh
+        if: matrix.language == 'tinygo'
+        run: builder/docker/tinygo/smoke.sh
 
   # only run if reference is a tag
   release:
     if: startsWith(github.ref, 'refs/tags/v')
 
-    needs: [lint, test]
+    needs: [lint, smoke, test]
     runs-on: ubuntu-latest
 
     steps:
@@ -90,7 +148,7 @@ jobs:
           path: |
             ~/.cache/go-build
             ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.os }}-go-${{ hashFiles('go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
       - run: go mod download
