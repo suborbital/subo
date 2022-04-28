@@ -31,8 +31,7 @@ subo create runnable rs-test --lang rust
 subo create runnable swift-test --lang swift
 subo create runnable as-test --lang assemblyscript
 subo create runnable tinygo-test --lang tinygo
-# TODO: uncomment when js builder is checked in
-#subo create runnable js-test --lang javascript
+subo create runnable js-test --lang javascript
 
 # build project bundle
 subo build .
