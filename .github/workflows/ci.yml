@@ -129,6 +129,7 @@ jobs:
           - swift
           - tinygo
           # - typescript
+          - wat
         include:
           - language: assemblyscript
             image: builder-as
@@ -151,6 +152,9 @@ jobs:
           # - language: typescript
           #   image: builder-js
           #   dockerfile: builder/docker/javascript/Dockerfile
+          - language: wat
+            image: builder-wat
+            dockerfile: builder/docker/wat/Dockerfile
 
     steps:
       - uses: actions/checkout@v3
