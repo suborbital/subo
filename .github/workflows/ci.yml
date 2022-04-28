@@ -65,7 +65,7 @@ jobs:
       matrix:
         language:
           - assemblyscript
-          # - grain
+          - grain
           # - javascript
           - rust
           - swift
@@ -75,9 +75,9 @@ jobs:
           - language: assemblyscript
             image: builder-as
             dockerfile: builder/docker/assemblyscript/Dockerfile
-          # - language: grain
-          #   image: builder-gr
-          #   dockerfile: builder/docker/grain/Dockerfile
+          - language: grain
+            image: builder-gr
+            dockerfile: builder/docker/grain/Dockerfile
           # - language: javascript
           #   image: builder-js
           #   dockerfile: builder/docker/javascript/Dockerfile
