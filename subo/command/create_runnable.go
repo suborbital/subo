@@ -55,6 +55,7 @@ func CreateRunnableCmd() *cobra.Command {
 			lang, _ := cmd.Flags().GetString(langFlag)
 			repo, _ := cmd.Flags().GetString(repoFlag)
 			branch, _ := cmd.Flags().GetString(branchFlag)
+			handler, _ := cmd.Flags().GetString(handlerFlag)
 
 			dir, _ := cmd.Flags().GetString(dirFlag)
 			bctx, err := project.ForDirectory(dir)
@@ -106,6 +107,12 @@ func CreateRunnableCmd() *cobra.Command {
 				}
 			}
 
+			if handler != "" {
+				if err := CreateHandlerCmd().RunE(cmd, []string{handler, name}); err != nil {
+					return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to CreateHandlerCmd")
+				}
+			}
+
 			util.LogDone(path)
 
 			return nil
@@ -123,6 +130,7 @@ func CreateRunnableCmd() *cobra.Command {
 	cmd.Flags().String(repoFlag, "suborbital/subo", "git repo to download templates from")
 	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
 	cmd.Flags().Bool(updateTemplatesFlag, false, "update with the newest runnable templates")
+	cmd.Flags().String(handlerFlag, "", "the handler to use for the new runnable")
 
 	return cmd
 }

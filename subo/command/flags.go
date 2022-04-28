@@ -18,4 +18,5 @@ const (
 	localFlag           = "local"
 	proxyPortFlag       = "proxy-port"
 	domainFlag          = "domain"
+	handlerFlag         = "handler"
 )
