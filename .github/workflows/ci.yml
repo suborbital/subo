@@ -124,11 +124,11 @@ jobs:
         language:
           - assemblyscript
           - grain
-          # - javascript
+          - javascript
           - rust
           - swift
           - tinygo
-          # - typescript
+          - typescript
           - wat
         include:
           - language: assemblyscript
@@ -137,9 +137,9 @@ jobs:
           - language: grain
             image: builder-gr
             dockerfile: builder/docker/grain/Dockerfile
-          # - language: javascript
-          #   image: builder-js
-          #   dockerfile: builder/docker/javascript/Dockerfile
+          - language: javascript
+            image: builder-js
+            dockerfile: builder/docker/javascript/Dockerfile
           - language: rust
             image: builder-rs
             dockerfile: builder/docker/rust/Dockerfile
@@ -149,9 +149,9 @@ jobs:
           - language: tinygo
             image: builder-tinygo
             dockerfile: builder/docker/tinygo/Dockerfile
-          # - language: typescript
-          #   image: builder-js
-          #   dockerfile: builder/docker/javascript/Dockerfile
+          - language: typescript
+            image: builder-js
+            dockerfile: builder/docker/javascript/Dockerfile
           - language: wat
             image: builder-wat
             dockerfile: builder/docker/wat/Dockerfile
