@@ -7,7 +7,7 @@
 : ${GREP:=grep}
 
 base=builder/docker/tinygo
-version=$(cat ${base}/.tinygo-ver)
+version=$(cat ${base}/.tinygo-ver | tr -d '\n')
 
 err_sum=0
 
