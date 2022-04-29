@@ -25,6 +25,9 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    outputs:
+      repo: ${{ fromJSON(steps.github.outputs.result).repo }}
+      branch: ${{ fromJSON(steps.github.outputs.result).branch }}
 
     steps:
       - uses: actions/checkout@v3
@@ -56,6 +59,29 @@ jobs:
           name: subo
           path: ~/go/bin/subo
           if-no-files-found: error
+
+      - name: Get repo and branch name
+        id: github
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const results = { repo: undefined, branch: undefined}
+
+            if (context.eventName == 'pull_request') {
+              results.repo = context.payload.pull_request.head.repo.full_name,
+              results.branch = context.payload.pull_request.head.ref
+            } else {
+              results.repo = context.payload.repository.full_name
+              results.branch = context.ref.replace(/^refs\/heads\/|^refs\/tags\//, '')
+            }
+            console.log(results)
+
+            if (!results.repo || !results.branch) {
+              console.log('repo and branch must both be defined')
+              process.exit(1)
+            }
+            return results
 
   smoke:
     needs: test
@@ -106,10 +132,6 @@ jobs:
           chmod +x $HOME/bin/subo
           echo "$HOME/bin" >> $GITHUB_PATH
 
-      - name: Get branch name
-        id: branch-name
-        uses: tj-actions/branch-names@v5.2
-
       - name: Build ${{ matrix.image }}:dev image
         uses: docker/build-push-action@v2
         with:
@@ -120,7 +142,7 @@ jobs:
           tags: suborbital/${{ matrix.image }}:dev
 
       - name: Create runnable
-        run: subo create runnable ${{ matrix.language }}-test --lang ${{ matrix.language }} --branch ${{ steps.branch-name.outputs.current_branch }}
+        run: subo create runnable ${{ matrix.language }}-test --lang ${{ matrix.language }} --repo ${{ needs.test.outputs.repo }} --branch ${{ needs.test.outputs.branch }}
 
       - name: Run subo build
         run: subo build ${{ matrix.language }}-test --builder-tag dev
