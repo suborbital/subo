@@ -31,22 +31,21 @@ steps:
     entrypoint: bash
     secretEnv: ['DOCKERHUB_USERNAME', 'DOCKERHUB_TOKEN']
     args:
-      - '-eEuo'
-      - 'pipefail'
       - '-c'
-      - |-
-        echo $$DOCKERHUB_TOKEN | docker login -u $$DOCKERHUB_USERNAME --password-stdin
+      - echo $$DOCKERHUB_TOKEN | docker login -u $$DOCKERHUB_USERNAME --password-stdin
   - id: build-tinygo-base
     name: gcr.io/cloud-builders/docker
-    entrypoint: bash
     args:
-      - '-eEuo'
-      - 'pipefail'
-      - '-c'
-      - |-
-        tinygo_ver="$(cat builder/docker/tinygo/.tinygo-ver | tr -d '\n')"
-        echo "docker buildx build --platform linux/amd64,linux/arm64 -f builder/docker/tinygo/Dockerfile.base -t suborbital/tinygo-base:$tinygo_ver $_TINYGO_BASE_ARGS ."
-        docker buildx build --platform linux/amd64,linux/arm64 -f builder/docker/tinygo/Dockerfile.base -t suborbital/tinygo-base:$tinygo_ver $_TINYGO_BASE_ARGS .
+      - buildx
+      - build
+      - '--platform'
+      - linux/amd64,linux/arm64
+      - '-f'
+      - builder/docker/tinygo/Dockerfile.base
+      - '-t'
+      - suborbital/tinygo-base:$_TINYGO_VERSION
+      - $_DOCKER_ADDITIONAL_ARGS
+      - '.'
 availableSecrets:
    secretManager:
    - versionName: projects/826192005836/secrets/DOCKERHUB_TOKEN/versions/1
@@ -59,4 +58,5 @@ options:
     - DOCKER_CLI_EXPERIMENTAL=enabled
   machineType: E2_HIGHCPU_8
 substitutions:
-  _TINYGO_BASE_ARGS: ''
+  _TINYGO_VERSION: 'v0.23.0'
+  _DOCKER_ADDITIONAL_ARGS: '--load'

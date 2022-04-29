@@ -8,6 +8,7 @@
 
 base=builder/docker/tinygo
 version=$(cat ${base}/.tinygo-ver | tr -d '\n')
+base_version=$(yq e '.substitutions._TINYGO_VERSION' ${base}/cloudbuild.yaml)
 
 err_sum=0
 
@@ -44,7 +45,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Check the base image
-assert_file $base/Dockerfile.base $version 'branch \K.+(?= https://github.com/tinygo-org/tinygo.git)'
+assert_file $base/Dockerfile.base $base_version 'branch \K.+(?= https://github.com/tinygo-org/tinygo.git)'
 assert_file $base/Dockerfile $version 'FROM suborbital/tinygo-base:\K.+(?= as)'
 
 if [ $err_sum -eq 0 ]; then
