@@ -23,7 +23,7 @@ func BuildCmd() *cobra.Command {
 				dir = args[0]
 			}
 
-			bdr, err := builder.ForDirectory(&util.PrintLogger{}, util.Command, dir)
+			bdr, err := builder.ForDirectory(&util.PrintLogger{}, &builder.DefaultBuildConfig, dir)
 			if err != nil {
 				return errors.Wrap(err, "failed to builder.ForDirectory")
 			}
