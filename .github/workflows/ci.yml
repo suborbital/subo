@@ -23,43 +23,13 @@ jobs:
         with:
           version: v1.45
 
-  test:
+  meta:
     runs-on: ubuntu-latest
     outputs:
       repo: ${{ fromJSON(steps.github.outputs.result).repo }}
       branch: ${{ fromJSON(steps.github.outputs.result).branch }}
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-
-      - name: Cache Go mods
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      - run: go mod download
-
-      - name: Run unit tests
-        run: |
-          make test
-
-      - name: Build Subo
-        run: |
-          make subo
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: subo
-          path: ~/go/bin/subo
-          if-no-files-found: error
-
       - name: Get repo and branch name
         id: github
         uses: actions/github-script@v6
@@ -83,8 +53,65 @@ jobs:
             }
             return results
 
+  image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: docker/setup-buildx-action@v1
+
+      - name: Build suborbital/subo:dev image
+        uses: docker/build-push-action@v2
+        with:
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          file: Dockerfile
+          tags: suborbital/subo:dev
+          outputs: type=docker,dest=/tmp/subo.tar
+
+      - name: Upload subo image
+        uses: actions/upload-artifact@v3
+        with:
+          name: subo.tar
+          path: /tmp/subo.tar
+          if-no-files-found: error
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+
+      - name: Cache Go mods
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - run: go mod download
+
+      - name: Build Subo
+        run: |
+          make subo
+
+      - name: Run unit tests
+        run: |
+          make test
+
+      - name: Upload subo binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: subo
+          path: ~/go/bin/subo
+          if-no-files-found: error
+
   smoke:
-    needs: test
+    needs: [image, meta, test]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -124,13 +151,25 @@ jobs:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v1
 
-      - uses: actions/download-artifact@v3
+      - name: Download subo binary
+        uses: actions/download-artifact@v3
         with:
           name: subo
           path: ~/bin
-      - run: |
+      - name: Run chmod +x subo binary
+        run: |
           chmod +x $HOME/bin/subo
           echo "$HOME/bin" >> $GITHUB_PATH
+
+      - name: Download subo image
+        uses: actions/download-artifact@v3
+        with:
+          name: subo.tar
+          path: /tmp
+      - name: Load subo image into Docker
+        run: |
+          docker load --input /tmp/subo.tar
+          docker image ls -a
 
       - name: Build ${{ matrix.image }}:dev image
         uses: docker/build-push-action@v2
@@ -142,7 +181,7 @@ jobs:
           tags: suborbital/${{ matrix.image }}:dev
 
       - name: Create runnable
-        run: subo create runnable ${{ matrix.language }}-test --lang ${{ matrix.language }} --repo ${{ needs.test.outputs.repo }} --branch ${{ needs.test.outputs.branch }}
+        run: subo create runnable ${{ matrix.language }}-test --lang ${{ matrix.language }} --repo ${{ needs.meta.outputs.repo }} --branch ${{ needs.meta.outputs.branch }}
 
       - name: Run subo build
         run: subo build ${{ matrix.language }}-test --builder-tag dev
@@ -155,7 +194,7 @@ jobs:
   release:
     if: startsWith(github.ref, 'refs/tags/v')
 
-    needs: [lint, smoke, test]
+    needs: [image, lint, smoke, test]
     runs-on: ubuntu-latest
 
     steps:
