@@ -48,8 +48,8 @@ builder/docker/tinygo-base/publish:
 builder/docker/tinygo-base/dev/publish:
 	docker buildx build . -f builder/docker/tinygo/Dockerfile.base --platform linux/amd64,linux/arm64 -t suborbital/tinygo-base:dev --push
 
-# TinyGo (slim) docker targets
-builder/docker/tinygo: builder/docker/tinygo-base
+# TinyGo docker targets
+builder/docker/tinygo:
 	DOCKER_BUILDKIT=1 docker build . -f builder/docker/tinygo/Dockerfile -t suborbital/builder-tinygo:$(ver)
 
 builder/docker/tinygo/publish:
