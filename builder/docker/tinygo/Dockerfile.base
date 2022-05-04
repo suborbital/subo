@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     cmake \
     ninja-build \
     && rm -rf /var/lib/apt/lists/*
-ADD https://raw.githubusercontent.com/tinygo-org/tinygo/v0.22.0/Makefile ./Makefile
+ADD https://raw.githubusercontent.com/tinygo-org/tinygo/v0.23.0/Makefile ./Makefile
 RUN make llvm-source
 
 FROM llvm AS llvm-build
@@ -19,7 +19,7 @@ RUN export CC=clang-11 && export CXX=clang++-11 && make llvm-build
 
 FROM llvm-build
 WORKDIR /root/tinygo
-RUN git clone --depth 1 --branch v0.22.0 https://github.com/tinygo-org/tinygo.git /root/tinygo && \
+RUN git clone --depth 1 --branch v0.23.0 https://github.com/tinygo-org/tinygo.git /root/tinygo && \
     git submodule update --init
 RUN make -j2 LLVM_BUILDDIR=/root/llvm-build LLVM_PROJECTDIR=/root/llvm-project
 RUN make -j2 LLVM_BUILDDIR=/root/llvm-build LLVM_PROJECTDIR=/root/llvm-project wasi-libc binaryen
