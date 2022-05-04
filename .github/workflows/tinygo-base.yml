@@ -85,7 +85,7 @@ jobs:
           cache-to: type=gha,mode=max
           file: builder/docker/tinygo/Dockerfile.base
           platforms: linux/amd64,linux/arm64
-          push: $INPUT_PUSH
+          push: ${{ inputs.push == 'true' }}
           tags: suborbital/tinygo-base:${{ needs.create-vm.outputs.tag }}
 
   destroy-vm:
