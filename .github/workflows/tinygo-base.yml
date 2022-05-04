@@ -69,17 +69,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - if: ${{ github.event_name == 'pull_request' }}
-        uses: docker/build-push-action@v2
-        with:
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          file: builder/docker/tinygo/Dockerfile.base
-          platforms: linux/amd64,linux/arm64
-          push: false
-          tags: suborbital/tinygo-base:${{ needs.create-vm.outputs.tag }}
-      - if: ${{ github.event_name == 'workflow_dispatch' }}
-        uses: docker/build-push-action@v2
+      - uses: docker/build-push-action@v2
         with:
           cache-from: type=gha
           cache-to: type=gha,mode=max
