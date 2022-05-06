@@ -1,7 +1,7 @@
 FROM suborbital/tinygo-base:v0.23.0 as tinygo
 FROM suborbital/subo:dev as subo
 
-FROM golang:1.17-bullseye
+FROM golang:1.18-bullseye
 WORKDIR /root/runnable
 COPY --from=tinygo /root/release/tinygo /usr/local/tinygo
 COPY --from=subo /go/bin/subo /usr/local/bin
