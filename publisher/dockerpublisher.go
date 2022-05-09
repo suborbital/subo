@@ -42,7 +42,7 @@ func (b *DockerPublishJob) Publish(log util.FriendlyLogger, ctx *project.Context
 		return errors.Wrap(err, "failed to dockerNameFromDirective")
 	}
 
-	if _, err := util.Run(fmt.Sprintf("docker buildx build . --platform linux/amd64,linux/arm64 -t %s --push", imageName)); err != nil {
+	if _, err := util.Command.Run(fmt.Sprintf("docker buildx build . --platform linux/amd64,linux/arm64 -t %s --push", imageName)); err != nil {
 		return errors.Wrap(err, "failed to Run docker")
 	}
 

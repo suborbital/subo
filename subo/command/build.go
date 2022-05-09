@@ -23,7 +23,7 @@ func BuildCmd() *cobra.Command {
 				dir = args[0]
 			}
 
-			bdr, err := builder.ForDirectory(&util.PrintLogger{}, dir)
+			bdr, err := builder.ForDirectory(&util.PrintLogger{}, &builder.DefaultBuildConfig, dir)
 			if err != nil {
 				return errors.Wrap(err, "failed to builder.ForDirectory")
 			}
@@ -71,7 +71,7 @@ func BuildCmd() *cobra.Command {
 
 			if makeTarget != "" {
 				util.LogStart(fmt.Sprintf("make %s", makeTarget))
-				_, err = util.Run(fmt.Sprintf("make %s", makeTarget))
+				_, err = util.Command.Run(fmt.Sprintf("make %s", makeTarget))
 				if err != nil {
 					return errors.Wrapf(err, "🚫 failed to make %s", makeTarget)
 				}

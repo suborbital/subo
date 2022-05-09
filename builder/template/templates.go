@@ -42,13 +42,13 @@ func UpdateTemplates(repo, branch string) (string, error) {
 		return "", errors.Wrap(err, "failed to TemplateDir")
 	}
 
-	filepath, err := downloadZip(repo, branch, templateRootPath)
+	filepathVar, err := downloadZip(repo, branch, templateRootPath)
 	if err != nil {
 		return "", errors.Wrap(err, "🚫 failed to downloadZip for templates")
 	}
 
 	// The tmplPath may be different than the default if a custom URL was provided.
-	tmplPath, err := extractZip(filepath, templateRootPath, branchDirName)
+	tmplPath, err := extractZip(filepathVar, templateRootPath, branchDirName)
 	if err != nil {
 		return "", errors.Wrap(err, "🚫 failed to extractZip for templates")
 	}
@@ -211,11 +211,11 @@ func downloadZip(repo, branch, targetPath string) (string, error) {
 		return "", fmt.Errorf("response was non-200: %d", resp.StatusCode)
 	}
 
-	filePath := filepath.Join(targetPath, "subo.zip")
+	filepathVar := filepath.Join(targetPath, "subo.zip")
 
 	// Check if the zip already exists, and delete it if it does.
-	if _, err := os.Stat(filePath); err == nil {
-		if err := os.Remove(filePath); err != nil {
+	if _, err := os.Stat(filepathVar); err == nil {
+		if err := os.Remove(filepathVar); err != nil {
 			return "", errors.Wrap(err, "failed to delete exising templates zip")
 		}
 	}
@@ -224,7 +224,7 @@ func downloadZip(repo, branch, targetPath string) (string, error) {
 		return "", errors.Wrap(err, "failed to MkdirAll")
 	}
 
-	file, err := os.Create(filePath)
+	file, err := os.Create(filepathVar)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to Open file")
 	}
@@ -234,7 +234,7 @@ func downloadZip(repo, branch, targetPath string) (string, error) {
 		return "", errors.Wrap(err, "failed to Copy data to file")
 	}
 
-	return filePath, nil
+	return filepathVar, nil
 }
 
 // extractZip extracts a ZIP file.
@@ -250,7 +250,7 @@ func extractZip(filePath, destPath, branchDirName string) (string, error) {
 		}
 	}
 
-	if _, err := util.Run(fmt.Sprintf("unzip -q %s -d %s", escapedFilepath, escapedDestPath)); err != nil {
+	if _, err := util.Command.Run(fmt.Sprintf("unzip -q %s -d %s", escapedFilepath, escapedDestPath)); err != nil {
 		return "", errors.Wrap(err, "failed to Run unzip")
 	}
 

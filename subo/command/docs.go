@@ -102,7 +102,7 @@ func DocsTestCmd() *cobra.Command {
 				dir = args[0]
 			}
 
-			if cache, err := util.CacheDir(); err != nil {
+			if cache, err := util.CacheDir("subo"); err != nil {
 				return errors.Wrap(err, "failed to CacheDir")
 			} else if err := generateDocs(dir, filepath.Join(cache, "docs")); err != nil {
 				return errors.Wrap(err, "failed to getUpdatedDocs")

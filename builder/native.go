@@ -44,6 +44,9 @@ var nativeCommandsForLang = map[string]map[string][]string{
 		"javascript": {
 			"npm run build",
 		},
+		"wat": {
+			"wat2wasm lib.wat -o {{ .Name }}.wasm",
+		},
 	},
 	"linux": {
 		"rust": {
@@ -72,6 +75,9 @@ var nativeCommandsForLang = map[string]map[string][]string{
 		},
 		"javascript": {
 			"npm run build",
+		},
+		"wat": {
+			"wat2wasm lib.wat -o {{ .Name }}.wasm",
 		},
 	},
 }

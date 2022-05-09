@@ -129,7 +129,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 			util.LogStart("installing...")
 
 			if localInstall {
-				if _, err := util.Run("docker-compose up -d"); err != nil {
+				if _, err := util.Command.Run("docker-compose up -d"); err != nil {
 					return errors.Wrap(err, "🚫 failed to docker-compose up")
 				}
 
@@ -152,18 +152,18 @@ func ComputeDeployCoreCommand() *cobra.Command {
 				repl.Run()
 
 			} else {
-				if _, err := util.Run("kubectl apply -f https://github.com/kedacore/keda/releases/download/v2.4.0/keda-2.4.0.yaml"); err != nil {
+				if _, err := util.Command.Run("kubectl apply -f https://github.com/kedacore/keda/releases/download/v2.4.0/keda-2.4.0.yaml"); err != nil {
 					return errors.Wrap(err, "🚫 failed to install KEDA")
 				}
 
 				// we don't care if this fails, so don't check error.
-				util.Run("kubectl create ns suborbital")
+				util.Command.Run("kubectl create ns suborbital")
 
 				if err := createConfigMap(cwd); err != nil {
 					return errors.Wrap(err, "failed to createConfigMap")
 				}
 
-				if _, err := util.Run("kubectl apply -f .suborbital/"); err != nil {
+				if _, err := util.Command.Run("kubectl apply -f .suborbital/"); err != nil {
 					return errors.Wrap(err, "🚫 failed to kubectl apply")
 				}
 
@@ -220,19 +220,29 @@ Are you ready to continue? (y/N): `)
 
 // getEnvToken gets the environment token from stdin.
 func getEnvToken() (string, error) {
-	buf, err := util.ReadEnvironmentToken()
+	existing, err := util.ReadEnvironmentToken()
 	if err == nil {
-		return buf, nil
+		util.LogInfo("using cached environment token")
+		return existing, nil
 	}
 
 	fmt.Print("Enter your environment token: ")
 	token, err := input.ReadStdinString()
+
 	if err != nil {
 		return "", errors.Wrap(err, "failed to ReadStdinString")
 	}
 
 	if len(token) != 32 {
 		return "", errors.New("token must be 32 characters in length")
+	}
+
+	if err := util.WriteEnvironmentToken(token); err != nil {
+		util.LogWarn(err.Error())
+		return token, nil
+
+	} else {
+		util.LogInfo("saved environment token to cache")
 	}
 
 	return token, nil
@@ -278,7 +288,7 @@ func getStorageClass() (string, error) {
 }
 
 func detectStorageClass() (string, error) {
-	output, err := util.Run("kubectl get storageclass --output=name")
+	output, err := util.Command.Run("kubectl get storageclass --output=name")
 	if err != nil {
 		return "", errors.Wrap(err, "failed to get default storageclass")
 	}
@@ -302,7 +312,7 @@ func createConfigMap(cwd string) error {
 		return errors.Wrap(err, "failed to Stat scc-config.yaml")
 	}
 
-	if _, err := util.Run(fmt.Sprintf("kubectl create configmap scc-config --from-file=scc-config.yaml=%s -n suborbital", configFilepath)); err != nil {
+	if _, err := util.Command.Run(fmt.Sprintf("kubectl create configmap scc-config --from-file=scc-config.yaml=%s -n suborbital", configFilepath)); err != nil {
 		return errors.Wrap(err, "failed to create configmap (you may need to run `kubectl delete configmap scc-config -n suborbital`)")
 	}
 

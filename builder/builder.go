@@ -23,11 +23,25 @@ var dockerImageForLang = map[string]string{
 	"grain":          "--platform linux/amd64 suborbital/builder-gr",
 	"typescript":     "suborbital/builder-js",
 	"javascript":     "suborbital/builder-js",
+	"wat":            "suborbital/builder-wat",
+}
+
+// BuildConfig is the configuration for a Builder.
+type BuildConfig struct {
+	JsToolchain   string
+	CommandRunner util.CommandRunner
+}
+
+// DefaultBuildConfig is the default build configuration.
+var DefaultBuildConfig = BuildConfig{
+	JsToolchain:   "npm",
+	CommandRunner: util.Command,
 }
 
 // Builder is capable of building Wasm modules from source.
 type Builder struct {
 	Context *project.Context
+	Config  *BuildConfig
 
 	results []BuildResult
 
@@ -48,7 +62,7 @@ const (
 )
 
 // ForDirectory creates a Builder bound to a particular directory.
-func ForDirectory(logger util.FriendlyLogger, dir string) (*Builder, error) {
+func ForDirectory(logger util.FriendlyLogger, config *BuildConfig, dir string) (*Builder, error) {
 	ctx, err := project.ForDirectory(dir)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to project.ForDirectory")
@@ -56,6 +70,7 @@ func ForDirectory(logger util.FriendlyLogger, dir string) (*Builder, error) {
 
 	b := &Builder{
 		Context: ctx,
+		Config:  config,
 		results: []BuildResult{},
 		log:     logger,
 	}
@@ -142,7 +157,7 @@ func (b *Builder) dockerBuildForLang(lang string) (*BuildResult, error) {
 
 	result := &BuildResult{}
 
-	outputLog, err := util.Run(fmt.Sprintf("docker run --rm --mount type=bind,source=%s,target=/root/runnable %s subo build %s --native --langs %s", b.Context.MountPath, img, b.Context.RelDockerPath, lang))
+	outputLog, err := b.Config.CommandRunner.Run(fmt.Sprintf("docker run --rm --mount type=bind,source=%s,target=/root/runnable %s subo build %s --native --langs %s", b.Context.MountPath, img, b.Context.RelDockerPath, lang))
 
 	result.OutputLog = outputLog
 
@@ -177,7 +192,7 @@ func (b *Builder) doNativeBuildForRunnable(r project.RunnableDir, result *BuildR
 		cmdString := strings.TrimSpace(fullCmd.String())
 
 		// Even if the command fails, still load the output into the result object.
-		outputLog, err := util.RunInDir(cmdString, r.Fullpath)
+		outputLog, err := b.Config.CommandRunner.RunInDir(cmdString, r.Fullpath)
 
 		result.OutputLog += outputLog + "\n"
 
@@ -215,20 +230,20 @@ func (b *Builder) checkAndRunPreReqs(runnable project.RunnableDir, result *Build
 
 	for _, p := range preReqs {
 
-		filepath := filepath.Join(runnable.Fullpath, p.File)
+		filepathVar := filepath.Join(runnable.Fullpath, p.File)
 
-		if _, err := os.Stat(filepath); err != nil {
+		if _, err := os.Stat(filepathVar); err != nil {
 			if errors.Is(err, os.ErrNotExist) {
 				b.log.LogStart(fmt.Sprintf("missing %s, fixing...", p.File))
 
-				fullCmd, err := p.GetCommand(runnable)
+				fullCmd, err := p.GetCommand(*b.Config, runnable)
 				if err != nil {
 					return errors.Wrap(err, "prereq.GetCommand")
 				}
 
-				outputLog, err := util.RunInDir(fullCmd, runnable.Fullpath)
+				outputLog, err := b.Config.CommandRunner.RunInDir(fullCmd, runnable.Fullpath)
 				if err != nil {
-					return errors.Wrapf(err, "util.RunInDir: %s", fullCmd)
+					return errors.Wrapf(err, "commandRunner.RunInDir: %s", fullCmd)
 				}
 
 				result.OutputLog += outputLog + "\n"

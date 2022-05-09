@@ -6,11 +6,11 @@ require (
 	github.com/deislabs/go-bindle v0.1.1-0.20220201013943-612c59d27f42
 	github.com/google/go-github/v41 v41.0.0
 	github.com/hashicorp/go-version v1.4.0
-	github.com/pelletier/go-toml v1.9.4
+	github.com/pelletier/go-toml v1.9.5
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.1
-	github.com/suborbital/atmo v0.4.6
+	github.com/suborbital/atmo v0.4.7
 	golang.org/x/mod v0.5.1
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -37,7 +37,7 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
 	github.com/kr/pretty v0.2.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/sethvargo/go-envconfig v0.5.0 // indirect
+	github.com/sethvargo/go-envconfig v0.6.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/suborbital/reactr v0.15.1 // indirect
 	github.com/suborbital/vektor v0.5.3-0.20220302142328-fb4fc3951eb1 // indirect

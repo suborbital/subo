@@ -23,6 +23,58 @@ jobs:
         with:
           version: v1.45
 
+  meta:
+    runs-on: ubuntu-latest
+    outputs:
+      repo: ${{ fromJSON(steps.github.outputs.result).repo }}
+      branch: ${{ fromJSON(steps.github.outputs.result).branch }}
+
+    steps:
+      - name: Get repo and branch name
+        id: github
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const results = { repo: undefined, branch: undefined}
+
+            if (context.eventName == 'pull_request') {
+              results.repo = context.payload.pull_request.head.repo.full_name,
+              results.branch = context.payload.pull_request.head.ref
+            } else {
+              results.repo = context.payload.repository.full_name
+              results.branch = context.ref.replace(/^refs\/heads\/|^refs\/tags\//, '')
+            }
+            console.log(results)
+
+            if (!results.repo || !results.branch) {
+              console.log('repo and branch must both be defined')
+              process.exit(1)
+            }
+            return results
+
+  image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: docker/setup-buildx-action@v1
+
+      - name: Build suborbital/subo:dev image
+        uses: docker/build-push-action@v2
+        with:
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          file: Dockerfile
+          tags: suborbital/subo:dev
+          outputs: type=docker,dest=/tmp/subo.tar
+
+      - name: Upload subo image
+        uses: actions/upload-artifact@v3
+        with:
+          name: subo.tar
+          path: /tmp/subo.tar
+          if-no-files-found: error
+
   test:
     runs-on: ubuntu-latest
 
@@ -43,39 +95,106 @@ jobs:
             ${{ runner.os }}-go-
       - run: go mod download
 
-      - name: Run unit tests
-        run: |
-          make test
-
       - name: Build Subo
         run: |
           make subo
 
-      - name: Get branch name
-        id: branch-name
-        uses: tj-actions/branch-names@v5.2
-
-      - name: Create project and runnable
+      - name: Run unit tests
         run: |
-          subo create project smoketest
-          subo create runnable rs-test --branch ${{ steps.branch-name.outputs.current_branch }} --lang rust --dir ./smoketest
-          subo create runnable swift-test --branch ${{ steps.branch-name.outputs.current_branch }} --lang swift --dir ./smoketest
-          subo create runnable as-test --branch ${{ steps.branch-name.outputs.current_branch }} --lang assemblyscript --dir ./smoketest
-          subo create runnable tinygo-test --branch ${{ steps.branch-name.outputs.current_branch }} --lang tinygo --dir ./smoketest
+          make test
 
-      - name: Build project
+      - name: Upload subo binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: subo
+          path: ~/go/bin/subo
+          if-no-files-found: error
+
+  smoke:
+    needs: [image, meta, test]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language:
+          - assemblyscript
+          - grain
+          # - javascript
+          - rust
+          - swift
+          - tinygo
+          # - typescript
+        include:
+          - language: assemblyscript
+            image: builder-as
+            dockerfile: builder/docker/assemblyscript/Dockerfile
+          - language: grain
+            image: builder-gr
+            dockerfile: builder/docker/grain/Dockerfile
+          # - language: javascript
+          #   image: builder-js
+          #   dockerfile: builder/docker/javascript/Dockerfile
+          - language: rust
+            image: builder-rs
+            dockerfile: builder/docker/rust/Dockerfile
+          - language: swift
+            image: builder-swift
+            dockerfile: builder/docker/swift/Dockerfile
+          - language: tinygo
+            image: builder-tinygo
+            dockerfile: builder/docker/tinygo/Dockerfile
+          # - language: typescript
+          #   image: builder-js
+          #   dockerfile: builder/docker/javascript/Dockerfile
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v1
+
+      - name: Download subo binary
+        uses: actions/download-artifact@v3
+        with:
+          name: subo
+          path: ~/bin
+      - name: Run chmod +x subo binary
         run: |
-          subo build ./smoketest --builder-tag dev
+          chmod +x $HOME/bin/subo
+          echo "$HOME/bin" >> $GITHUB_PATH
+
+      - name: Download subo image
+        uses: actions/download-artifact@v3
+        with:
+          name: subo.tar
+          path: /tmp
+      - name: Load subo image into Docker
+        run: |
+          docker load --input /tmp/subo.tar
+          docker image ls -a
+
+      - name: Build ${{ matrix.image }}:dev image
+        uses: docker/build-push-action@v2
+        with:
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          file: ${{ matrix.dockerfile }}
+          load: true
+          tags: suborbital/${{ matrix.image }}:dev
+
+      - name: Create runnable
+        run: subo create runnable ${{ matrix.language }}-test --lang ${{ matrix.language }} --repo ${{ needs.meta.outputs.repo }} --branch ${{ needs.meta.outputs.branch }}
+
+      - name: Run subo build
+        run: subo build ${{ matrix.language }}-test --builder-tag dev
 
       - name: Check TinyGo version number consistency
-        run: |
-          builder/docker/tinygo/smoke.sh
+        if: matrix.language == 'tinygo'
+        run: builder/docker/tinygo/smoke.sh
 
   # only run if reference is a tag
   release:
     if: startsWith(github.ref, 'refs/tags/v')
 
-    needs: [lint, test]
+    needs: [image, lint, smoke, test]
     runs-on: ubuntu-latest
 
     steps:
@@ -90,7 +209,7 @@ jobs:
           path: |
             ~/.cache/go-build
             ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.os }}-go-${{ hashFiles('go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
       - run: go mod download

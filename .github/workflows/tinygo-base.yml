@@ -1,0 +1,98 @@
+name: tinygo-base
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/tinygo-base.yml
+      - builder/docker/tinygo/Dockerfile.base
+  workflow_dispatch:
+    inputs:
+      push:
+        description: 'Push to Docker Hub'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  create-vm:
+    runs-on: ubuntu-latest
+    outputs:
+      id: ${{ steps.vars.outputs.id }}
+      tag: ${{ steps.vars.outputs.tag }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get build variables
+        id: vars
+        run: |
+          id=$(head -3 /dev/urandom | tr -cd '[:alnum:]' | tr '[:upper:]' '[:lower:]' | cut -c -4)
+          echo "id: $id"
+          echo ::set-output name=id::$id
+
+          tag=$(cat builder/docker/tinygo/.tinygo-ver | tr -d '\n')
+          echo "tag: $tag"
+          echo ::set-output name=tag::$tag
+
+      - name: Validate semver
+        uses: rubenesp87/semver-validation-action@0.0.6
+        with:
+          version: ${{ steps.vars.outputs.tag }}
+
+      - uses: google-github-actions/auth@v0
+        with:
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.WORKLOAD_IDENTITY_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v0
+
+      - name: Create runner
+        run: gcloud compute instances create $NAME --zone $ZONE --source-instance-template=runner --quiet
+        env:
+          NAME: runner-vm-${{ steps.vars.outputs.id }}
+          ZONE: us-central1-a
+
+  build:
+    needs: create-vm
+    runs-on: [self-hosted, tinygo-base, "runner-vm-${{ needs.create-vm.outputs.id }}"]
+    timeout-minutes: 150
+
+    steps:
+      - uses: docker/setup-buildx-action@v1
+      - uses: docker/setup-qemu-action@v1
+      - if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v2
+        with:
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          file: builder/docker/tinygo/Dockerfile.base
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event.inputs.push == 'true' }}
+          tags: suborbital/tinygo-base:${{ needs.create-vm.outputs.tag }}
+
+  destroy-vm:
+    if: ${{ always() }}
+    needs: [create-vm, build]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: google-github-actions/auth@v0
+        with:
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.WORKLOAD_IDENTITY_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v0
+
+      - name: Delete runner
+        run: gcloud compute instances delete $NAME --zone $ZONE --quiet
+        env:
+          NAME: runner-vm-${{ needs.create-vm.outputs.id }}
+          ZONE: us-central1-a

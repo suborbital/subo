@@ -29,12 +29,10 @@ func FullPath(repo, branch string) (string, error) {
 
 // TemplateRootDir gets the template directory for subo and ensures it exists.
 func TemplateRootDir() (string, error) {
-	config, err := os.UserConfigDir()
+	tmplPath, err := util.CacheDir("templates")
 	if err != nil {
-		return "", errors.Wrap(err, "failed to get UserConfigDir")
+		return "", errors.Wrap(err, "failed to CacheDir")
 	}
-
-	tmplPath := filepath.Join(config, "suborbital", "templates")
 
 	if _, err = os.Stat(tmplPath); err != nil {
 		if errors.Is(err, os.ErrNotExist) {

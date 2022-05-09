@@ -126,12 +126,12 @@ func cacheLatestRelease(latestRepoRelease *github.RepositoryRelease) error {
 	return nil
 }
 
-func getLatestVersion() (*version.Version, error) {
+func getLatestVersion(ctx context.Context) (*version.Version, error) {
 	latestRepoRelease, err := getLatestReleaseCache()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to getTimestampCache")
 	} else if latestRepoRelease == nil {
-		latestRepoRelease, _, err = github.NewClient(nil).Repositories.GetLatestRelease(context.Background(), "suborbital", "subo")
+		latestRepoRelease, _, err = github.NewClient(nil).Repositories.GetLatestRelease(ctx, "suborbital", "subo")
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to fetch latest subo release")
 		} else if err = cacheLatestRelease(latestRepoRelease); err != nil {
@@ -148,8 +148,8 @@ func getLatestVersion() (*version.Version, error) {
 }
 
 // CheckForLatestVersion returns an error if SuboDotVersion does not match the latest GitHub release or if the check fails.
-func CheckForLatestVersion() (string, error) {
-	if latestCmdVersion, err := getLatestVersion(); err != nil {
+func CheckForLatestVersion(ctx context.Context) (string, error) {
+	if latestCmdVersion, err := getLatestVersion(ctx); err != nil {
 		return "", errors.Wrap(err, "failed to getLatestVersion")
 	} else if cmdVersion, err := version.NewVersion(SuboDotVersion); err != nil {
 		return "", errors.Wrap(err, "failed to parse current subo version")

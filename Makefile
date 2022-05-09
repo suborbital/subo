@@ -9,8 +9,11 @@ subo:
 subo/dev:
 	$(GO_INSTALL) -tags=development
 
+subo/docker-bin:
+	$(GO_INSTALL) -tags=docker
+
 subo/docker:
-	docker build . -t suborbital/subo:dev
+	DOCKER_BUILDKIT=1 docker build . -t suborbital/subo:dev
 
 subo/docker/publish:
 	docker buildx build . --platform linux/amd64,linux/arm64 -t suborbital/subo:dev --push
@@ -22,10 +25,12 @@ mod/replace/atmo:
 	go mod edit -replace github.com/suborbital/atmo=$(HOME)/Workspaces/suborbital/atmo
 
 tidy:
-	go mod tidy && go mod download && go mod vendor
+	go mod tidy && go mod download
+
 lint:
 	golangci-lint run ./...
+
 test:
 	go test ./...
 
-.PHONY: subo subo/dev subo/docker subo/docker/publish subo/smoketest mod/replace/atmo tidy lint test
+.PHONY: subo subo/dev subo/docker-bin subo/docker subo/docker/publish subo/smoketest mod/replace/atmo tidy lint test
