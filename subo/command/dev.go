@@ -39,11 +39,10 @@ func DevCmd() *cobra.Command {
 
 			if verbose {
 				envvar = "-e ATMO_LOG_LEVEL=debug"
+				util.LogInfo("Running Atmo with debug logging")
 			}
 
-			//dockerCmd stores the Docker command to be displayed and executed.
 			dockerCmd := fmt.Sprintf("docker run -v=%s:/home/atmo -e=ATMO_HTTP_PORT=%s %s -p=%s:%s suborbital/atmo:%s atmo", bctx.Cwd, port, envvar, port, port, bctx.AtmoVersion)
-			fmt.Printf("\nRunning Docker command :\n%s\n\n", dockerCmd)
 
 			_, err = util.Command.Run(dockerCmd)
 			if err != nil {
@@ -55,7 +54,7 @@ func DevCmd() *cobra.Command {
 	}
 
 	cmd.Flags().String("port", "8080", "set the port that Atmo serves on")
-	cmd.Flags().BoolP("verbose", "v", false, "display debug messages and docker commands")
+	cmd.Flags().BoolP("verbose", "v", false, "run Atmo with debug level logging")
 	cmd.Flags().Lookup("verbose").NoOptDefVal = "true"
 
 	return cmd
