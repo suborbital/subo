@@ -14,6 +14,6 @@ RUN apt-get update && \
 FROM debian:bullseye-slim
 WORKDIR /root/runnable
 
-COPY --from=builder /root/wabt/bin/wat2wasm /usr/local/bin
+COPY --from=builder /wabt/bin/wat2wasm /usr/local/bin
 COPY --from=subo /go/bin/subo /usr/local/bin
 RUN mkdir /root/suborbital
