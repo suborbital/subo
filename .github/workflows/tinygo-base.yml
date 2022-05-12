@@ -71,8 +71,6 @@ jobs:
 
       - uses: docker/build-push-action@v3
         with:
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           file: builder/docker/tinygo/Dockerfile.base
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event.inputs.push == 'true' }}
