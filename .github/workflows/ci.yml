@@ -252,7 +252,7 @@ jobs:
           GITHUB_ACTOR_EMAIL: ${{ steps.committer.outputs.email }}
 
   release-image-subo:
-    if: startsWith(github.ref, 'refs/tags/v')
+    # if: startsWith(github.ref, 'refs/tags/v')
     needs: [image, lint, smoke, test]
     runs-on: ubuntu-latest
 
@@ -274,11 +274,12 @@ jobs:
       - uses: docker/metadata-action@v3
         id: docker_meta
         with:
-          images: suborbital/subo,ghcr.io/suborbital/subo
+          # images: suborbital/subo,ghcr.io/suborbital/subo
+          images: ghcr.io/suborbital/subo
           tags: |
-            type=match,pattern=(v.*)
+            type=ref,event=pr
           flavor: |
-            latest=auto
+            latest=false
 
       - name: Build subo image
         uses: docker/build-push-action@v3
@@ -292,7 +293,7 @@ jobs:
           labels: ${{ steps.docker_meta.outputs.labels }}
 
   release-image:
-    if: startsWith(github.ref, 'refs/tags/v')
+    # if: startsWith(github.ref, 'refs/tags/v')
     needs: [image, lint, test, smoke, release-image-subo]
     runs-on: ubuntu-latest
     strategy:
@@ -341,17 +342,18 @@ jobs:
         with:
           images: ghcr.io/suborbital/subo
           tags: |
-            type=match,pattern=(v.*)
+            type=ref,event=pr
           flavor: |
             latest=false
       - uses: docker/metadata-action@v3
         id: docker_meta
         with:
-          images: suborbital/${{ matrix.image }},ghcr.io/suborbital/${{ matrix.image }}
+          # images: suborbital/${{ matrix.image }},ghcr.io/suborbital/${{ matrix.image }}
+          images: ghcr.io/suborbital/${{ matrix.image }}
           tags: |
-            type=match,pattern=(v.*)
+            type=ref,event=pr
           flavor: |
-            latest=auto
+            latest=false
           labels: |
             org.opencontainers.image.title=${{ matrix.image }}
 
