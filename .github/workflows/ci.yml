@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - test-ci
     tags:
       - v*
 
@@ -38,6 +39,8 @@ jobs:
           script: |
             const results = { repo: undefined, branch: undefined}
 
+            console.log(context)
+
             if (context.eventName == 'pull_request') {
               results.repo = context.payload.pull_request.head.repo.full_name,
               results.branch = context.payload.pull_request.head.ref
@@ -51,6 +54,9 @@ jobs:
               console.log('repo and branch must both be defined')
               process.exit(1)
             }
+
+            process.exit(1)
+
             return results
 
   test:
