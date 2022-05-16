@@ -270,7 +270,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/metadata-action@v3
+      - uses: docker/metadata-action@v4
         id: docker_meta
         with:
           images: suborbital/subo,ghcr.io/suborbital/subo
@@ -334,7 +334,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/metadata-action@v3
+      - uses: docker/metadata-action@v4
         id: subo_meta
         with:
           images: ghcr.io/suborbital/subo
@@ -342,7 +342,7 @@ jobs:
             type=match,pattern=(v.*)
           flavor: |
             latest=false
-      - uses: docker/metadata-action@v3
+      - uses: docker/metadata-action@v4
         id: docker_meta
         with:
           images: suborbital/${{ matrix.image }},ghcr.io/suborbital/${{ matrix.image }}
