@@ -43,7 +43,7 @@ jobs:
               results.branch = context.payload.pull_request.head.ref
             } else {
               results.repo = context.payload.repository.full_name
-              results.branch = context.ref.replace(/^refs\/heads\/|^refs\/tags\//, '')
+              results.branch = context.ref.replace(/^refs\/heads\/|^refs\//, '')
             }
             console.log(results)
 
