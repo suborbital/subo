@@ -27,3 +27,6 @@ target
 # visual code
 .vscode/
 *.code-workspace
+
+# goland
+.idea
