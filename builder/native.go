@@ -36,7 +36,7 @@ var nativeCommandsForLang = map[string]map[string][]string{
 			"tinygo build -o {{ .Name }}.wasm -target wasi .",
 		},
 		"grain": {
-			"grain compile index.gr -I _lib -o {{ .Name }}.wasm",
+			"grain compile index.gr --release -I _lib -o {{ .Name }}.wasm",
 		},
 		"typescript": {
 			"npm run build",
@@ -68,7 +68,7 @@ var nativeCommandsForLang = map[string]map[string][]string{
 			"tinygo build -o {{ .Name }}.wasm -target wasi .",
 		},
 		"grain": {
-			"grain compile index.gr -I _lib -o {{ .Name }}.wasm",
+			"grain compile index.gr --release -I _lib -o {{ .Name }}.wasm",
 		},
 		"typescript": {
 			"npm run build",
