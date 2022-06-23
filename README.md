@@ -38,23 +38,29 @@ This repo contains builders for the various languages supported by Wasm Runnable
 The `subo` tool supports the following platforms and operating systems:
 |  | x86_64 | arm64
 | --- | --- | --- |
-| Mac | ✅ | ✅ |
+| macOS | ✅ | ✅ |
 | Linux | ✅ | ✅ |
-| Windows | 🚫 | 🚫 |
+| Windows* | — | — |
+
+_*On Windows you can use WSL._
  
 The language toolchains used by `subo` support the following platforms:
 | | x86_64 | arm64 | Docker |
 | --- | --- | --- | --- |
 | Rust | ✅ | ✅ | ✅ |
+| JavaScript | ✅ | ✅ | ✅ |
+| TypeScript | ✅ | ✅ | ✅ |
+| TinyGo | ✅ | ✅ | ✅ |
+| Grain | ✅ | ✅ | ✅ |
 | AssemblyScript | ✅ | ✅ | ✅ |
-| Swift | ✅ | 🚫 | 🟡 (no arm64) |
+| Swift | ✅ | — | 🟡 &nbsp;(no arm64) |
 
 ## Contributing
 
 Please read the [contributing guide](./CONTRIBUTING.md) to learn about how you can contribute to Subo! We welcome all types of contribution.
 
-By the way, Subo is also the name of our mascot, and it's pronounced Sooooobo.
+By the way, Subo is also the name of our mascot, and it's pronounced SOO-bo.
 
 ![SOS-Space_Panda-Dark-small](https://user-images.githubusercontent.com/5942370/129103528-8b013445-a8a2-44bb-8b39-65d912a66767.png)
 
-Copyright Suborbital contributors 2021.
+Copyright © 2021-2022 Suborbital and contributors.
