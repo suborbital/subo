@@ -11,7 +11,7 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/suborbital/atmo/directive"
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/cli/util"
 )
 
 // WriteDirectiveFile writes a Directive to disk.

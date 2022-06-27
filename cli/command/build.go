@@ -6,9 +6,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/suborbital/subo/builder"
-	"github.com/suborbital/subo/packager"
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/builder"
+	"github.com/suborbital/velo/cli/util"
+	"github.com/suborbital/velo/packager"
 )
 
 // BuildCmd returns the build command.

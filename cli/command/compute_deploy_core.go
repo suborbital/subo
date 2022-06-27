@@ -12,13 +12,13 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/suborbital/subo/builder/template"
-	"github.com/suborbital/subo/project"
-	"github.com/suborbital/subo/subo/input"
-	"github.com/suborbital/subo/subo/localproxy"
-	"github.com/suborbital/subo/subo/release"
-	"github.com/suborbital/subo/subo/repl"
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/builder/template"
+	"github.com/suborbital/velo/cli/input"
+	"github.com/suborbital/velo/cli/localproxy"
+	"github.com/suborbital/velo/cli/release"
+	"github.com/suborbital/velo/cli/repl"
+	"github.com/suborbital/velo/cli/util"
+	"github.com/suborbital/velo/project"
 )
 
 type deployData struct {

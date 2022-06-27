@@ -8,9 +8,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/suborbital/subo/builder/template"
-	"github.com/suborbital/subo/project"
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/builder/template"
+	"github.com/suborbital/velo/cli/util"
+	"github.com/suborbital/velo/project"
 )
 
 const (

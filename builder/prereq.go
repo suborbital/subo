@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/suborbital/subo/project"
+	"github.com/suborbital/velo/project"
 )
 
 // Prereq is a pre-requisite file paired with the native command needed to acquire that file (if it's missing).

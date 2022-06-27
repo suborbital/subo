@@ -11,9 +11,9 @@ import (
 
 	"github.com/suborbital/atmo/bundle"
 	"github.com/suborbital/atmo/directive"
-	"github.com/suborbital/subo/project"
-	"github.com/suborbital/subo/subo/release"
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/cli/release"
+	"github.com/suborbital/velo/cli/util"
+	"github.com/suborbital/velo/project"
 )
 
 const bundlePackageJobType = "bundle"

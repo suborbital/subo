@@ -11,8 +11,8 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/suborbital/atmo/directive"
-	"github.com/suborbital/subo/subo/release"
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/cli/release"
+	"github.com/suborbital/velo/cli/util"
 )
 
 // validLangs are the available languages.

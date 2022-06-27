@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/go-version"
 	"github.com/pkg/errors"
 
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/cli/util"
 )
 
 const lastCheckedFilename = "subo_last_checked"

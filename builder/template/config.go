@@ -8,7 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/cli/util"
 )
 
 func FullPath(repo, branch string) (string, error) {

@@ -8,8 +8,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/suborbital/atmo/directive"
-	"github.com/suborbital/subo/project"
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/cli/util"
+	"github.com/suborbital/velo/project"
 )
 
 func CreateHandlerCmd() *cobra.Command {

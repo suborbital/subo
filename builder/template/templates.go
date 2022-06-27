@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/suborbital/atmo/directive"
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/cli/util"
 )
 
 // ErrTemplateMissing and others are template related errors.

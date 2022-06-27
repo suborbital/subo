@@ -3,7 +3,7 @@ package command
 import (
 	"os"
 
-	"github.com/suborbital/subo/scn"
+	"github.com/suborbital/velo/scn"
 )
 
 func scnAPI() *scn.API {

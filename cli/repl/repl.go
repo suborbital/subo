@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/suborbital/atmo/fqfn"
-	"github.com/suborbital/subo/subo/input"
+	"github.com/suborbital/velo/cli/input"
 )
 
 // Repl is a 'local proxy repl' that allows the user to perform simple actions against their local install of Compute.

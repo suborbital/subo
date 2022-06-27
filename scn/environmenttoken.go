@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/suborbital/subo/scn/types"
+	"github.com/suborbital/velo/scn/types"
 )
 
 // CreateEnvironmentToken creates an environment token.

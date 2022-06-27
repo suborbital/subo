@@ -6,8 +6,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/suborbital/subo/subo/release"
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/cli/release"
+	"github.com/suborbital/velo/cli/util"
 )
 
 const checkVersionTimeout = 500 * time.Millisecond

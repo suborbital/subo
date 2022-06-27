@@ -3,8 +3,8 @@ package packager
 import (
 	"github.com/pkg/errors"
 
-	"github.com/suborbital/subo/project"
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/cli/util"
+	"github.com/suborbital/velo/project"
 )
 
 // Packager is responsible for packaging and publishing projects.

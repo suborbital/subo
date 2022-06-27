@@ -12,7 +12,7 @@ import (
 	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v2"
 
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/cli/util"
 )
 
 // DotSuboFile describes a .subo file for controlling releases.

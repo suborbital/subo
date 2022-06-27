@@ -11,10 +11,10 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/suborbital/atmo/directive"
-	"github.com/suborbital/subo/builder/template"
-	"github.com/suborbital/subo/project"
-	"github.com/suborbital/subo/subo/release"
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/builder/template"
+	"github.com/suborbital/velo/cli/release"
+	"github.com/suborbital/velo/cli/util"
+	"github.com/suborbital/velo/project"
 )
 
 // langAliases are aliases for languages.
@@ -41,13 +41,14 @@ func NewCreateRunnableError(path string, err error) CreateRunnableError {
 	return CreateRunnableError{Path: path, error: err}
 }
 
-// CreateRunnableCmd returns the build command.
-func CreateRunnableCmd() *cobra.Command {
+// CreateFunctionCmd returns the build command.
+func CreateFunctionCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "runnable <name>",
-		Short: "create a new Runnable",
-		Long:  `create a new Runnable to be used with Atmo or Reactr`,
-		Args:  cobra.ExactArgs(1),
+		Use:     "function <name>",
+		Aliases: []string{"fn"},
+		Short:   "create a new function",
+		Long:    `create a new function to be used with Velocity`,
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0]
 

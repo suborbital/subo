@@ -3,25 +3,44 @@ package main
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/suborbital/subo/subo/command"
-	"github.com/suborbital/subo/subo/features"
-	"github.com/suborbital/subo/subo/release"
+	"github.com/suborbital/velo/cli/command"
+	"github.com/suborbital/velo/cli/features"
+	"github.com/suborbital/velo/cli/release"
 )
 
 func rootCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "subo",
-		Short:   "Suborbital Development Platform CLI",
+		Use:     "velo",
+		Short:   "The Velocity CLI",
 		Version: release.Version(),
-		Long: `Subo is the full toolchain for using and managing Suborbital Development Platform tools,
-including building WebAssembly Runnables and Atmo projects.`,
+		Long:    `Velocity is a function server that adds a backend to any application.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cmd.Help()
 			return nil
 		},
 	}
 
-	cmd.SetVersionTemplate("Subo CLI v{{.Version}}\n")
+	cmd.SetVersionTemplate("Velo v{{.Version}}\n")
+
+	// velo init
+	cmd.AddCommand(command.InitCmd())
+	// velo build
+	cmd.AddCommand(command.BuildCmd())
+	// velo dev
+	cmd.AddCommand(command.DevCmd())
+	// velo clean
+	cmd.AddCommand(command.CleanCmd())
+	// compute related commands.
+	cmd.AddCommand(computeCommand())
+	// docs related commands.
+	cmd.AddCommand(docsCommand())
+
+	if features.EnableRegistryCommands {
+		// velo push
+		cmd.AddCommand(command.PushCmd())
+		// velo deploy
+		cmd.AddCommand(command.DeployCmd())
+	}
 
 	// create commands.
 	create := &cobra.Command{
@@ -34,25 +53,13 @@ including building WebAssembly Runnables and Atmo projects.`,
 		create.AddCommand(command.CreateReleaseCmd())
 	}
 
-	create.AddCommand(command.CreateProjectCmd())
-	create.AddCommand(command.CreateRunnableCmd())
+	// velo create function
+	create.AddCommand(command.CreateFunctionCmd())
+
+	// velo create handler
 	create.AddCommand(command.CreateHandlerCmd())
 
-	// compute network related commands.
-	cmd.AddCommand(computeCommand())
-
-	// docs related commands.
-	cmd.AddCommand(docsCommand())
-
 	cmd.AddCommand(create)
-	cmd.AddCommand(command.BuildCmd())
-	cmd.AddCommand(command.DevCmd())
-	cmd.AddCommand(command.CleanCmd())
-
-	if features.EnableRegistryCommands {
-		cmd.AddCommand(command.PushCmd())
-		cmd.AddCommand(command.DeployCmd())
-	}
 
 	return cmd
 }

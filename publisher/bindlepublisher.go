@@ -16,8 +16,8 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
-	"github.com/suborbital/subo/project"
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/cli/util"
+	"github.com/suborbital/velo/project"
 )
 
 const (

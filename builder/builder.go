@@ -11,8 +11,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/suborbital/subo/project"
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/cli/util"
+	"github.com/suborbital/velo/project"
 )
 
 var dockerImageForLang = map[string]string{

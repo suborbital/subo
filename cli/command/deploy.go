@@ -7,9 +7,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/suborbital/subo/deployer"
-	"github.com/suborbital/subo/project"
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/cli/util"
+	"github.com/suborbital/velo/deployer"
+	"github.com/suborbital/velo/project"
 )
 
 var validDeployTypes = map[string]bool{

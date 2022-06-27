@@ -1,4 +1,4 @@
-module github.com/suborbital/subo
+module github.com/suborbital/velo
 
 go 1.18
 

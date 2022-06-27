@@ -7,10 +7,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/suborbital/subo/builder/template"
-	"github.com/suborbital/subo/project"
-	"github.com/suborbital/subo/subo/release"
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/builder/template"
+	"github.com/suborbital/velo/cli/release"
+	"github.com/suborbital/velo/cli/util"
+	"github.com/suborbital/velo/project"
 )
 
 const (
@@ -25,12 +25,12 @@ type projectData struct {
 	AtmoVersion string
 }
 
-// CreateProjectCmd returns the build command.
-func CreateProjectCmd() *cobra.Command {
+// InitCmd returns the init command.
+func InitCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "project <name>",
-		Short: "create a new project",
-		Long:  `create a new project for Atmo or Reactr`,
+		Use:   "init <name>",
+		Short: "initialize a new project",
+		Long:  `initialize a new project for Velocity`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0]

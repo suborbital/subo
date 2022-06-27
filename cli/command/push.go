@@ -7,9 +7,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/suborbital/subo/project"
-	"github.com/suborbital/subo/publisher"
-	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/velo/cli/util"
+	"github.com/suborbital/velo/project"
+	"github.com/suborbital/velo/publisher"
 )
 
 var validPublishTypes = map[string]bool{
