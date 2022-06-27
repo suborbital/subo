@@ -62,8 +62,8 @@ func DeployCmd() *cobra.Command {
 	}
 
 	cmd.Flags().String(domainFlag, "", "domain name to configure TLS for (DNS must be configured post-deploy)")
-	cmd.Flags().String(repoFlag, "suborbital/subo", "git repo to download templates from")
-	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
+	cmd.Flags().String(repoFlag, "suborbital/runnable-templates", "git repo to download templates from")
+	cmd.Flags().String(branchFlag, "vmain", "git branch to download templates from")
 	cmd.Flags().Bool(updateTemplatesFlag, false, "update with the newest runnable templates")
 
 	return cmd

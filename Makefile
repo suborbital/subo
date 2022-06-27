@@ -1,24 +1,24 @@
 include ./builder/builder.mk
-include ./subo/release/release.mk
+include ./cli/release/release.mk
 
 GO_INSTALL=go install -ldflags $(RELEASE_FLAGS)
 
-subo:
+velo:
 	$(GO_INSTALL)
 
-subo/dev:
+velo/dev:
 	$(GO_INSTALL) -tags=development
 
-subo/docker-bin:
+velo/docker-bin:
 	$(GO_INSTALL) -tags=docker
 
-subo/docker:
-	DOCKER_BUILDKIT=1 docker build . -t suborbital/subo:dev
+velo/docker:
+	DOCKER_BUILDKIT=1 docker build . -t suborbital/velo:dev
 
-subo/docker/publish:
-	docker buildx build . --platform linux/amd64,linux/arm64 -t suborbital/subo:dev --push
+velo/docker/publish:
+	docker buildx build . --platform linux/amd64,linux/arm64 -t suborbital/velo:dev --push
 
-subo/smoketest: subo
+velo/smoketest: velo
 	./scripts/smoketest.sh
 
 mod/replace/atmo:
@@ -33,4 +33,4 @@ lint:
 test:
 	go test ./...
 
-.PHONY: subo subo/dev subo/docker-bin subo/docker subo/docker/publish subo/smoketest mod/replace/atmo tidy lint test
+.PHONY: velo velo/dev velo/docker-bin velo/docker velo/docker/publish velo/smoketest mod/replace/atmo tidy lint test

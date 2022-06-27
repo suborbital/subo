@@ -17,6 +17,11 @@ import (
 	"github.com/suborbital/velo/project"
 )
 
+const (
+	tmplTypeData    = "data"
+	tmplTypeHandler = "handler"
+)
+
 // langAliases are aliases for languages.
 var langAliases = map[string]string{
 	"as": "assemblyscript",
@@ -54,8 +59,14 @@ func CreateFunctionCmd() *cobra.Command {
 
 			namespace, _ := cmd.Flags().GetString(namespaceFlag)
 			lang, _ := cmd.Flags().GetString(langFlag)
+			tmplType, _ := cmd.Flags().GetString(typeFlag)
 			repo, _ := cmd.Flags().GetString(repoFlag)
 			branch, _ := cmd.Flags().GetString(branchFlag)
+
+			actualLang := lang
+			if val, exists := langAliases[lang]; exists {
+				actualLang = val
+			}
 
 			dir, _ := cmd.Flags().GetString(dirFlag)
 			bctx, err := project.ForDirectory(dir)
@@ -74,7 +85,7 @@ func CreateFunctionCmd() *cobra.Command {
 				return errors.Wrap(err, "🚫 failed to Mkdir")
 			}
 
-			runnable, err := writeDotRunnable(bctx.Cwd, name, lang, namespace)
+			runnable, err := writeDotRunnable(bctx.Cwd, name, actualLang, namespace)
 			if err != nil {
 				return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to writeDotRunnable")
 			}
@@ -91,7 +102,9 @@ func CreateFunctionCmd() *cobra.Command {
 				}
 			}
 
-			if err := template.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, runnable); err != nil {
+			templateName := tmplNameForLang(actualLang, tmplType)
+
+			if err := template.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, templateName, runnable); err != nil {
 				// if the templates are missing, try updating them and exec again.
 				if err == template.ErrTemplateMissing {
 					templatesPath, err = template.UpdateTemplates(repo, branch)
@@ -99,7 +112,7 @@ func CreateFunctionCmd() *cobra.Command {
 						return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to UpdateTemplates")
 					}
 
-					if err := template.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, runnable); err != nil {
+					if err := template.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, templateName, runnable); err != nil {
 						return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to ExecTmplDir")
 					}
 				} else {
@@ -121,18 +134,15 @@ func CreateFunctionCmd() *cobra.Command {
 	cmd.Flags().String(dirFlag, cwd, "the directory to put the new runnable in")
 	cmd.Flags().String(langFlag, "rust", "the language of the new runnable")
 	cmd.Flags().String(namespaceFlag, "default", "the namespace for the new runnable")
-	cmd.Flags().String(repoFlag, "suborbital/subo", "git repo to download templates from")
-	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
+	cmd.Flags().String(repoFlag, "suborbital/runnable-templates", "git repo to download templates from")
+	cmd.Flags().String(branchFlag, "vmain", "git branch to download templates from")
+	cmd.Flags().String(typeFlag, "data", "template type - 'data' or 'handler'")
 	cmd.Flags().Bool(updateTemplatesFlag, false, "update with the newest runnable templates")
 
 	return cmd
 }
 
 func writeDotRunnable(cwd, name, lang, namespace string) (*directive.Runnable, error) {
-	if actual, exists := langAliases[lang]; exists {
-		lang = actual
-	}
-
 	if valid := project.IsValidLang(lang); !valid {
 		return nil, fmt.Errorf("%s is not an available language", lang)
 	}
@@ -156,4 +166,12 @@ func writeDotRunnable(cwd, name, lang, namespace string) (*directive.Runnable, e
 	}
 
 	return runnable, nil
+}
+
+func tmplNameForLang(lang, tmplType string) string {
+	if tmplType == tmplTypeData {
+		return lang
+	}
+
+	return fmt.Sprintf("%s-%s", lang, tmplType)
 }

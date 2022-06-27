@@ -7,4 +7,5 @@ package features
 const (
 	EnableReleaseCommands  = true
 	EnableRegistryCommands = true
+	EnableDocsCommands     = true
 )

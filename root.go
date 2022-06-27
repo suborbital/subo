@@ -32,8 +32,6 @@ func rootCommand() *cobra.Command {
 	cmd.AddCommand(command.CleanCmd())
 	// compute related commands.
 	cmd.AddCommand(computeCommand())
-	// docs related commands.
-	cmd.AddCommand(docsCommand())
 
 	if features.EnableRegistryCommands {
 		// velo push
@@ -42,11 +40,16 @@ func rootCommand() *cobra.Command {
 		cmd.AddCommand(command.DeployCmd())
 	}
 
+	if features.EnableDocsCommands {
+		// docs related commands.
+		cmd.AddCommand(docsCommand())
+	}
+
 	// create commands.
 	create := &cobra.Command{
 		Use:   "create",
-		Short: "create a runnable, project, or handler",
-		Long:  `create a new Atmo project, WebAssembly runnable or handler`,
+		Short: "create a function or handler",
+		Long:  `create a new WebAssembly function or handler`,
 	}
 
 	if features.EnableReleaseCommands {
