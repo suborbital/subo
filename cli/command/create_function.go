@@ -5,12 +5,14 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
 	"github.com/suborbital/atmo/directive"
+	"github.com/suborbital/atmo/directive/executable"
 	"github.com/suborbital/velo/builder/template"
 	"github.com/suborbital/velo/cli/release"
 	"github.com/suborbital/velo/cli/util"
@@ -120,6 +122,10 @@ func CreateFunctionCmd() *cobra.Command {
 				}
 			}
 
+			if err := addDefaultHandler(bctx, runnable); err != nil {
+				return errors.Wrap(err, "failed to addDefaultHandler")
+			}
+
 			util.LogDone(path)
 
 			return nil
@@ -174,4 +180,34 @@ func tmplNameForLang(lang, tmplType string) string {
 	}
 
 	return fmt.Sprintf("%s-%s", lang, tmplType)
+}
+
+func addDefaultHandler(bctx *project.Context, runnable *directive.Runnable) error {
+	fullName := fmt.Sprintf("/%s/%s", runnable.Namespace, runnable.Name)
+	fullPath := strings.ToLower(fullName)
+
+	handler := directive.Handler{
+		Input: directive.Input{
+			Type:     "request",
+			Method:   "GET",
+			Resource: fullPath,
+		},
+		Steps: []executable.Executable{
+			{
+				CallableFn: executable.CallableFn{
+					Fn: fullName,
+				},
+			},
+		},
+	}
+
+	d := bctx.Directive
+
+	d.Handlers = append(d.Handlers, handler)
+
+	if err := project.WriteDirectiveFile(bctx.Cwd, d); err != nil {
+		return errors.Wrap(err, "failed to WriteDirectiveFile")
+	}
+
+	return nil
 }

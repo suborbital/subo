@@ -54,7 +54,6 @@ func InitCmd() *cobra.Command {
 
 			branch, _ := cmd.Flags().GetString(branchFlag)
 			environment, _ := cmd.Flags().GetString(environmentFlag)
-			headless, _ := cmd.Flags().GetBool(headlessFlag)
 
 			templatesPath, err := template.FullPath(defaultRepo, branch)
 			if err != nil {
@@ -73,7 +72,6 @@ func InitCmd() *cobra.Command {
 				Environment: environment,
 				APIVersion:  release.FFIVersion,
 				AtmoVersion: release.AtmoVersion,
-				Headless:    headless,
 			}
 
 			if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data); err != nil {
@@ -104,7 +102,6 @@ func InitCmd() *cobra.Command {
 
 	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
 	cmd.Flags().String(environmentFlag, "com.suborbital", "project environment name (your company's reverse domain")
-	cmd.Flags().Bool(headlessFlag, false, "use 'headless mode' for this project")
 	cmd.Flags().Bool(updateTemplatesFlag, false, "update with the newest templates")
 
 	return cmd

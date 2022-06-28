@@ -15,8 +15,8 @@ import (
 func BuildCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "build [dir]",
-		Short: "build a WebAssembly runnable",
-		Long:  `build a WebAssembly runnable and/or create a Runnable Bundle`,
+		Short: "build a project or single function",
+		Long:  `build a build a Velocity project and bundle the results, or build a single function into a WebAssembly module`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			dir := "."
 			if len(args) > 0 {

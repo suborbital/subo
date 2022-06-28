@@ -28,6 +28,8 @@ func rootCommand() *cobra.Command {
 	cmd.AddCommand(command.BuildCmd())
 	// velo dev
 	cmd.AddCommand(command.DevCmd())
+	// velo start
+	cmd.AddCommand(command.StartCmd())
 	// velo clean
 	cmd.AddCommand(command.CleanCmd())
 	// compute related commands.
@@ -45,33 +47,34 @@ func rootCommand() *cobra.Command {
 		cmd.AddCommand(docsCommand())
 	}
 
-	// create commands.
-	create := &cobra.Command{
-		Use:   "create",
-		Short: "create a function or handler",
-		Long:  `create a new WebAssembly function or handler`,
+	// add commands.
+	add := &cobra.Command{
+		Use:   "add",
+		Short: "add a function or handler",
+		Long:  `add a new WebAssembly function or route handler`,
 	}
+
+	// velo add function
+	add.AddCommand(command.CreateFunctionCmd())
 
 	if features.EnableReleaseCommands {
-		create.AddCommand(command.CreateReleaseCmd())
+		// velo add release
+		add.AddCommand(command.CreateReleaseCmd())
 	}
 
-	// velo create function
-	create.AddCommand(command.CreateFunctionCmd())
+	cmd.AddCommand(add)
 
-	// velo create handler
-	create.AddCommand(command.CreateHandlerCmd())
-
-	cmd.AddCommand(create)
+	cmd.CompletionOptions.HiddenDefaultCmd = true
 
 	return cmd
 }
 
 func computeCommand() *cobra.Command {
 	compute := &cobra.Command{
-		Use:   "compute",
-		Short: "compute network related resources",
-		Long:  `manage Suborbital Compute Network resources`,
+		Use:    "compute",
+		Short:  "compute network related resources",
+		Long:   `manage Suborbital Compute Network resources`,
+		Hidden: true,
 	}
 
 	create := &cobra.Command{
