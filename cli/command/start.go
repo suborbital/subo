@@ -26,10 +26,7 @@ func StartCmd() *cobra.Command {
 		Long:    "starts the velocity server using the provided options and configured partner + backend, if desired",
 		Version: release.VelocityServerDotVersion,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			path := "./runnables.wasm.zip"
-			if len(args) > 0 {
-				path = args[0]
-			}
+			path, _ := cmd.Flags().GetString(bundleFlag)
 
 			logger := vlog.Default(
 				vlog.AppMeta(velocityInfo{VelocityVersion: release.VelocityServerDotVersion}),
@@ -75,6 +72,7 @@ func StartCmd() *cobra.Command {
 
 	cmd.SetVersionTemplate("{{.Version}}\n")
 
+	cmd.Flags().String(bundleFlag, "./runnables.wasm.zip", "the bundle file to load")
 	cmd.Flags().String(appNameFlag, "Velocity", "if passed, it'll be used as VELOCITY_APP_NAME, otherwise 'Velocity' will be used")
 	cmd.Flags().String(runPartnerFlag, "", "if passed, the provided command will be run as the partner application")
 	cmd.Flags().String(domainFlag, "", "if passed, it'll be used as VELOCITY_DOMAIN and HTTPS will be used, otherwise HTTP will be used")

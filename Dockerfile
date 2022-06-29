@@ -4,7 +4,7 @@ WORKDIR /root/github.com/suborbital/subo
 COPY go.* ./
 RUN go mod download
 
-COPY subo ./subo
+COPY cli ./cli
 COPY builder ./builder
 COPY deployer ./deployer
 COPY packager ./packager
@@ -13,7 +13,7 @@ COPY project ./project
 COPY scn ./scn
 COPY *.go ./
 COPY Makefile .
-RUN make subo/docker-bin
+RUN make velo/docker-bin
 
 FROM debian:bullseye
-COPY --from=builder /go/bin/subo /go/bin/subo
+COPY --from=builder /go/bin/velo /usr/local/bin/velo

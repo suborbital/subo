@@ -3,6 +3,7 @@ package command
 const (
 	langFlag            = "lang"
 	dirFlag             = "dir"
+	bundleFlag          = "bundle"
 	namespaceFlag       = "namespace"
 	branchFlag          = "branch"
 	methodFlag          = "method"

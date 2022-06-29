@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	defaultRepo = "suborbital/subo"
+	defaultRepo = "suborbital/runnable-templates"
 )
 
 type projectData struct {
@@ -54,6 +54,7 @@ func InitCmd() *cobra.Command {
 
 			branch, _ := cmd.Flags().GetString(branchFlag)
 			environment, _ := cmd.Flags().GetString(environmentFlag)
+			projectType, _ := cmd.Flags().GetString(typeFlag)
 
 			templatesPath, err := template.FullPath(defaultRepo, branch)
 			if err != nil {
@@ -74,7 +75,12 @@ func InitCmd() *cobra.Command {
 				AtmoVersion: release.AtmoVersion,
 			}
 
-			if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data); err != nil {
+			templateName := "project"
+			if projectType != "" {
+				templateName = fmt.Sprintf("project-%s", projectType)
+			}
+
+			if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, templateName, data); err != nil {
 				// if the templates are missing, try updating them and exec again.
 				if err == template.ErrTemplateMissing {
 					templatesPath, err = template.UpdateTemplates(defaultRepo, branch)
@@ -82,7 +88,7 @@ func InitCmd() *cobra.Command {
 						return errors.Wrap(err, "🚫 failed to UpdateTemplates")
 					}
 
-					if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data); err != nil {
+					if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, templateName, data); err != nil {
 						return errors.Wrap(err, "🚫 failed to ExecTmplDir")
 					}
 				} else {
@@ -100,7 +106,8 @@ func InitCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
+	cmd.Flags().String(branchFlag, "vmain", "git branch to download templates from")
+	cmd.Flags().String(typeFlag, "", "type of project to create, such as 'js'")
 	cmd.Flags().String(environmentFlag, "com.suborbital", "project environment name (your company's reverse domain")
 	cmd.Flags().Bool(updateTemplatesFlag, false, "update with the newest templates")
 

@@ -14,14 +14,11 @@ import (
 // BuildCmd returns the build command.
 func BuildCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "build [dir]",
+		Use:   "build",
 		Short: "build a project or single function",
 		Long:  `build a build a Velocity project and bundle the results, or build a single function into a WebAssembly module`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			dir := "."
-			if len(args) > 0 {
-				dir = args[0]
-			}
+			dir, _ := cmd.Flags().GetString("dir")
 
 			bdr, err := builder.ForDirectory(&util.PrintLogger{}, &builder.DefaultBuildConfig, dir)
 			if err != nil {
@@ -49,6 +46,7 @@ func BuildCmd() *cobra.Command {
 
 			useNative, _ := cmd.Flags().GetBool("native")
 			makeTarget, _ := cmd.Flags().GetString("make")
+			runCmd, _ := cmd.Flags().GetString("run")
 
 			// Determine if a custom Docker mountpath and relpath were set.
 			mountPath, _ := cmd.Flags().GetString("mountpath")
@@ -74,6 +72,14 @@ func BuildCmd() *cobra.Command {
 				_, err = util.Command.Run(fmt.Sprintf("make %s", makeTarget))
 				if err != nil {
 					return errors.Wrapf(err, "🚫 failed to make %s", makeTarget)
+				}
+			}
+
+			if runCmd != "" {
+				util.LogStart(fmt.Sprintf("running %s", runCmd))
+				_, err = util.Command.Run(runCmd)
+				if err != nil {
+					return errors.Wrapf(err, "🚫 failed to %s", runCmd)
 				}
 			}
 
@@ -109,9 +115,11 @@ func BuildCmd() *cobra.Command {
 		},
 	}
 
+	cmd.Flags().String("dir", ".", "the directory in which to run the build")
 	cmd.Flags().Bool("no-bundle", false, "if passed, a .wasm.zip bundle will not be generated")
 	cmd.Flags().Bool("native", false, "use native (locally installed) toolchain rather than Docker")
 	cmd.Flags().String("make", "", "execute the provided Make target before building the project bundle")
+	cmd.Flags().String(runPartnerFlag, "", "execute the provided command before building the project bundle")
 	cmd.Flags().Bool("docker", false, "build your project's Dockerfile. It will be tagged {identifier}:{appVersion}")
 	cmd.Flags().StringSlice("langs", []string{}, "build only Runnables for the listed languages (comma-seperated)")
 	cmd.Flags().String("mountpath", "", "if passed, the Docker builders will mount their volumes at the provided path")
