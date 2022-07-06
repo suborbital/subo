@@ -54,7 +54,7 @@ Flags:
 ```
 
 ## Building Wasm Runnables
-**It is reccomended that Docker be installed to build Wasm Runnables. See below if you do not have Docker installed.**
+**It is recommended that Docker be installed to build Wasm Runnables. See below if you do not have Docker installed.**
  
 To build your Runnable into a Wasm module for Reactr or Atmo, use the build command:
 ```
