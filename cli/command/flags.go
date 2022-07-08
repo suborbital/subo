@@ -22,4 +22,7 @@ const (
 	httpPortFlag        = "http-port"
 	tlsPortFlag         = "tls-port"
 	runPartnerFlag      = "run"
+	orgFlag             = "org"
+	regionFlag          = "region"
+	preBuildFlag        = "pre-build"
 )

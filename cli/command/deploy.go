@@ -15,6 +15,8 @@ import (
 var validDeployTypes = map[string]bool{
 	"kubernetes": true,
 	"k8s":        true,
+	"fly":        true,
+	"fly.io":     true,
 }
 
 //DeployCmd deploys the current project.
@@ -47,10 +49,15 @@ func DeployCmd() *cobra.Command {
 			branch, _ := cmd.Flags().GetString(branchFlag)
 			domain, _ := cmd.Flags().GetString(domainFlag)
 			updateTemplates := cmd.Flags().Changed(updateTemplatesFlag)
+			org, _ := cmd.Flags().GetString(orgFlag)
+			region, _ := cmd.Flags().GetString(regionFlag)
+			local := cmd.Flags().Changed(localFlag)
 
 			switch deployType {
 			case "kubernetes", "k8s":
 				deployJob = deployer.NewK8sDeployJob(repo, branch, domain, updateTemplates)
+			case "fly", "fly.io":
+				deployJob = deployer.NewFlyDeployJob(org, region, local)
 			}
 
 			if err := dplyr.Deploy(ctx, deployJob); err != nil {
@@ -64,7 +71,10 @@ func DeployCmd() *cobra.Command {
 	cmd.Flags().String(domainFlag, "", "domain name to configure TLS for (DNS must be configured post-deploy)")
 	cmd.Flags().String(repoFlag, "suborbital/runnable-templates", "git repo to download templates from")
 	cmd.Flags().String(branchFlag, "vmain", "git branch to download templates from")
+	cmd.Flags().String(orgFlag, "personal", "the organisation in which to deploy (for fly.io)")
+	cmd.Flags().String(regionFlag, "lax", "the region in which to deploy (for fly.io)")
 	cmd.Flags().Bool(updateTemplatesFlag, false, "update with the newest runnable templates")
+	cmd.Flags().Bool(localFlag, false, "use the local Docker installation for container builds (for fly.io)")
 
 	return cmd
 }

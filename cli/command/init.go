@@ -3,6 +3,8 @@ package command
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -14,7 +16,8 @@ import (
 )
 
 const (
-	defaultRepo = "suborbital/runnable-templates"
+	defaultRepo   = "suborbital/runnable-templates"
+	defaultBranch = "vmain"
 )
 
 type projectData struct {
@@ -33,8 +36,6 @@ func InitCmd() *cobra.Command {
 		Long:  `initialize a new project for Velocity`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			name := args[0]
-
 			cwd, err := os.Getwd()
 			if err != nil {
 				return errors.Wrap(err, "failed to Getwd")
@@ -45,11 +46,19 @@ func InitCmd() *cobra.Command {
 				return errors.Wrap(err, "🚫 failed to project.ForDirectory")
 			}
 
+			name := args[0]
+			path := name
+
 			util.LogStart(fmt.Sprintf("creating project %s", name))
 
-			path, err := util.Mkdir(bctx.Cwd, name)
-			if err != nil {
-				return errors.Wrap(err, "🚫 failed to Mkdir")
+			if name != "." {
+				if _, err = util.Mkdir(bctx.Cwd, name); err != nil {
+					return errors.Wrap(err, "🚫 failed to Mkdir")
+				}
+			} else {
+				// if the provided name was '.', then set the project name to be the current dir name
+				pathElements := strings.Split(cwd, string(filepath.Separator))
+				name = pathElements[len(pathElements)-1]
 			}
 
 			branch, _ := cmd.Flags().GetString(branchFlag)
@@ -80,7 +89,7 @@ func InitCmd() *cobra.Command {
 				templateName = fmt.Sprintf("project-%s", projectType)
 			}
 
-			if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, templateName, data); err != nil {
+			if err := template.ExecTmplDir(bctx.Cwd, path, templatesPath, templateName, data); err != nil {
 				// if the templates are missing, try updating them and exec again.
 				if err == template.ErrTemplateMissing {
 					templatesPath, err = template.UpdateTemplates(defaultRepo, branch)
@@ -88,7 +97,7 @@ func InitCmd() *cobra.Command {
 						return errors.Wrap(err, "🚫 failed to UpdateTemplates")
 					}
 
-					if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, templateName, data); err != nil {
+					if err := template.ExecTmplDir(bctx.Cwd, path, templatesPath, templateName, data); err != nil {
 						return errors.Wrap(err, "🚫 failed to ExecTmplDir")
 					}
 				} else {
@@ -96,7 +105,7 @@ func InitCmd() *cobra.Command {
 				}
 			}
 
-			util.LogDone(path)
+			util.LogDone(name)
 
 			if _, err := util.Command.Run(fmt.Sprintf("git init ./%s", name)); err != nil {
 				return errors.Wrap(err, "🚫 failed to initialize Run git init")

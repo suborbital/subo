@@ -77,4 +77,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/suborbital/velocity => github.com/suborbital/atmo v0.4.4-0.20220627010215-14d4bd568c21
+replace github.com/suborbital/velocity => github.com/suborbital/atmo v0.4.4-0.20220630134203-00896cd3067e

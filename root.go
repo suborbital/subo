@@ -32,15 +32,12 @@ func rootCommand() *cobra.Command {
 	cmd.AddCommand(command.StartCmd())
 	// velo clean
 	cmd.AddCommand(command.CleanCmd())
+	// velo push
+	cmd.AddCommand(command.PushCmd())
+	// velo deploy
+	cmd.AddCommand(command.DeployCmd())
 	// compute related commands.
 	cmd.AddCommand(computeCommand())
-
-	if features.EnableRegistryCommands {
-		// velo push
-		cmd.AddCommand(command.PushCmd())
-		// velo deploy
-		cmd.AddCommand(command.DeployCmd())
-	}
 
 	if features.EnableDocsCommands {
 		// docs related commands.
