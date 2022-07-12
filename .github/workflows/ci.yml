@@ -202,10 +202,6 @@ jobs:
       - name: Run subo build
         run: subo build ${{ matrix.language }}-test --builder-tag dev
 
-      - name: Check TinyGo version number consistency
-        if: matrix.language == 'tinygo'
-        run: builder/docker/tinygo/smoke.sh
-
   release-image-subo:
     if: startsWith(github.ref, 'refs/tags/v')
     needs: [image, lint, test, smoke]
