@@ -1,6 +1,5 @@
 # all paths are relative to project root
 ver = $(shell cat ./builder/.image-ver)
-tinygo_ver = $(shell cat ./builder/docker/tinygo/.tinygo-ver)
 
 builder/docker: subo/docker builder/docker/rust builder/docker/swift builder/docker/as builder/docker/tinygo builder/docker/grain builder/docker/javascript builder/docker/wat
 
@@ -37,16 +36,6 @@ builder/docker/swift/publish:
 
 builder/docker/swift/dev/publish:
 	docker buildx build . -f builder/docker/swift/Dockerfile --platform linux/amd64,linux/arm64 -t suborbital/builder-swift:dev --push
-
-# TinyGo (base) docker targets
-builder/docker/tinygo-base:
-	DOCKER_BUILDKIT=1 docker build . -f builder/docker/tinygo/Dockerfile.base -t suborbital/tinygo-base:$(tinygo_ver)
-
-builder/docker/tinygo-base/publish:
-	docker buildx build . -f builder/docker/tinygo/Dockerfile.base --platform linux/amd64,linux/arm64 -t suborbital/tinygo-base:$(tinygo_ver) --push
-
-builder/docker/tinygo-base/dev/publish:
-	docker buildx build . -f builder/docker/tinygo/Dockerfile.base --platform linux/amd64,linux/arm64 -t suborbital/tinygo-base:dev --push
 
 # TinyGo docker targets
 builder/docker/tinygo:
