@@ -18,8 +18,7 @@ import (
 )
 
 const (
-	tmplTypeData    = "data"
-	tmplTypeHandler = "handler"
+	tmplTypeData = "data"
 )
 
 // langAliases are aliases for languages.
