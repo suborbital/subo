@@ -11,13 +11,44 @@ linters:
   disable-all: true
   enable:
     - deadcode
+    - revive
     - gci
-    - godot
-    - unparam
     - unused
 
 linters-settings:
   gci:
-    local-prefixes: github.com/suborbital
-  godot:
-    scope: all
+    no-inline-comments: true
+    no-prefix-comments: true
+    sections:
+      - standard
+      - default
+      - prefix(github.com/suborbital)
+  revive:
+    # Maximum number of open files at the same time.
+    # See https://github.com/mgechev/revive#command-line-flags
+    # Defaults to unlimited.
+    max-open-files: 2048
+    # When set to false, ignores files with "GENERATED" header, similar to golint.
+    # See https://github.com/mgechev/revive#available-rules for details.
+    # Default: false
+    ignore-generated-header: true
+    # Sets the default severity.
+    # See https://github.com/mgechev/revive#configuration
+    # Default: warning
+    severity: error
+    # Enable all available rules.
+    # Default: false
+    enable-all-rules: false
+    # Sets the default failure confidence.
+    # This means that linting errors with less than 0.8 confidence will be ignored.
+    # Default: 0.8
+    confidence: 0.1
+    rules:
+      # https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#import-shadowing
+      - name: import-shadowing
+        severity: warning
+        disabled: false
+      # https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#duplicated-imports
+      - name: duplicated-imports
+        severity: warning
+        disabled: false
