@@ -1,13 +1,13 @@
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: scc-atmo-scaledobject
+  name: scn-atmo-scaledobject
   namespace: suborbital
   labels:
-    app: scc-atmo
+    app: scn-atmo
 spec:
   scaleTargetRef:
-    name: scc-atmo-deployment
+    name: scn-atmo-deployment
     envSourceContainerName: atmo
   pollingInterval: 5
   cooldownPeriod:  30
@@ -17,5 +17,5 @@ spec:
     - type: metrics-api
       metadata:
         targetValue: "1"
-        url: "http://scc-atmo-service.suborbital.svc.cluster.local/meta/metrics"
+        url: "http://scn-atmo-service.suborbital.svc.cluster.local/meta/metrics"
         valueLocation: "scheduler.totalThreadCount"

@@ -1,41 +1,41 @@
 version: '3'
 services:
-  scc-control-plane:
-    image: suborbital/scc-control-plane:{{ .SCCVersion }}
+  scn-control-plane:
+    image: suborbital/scn-control-plane:{{ .SCNVersion }}
     command: controlplane
     volumes:
       - ./:/home/scn
     environment:
-      SCC_LOG_LEVEL: info
-      SCC_HEADLESS: "true"
-      SCC_HTTP_PORT: 8081
-    env_file: 
-      - SCC.env
+      SCN_LOG_LEVEL: info
+      SCN_HEADLESS: "true"
+      SCN_HTTP_PORT: 8081
+    env_file:
+      - SCN.env
     ports:
       - "8081:8081"
     networks:
       - scn
 
-  scc-builder:
-    image: suborbital/scc-builder:{{ .SCCVersion }}
+  scn-builder:
+    image: suborbital/scn-builder:{{ .SCNVersion }}
     command: builder
     volumes:
       - ./:/home/scn
     environment:
-      SCC_LOG_LEVEL: info
-      SCC_HTTP_PORT: 8082
+      SCN_LOG_LEVEL: info
+      SCN_HTTP_PORT: 8082
     ports:
       - "8082:8082"
     networks:
       - scn
-    
-  scc-atmo:
+
+  scn-atmo:
     image: suborbital/atmo:v0.4.7
     command: atmo
     depends_on:
-      - scc-control-plane
+      - scn-control-plane
     environment:
-      ATMO_CONTROL_PLANE: "scc-control-plane:8081"
+      ATMO_CONTROL_PLANE: "scn-control-plane:8081"
       ATMO_HEADLESS: "true"
       ATMO_LOG_LEVEL: info
       ATMO_HTTP_PORT: 8080

@@ -6,6 +6,8 @@ networkRules: &networkRules
     - "*.cluster.local"
     - "scc-controlplane-service"
     - "scc-builder-service"
+    - "scn-controlplane-service"
+    - "scn-builder-service"
 
 capabilities:
   logger:

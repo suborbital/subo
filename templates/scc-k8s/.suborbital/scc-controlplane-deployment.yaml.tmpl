@@ -2,54 +2,54 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  name: scc-controlplane-deployment
+  name: scn-controlplane-deployment
   namespace: suborbital
   labels:
-    app: scc-controlplane
+    app: scn-controlplane
 
 spec:
   replicas: 1
 
   selector:
     matchLabels:
-      app: scc-controlplane
+      app: scn-controlplane
 
   template:
     metadata:
       labels:
-        app: scc-controlplane
+        app: scn-controlplane
 
     spec:
       containers:
         - name: controlplane
-          image: suborbital/scc-control-plane:{{ .SCCVersion }}
+          image: suborbital/scn-control-plane:{{ .SCNVersion }}
           command: ["controlplane"]
 
           ports:
             - containerPort: 8081
 
           env:
-            - name: SCC_HTTP_PORT
+            - name: SCN_HTTP_PORT
               value: "8081"
-            
-            - name: SCC_LOG_LEVEL
+
+            - name: SCN_LOG_LEVEL
               value: "info"
-            
-            - name: SCC_HEADLESS
+
+            - name: SCN_HEADLESS
               value: "true"
 
-            - name: SCC_ENV_TOKEN
+            - name: SCN_ENV_TOKEN
               value: {{ .EnvToken }}
-          
+
           volumeMounts:
             - name: controlplane-storage
               mountPath: "/home/scn"
             - name: controlplane-config
               mountPath: "/home/scn/config"
               readOnly: true
-        
+
         - name: builder
-          image: suborbital/scc-builder:{{ .SCCVersion }}
+          image: suborbital/scn-builder:{{ .SCNVersion }}
           command: ["builder"]
 
           ports:
@@ -57,36 +57,36 @@ spec:
             - containerPort: 8443
 
           env:
-            - name: SCC_DOMAIN
+            - name: SCN_DOMAIN
               value: "{{ .BuilderDomain }}"
 
-            - name: SCC_TLS_PORT
+            - name: SCN_TLS_PORT
               value: "8443"
-            
-            - name: SCC_LOG_LEVEL
+
+            - name: SCN_LOG_LEVEL
               value: "info"
 
-            - name: SCC_CONTROL_PLANE
-              value: "scc-controlplane-service:8081"
-          
+            - name: SCN_CONTROL_PLANE
+              value: "scn-controlplane-service:8081"
+
           volumeMounts:
             - mountPath: "/home/scn"
               name: controlplane-storage
       initContainers:
-        - name: scc-init
+        - name: scn-init
           image: busybox
           command: ["/bin/chmod","-R","777", "/data"]
           volumeMounts:
           - name: controlplane-storage
             mountPath: /data
-      
+
       volumes:
         - name: controlplane-storage
           persistentVolumeClaim:
-            claimName: scc-controlplane-pvc
+            claimName: scn-controlplane-pvc
         - name: controlplane-config
           configMap:
-            name: scc-config
+            name: scn-config
 
 ---
 
@@ -94,7 +94,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   namespace: suborbital
-  name: scc-controlplane-pvc
+  name: scn-controlplane-pvc
 spec:
   accessModes:
     - ReadWriteOnce
@@ -109,10 +109,10 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: suborbital
-  name: scc-controlplane-service
+  name: scn-controlplane-service
 spec:
   selector:
-    app: scc-controlplane
+    app: scn-controlplane
   ports:
     - protocol: TCP
       port: 8081
@@ -124,10 +124,10 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: suborbital
-  name: scc-builder-service
+  name: scn-builder-service
 spec:
   selector:
-    app: scc-controlplane
+    app: scn-controlplane
   ports:
     - protocol: TCP
       name: challenge
