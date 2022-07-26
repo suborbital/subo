@@ -22,7 +22,7 @@ import (
 )
 
 type deployData struct {
-	SCCVersion       string
+	SCNVersion       string
 	EnvToken         string
 	BuilderDomain    string
 	StorageClassName string
@@ -92,7 +92,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 				}
 
 				data := deployData{
-					SCCVersion: tag,
+					SCNVersion: tag,
 					EnvToken:   envToken,
 				}
 
@@ -177,7 +177,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 	}
 
 	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
-	cmd.Flags().String(versionFlag, release.SCCTag, "Docker tag to use for control plane images")
+	cmd.Flags().String(versionFlag, release.SCNTag, "Docker tag to use for control plane images")
 	cmd.Flags().Int(proxyPortFlag, proxyDefaultPort, "port that the Editor proxy listens on")
 	cmd.Flags().Bool(localFlag, false, "deploy locally using docker-compose")
 	cmd.Flags().Bool(dryRunFlag, false, "prepare the deployment in the .suborbital directory, but do not apply it")
