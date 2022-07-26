@@ -32,6 +32,8 @@ const (
 	proxyDefaultPort   int = 80
 	dockerTemplateName     = "scn-docker"
 	k8sTemplateName        = "scn-k8s"
+	configFileType         = "scn-config"
+	configFileName         = configFileType + ".yaml"
 )
 
 // ComputeDeployCoreCommand returns the compute deploy command.
@@ -311,15 +313,15 @@ func detectStorageClass() (string, error) {
 }
 
 func createConfigMap(cwd string) error {
-	configFilepath := filepath.Join(cwd, "config", "scc-config.yaml")
+	configFilepath := filepath.Join(cwd, "config", configFileName)
 
 	_, err := os.Stat(configFilepath)
 	if err != nil {
-		return errors.Wrap(err, "failed to Stat scc-config.yaml")
+		return errors.Wrap(err, fmt.Sprintf("failed to Stat %s", configFileName))
 	}
 
-	if _, err := util.Command.Run(fmt.Sprintf("kubectl create configmap scc-config --from-file=scc-config.yaml=%s -n suborbital", configFilepath)); err != nil {
-		return errors.Wrap(err, "failed to create configmap (you may need to run `kubectl delete configmap scc-config -n suborbital`)")
+	if _, err := util.Command.Run(fmt.Sprintf("kubectl create configmap %s --from-file=%s=%s -n suborbital", configFileType, configFileName, configFilepath)); err != nil {
+		return errors.Wrap(err, fmt.Sprintf("failed to create configmap (you may need to run `kubectl delete configmap %s -n suborbital`)", configFileType))
 	}
 
 	return nil
