@@ -13,7 +13,6 @@ linters:
     - deadcode
     - revive
     - gci
-    - unparam
     - unused
 
 linters-settings:
