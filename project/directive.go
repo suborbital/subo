@@ -116,7 +116,7 @@ func getHandlerFnList(dxe *directive.Directive) []string {
 		}
 	}
 
-	fns := []string{}
+	fns := make([]string, 0)
 	for fn := range fnMap {
 		fns = append(fns, fn)
 	}
