@@ -28,7 +28,13 @@ type deployData struct {
 	StorageClassName string
 }
 
-const proxyDefaultPort int = 80
+const (
+	proxyDefaultPort   int = 80
+	dockerTemplateName     = "scn-docker"
+	k8sTemplateName        = "scn-k8s"
+	configType             = "scn-config"
+	configFileName         = configType + ".yaml"
+)
 
 // ComputeDeployCoreCommand returns the compute deploy command.
 func ComputeDeployCoreCommand() *cobra.Command {
@@ -96,7 +102,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 					EnvToken:   envToken,
 				}
 
-				templateName := "scc-docker"
+				templateName := dockerTemplateName
 
 				if !localInstall {
 					data.BuilderDomain, err = getBuilderDomain()
@@ -109,7 +115,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 						return errors.Wrap(err, "🚫 failed to getStorageClass")
 					}
 
-					templateName = "scc-k8s"
+					templateName = k8sTemplateName
 				}
 
 				if err := template.ExecTmplDir(bctx.Cwd, "", templatesPath, templateName, data); err != nil {
@@ -305,15 +311,15 @@ func detectStorageClass() (string, error) {
 }
 
 func createConfigMap(cwd string) error {
-	configFilepath := filepath.Join(cwd, "config", "scc-config.yaml")
+	configFilepath := filepath.Join(cwd, "config", configFileName)
 
 	_, err := os.Stat(configFilepath)
 	if err != nil {
-		return errors.Wrap(err, "failed to Stat scc-config.yaml")
+		return errors.Wrap(err, fmt.Sprintf("failed to Stat %s", configFileName))
 	}
 
-	if _, err := util.Command.Run(fmt.Sprintf("kubectl create configmap scc-config --from-file=scc-config.yaml=%s -n suborbital", configFilepath)); err != nil {
-		return errors.Wrap(err, "failed to create configmap (you may need to run `kubectl delete configmap scc-config -n suborbital`)")
+	if _, err := util.Command.Run(fmt.Sprintf("kubectl create configmap %s --from-file=%s=%s -n suborbital", configType, configFileName, configFilepath)); err != nil {
+		return errors.Wrap(err, fmt.Sprintf("failed to create configmap (you may need to run `kubectl delete configmap %s -n suborbital`)", configType))
 	}
 
 	return nil
