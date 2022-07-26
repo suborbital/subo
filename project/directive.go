@@ -15,10 +15,10 @@ import (
 )
 
 // WriteDirectiveFile writes a Directive to disk.
-func WriteDirectiveFile(cwd string, directive *directive.Directive) error {
+func WriteDirectiveFile(cwd string, localDirective *directive.Directive) error {
 	filePath := filepath.Join(cwd, "Directive.yaml")
 
-	directiveBytes, err := yaml.Marshal(directive)
+	directiveBytes, err := yaml.Marshal(localDirective)
 	if err != nil {
 		return errors.Wrap(err, "failed to Marshal")
 	}
@@ -44,12 +44,12 @@ func readDirectiveFile(cwd string) (*directive.Directive, error) {
 		return nil, errors.Wrap(err, "failed to ReadFile for Directive")
 	}
 
-	directive := &directive.Directive{}
-	if err := directive.Unmarshal(directiveBytes); err != nil {
+	localDirective := &directive.Directive{}
+	if err := localDirective.Unmarshal(directiveBytes); err != nil {
 		return nil, errors.Wrap(err, "failed to Unmarshal Directive")
 	}
 
-	return directive, nil
+	return localDirective, nil
 }
 
 // readQueriesFile finds a queries.yaml from disk.
@@ -65,12 +65,12 @@ func readQueriesFile(cwd string) ([]directive.DBQuery, error) {
 		return nil, errors.Wrap(err, "failed to ReadFile for Queries.yaml")
 	}
 
-	directive := &directive.Directive{}
-	if err := directive.Unmarshal(directiveBytes); err != nil {
+	localDirective := &directive.Directive{}
+	if err := localDirective.Unmarshal(directiveBytes); err != nil {
 		return nil, errors.Wrap(err, "failed to Unmarshal Directive")
 	}
 
-	return directive.Queries, nil
+	return localDirective.Queries, nil
 }
 
 // AugmentAndValidateDirectiveFns ensures that all functions referenced in a handler exist
