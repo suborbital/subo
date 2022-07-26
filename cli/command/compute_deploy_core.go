@@ -22,7 +22,7 @@ import (
 )
 
 type deployData struct {
-	SCCVersion       string
+	SCNVersion       string
 	EnvToken         string
 	BuilderDomain    string
 	StorageClassName string
@@ -92,7 +92,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 				}
 
 				data := deployData{
-					SCCVersion: tag,
+					SCNVersion: tag,
 					EnvToken:   envToken,
 				}
 
