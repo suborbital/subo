@@ -152,9 +152,11 @@ func ComputeDeployCoreCommand() *cobra.Command {
 				// it's not ideal, but the least gross way to ensure a good experience.
 				time.Sleep(time.Second * 1)
 
-				repl := repl.New(proxyPortStr)
-				repl.Run()
-
+				replInstance := repl.New(proxyPortStr)
+				err := replInstance.Run()
+				if err != nil {
+					return errors.Wrap(err, fmt.Sprintf("local install repl run with proxy port string %s", proxyPortStr))
+				}
 			} else {
 				if _, err := util.Command.Run("kubectl apply -f https://github.com/kedacore/keda/releases/download/v2.4.0/keda-2.4.0.yaml"); err != nil {
 					return errors.Wrap(err, "🚫 failed to install KEDA")
