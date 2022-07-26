@@ -120,12 +120,12 @@ func (b *BindlePublishJob) Publish(log util.FriendlyLogger, ctx *project.Context
 		return errors.Wrap(err, "failed to GenerateCreatorSignaure")
 	}
 
-	client, err := client.New("http://127.0.0.1:8080/v1", nil)
+	publishClient, err := client.New("http://127.0.0.1:8080/v1", nil)
 	if err != nil {
-		return errors.Wrap(err, "failed to client.New")
+		return errors.Wrap(err, "failed to publishClient.New")
 	}
 
-	invResp, err := client.CreateInvoice(*invoice)
+	invResp, err := publishClient.CreateInvoice(*invoice)
 	if err != nil {
 		return errors.Wrap(err, "failed to CreateInvoice")
 	}
@@ -133,7 +133,7 @@ func (b *BindlePublishJob) Publish(log util.FriendlyLogger, ctx *project.Context
 	for _, p := range invResp.Missing {
 		wrapper := parcelsBySHA[p.SHA256]
 
-		if err := client.CreateParcel(invoice.Name(), p.SHA256, wrapper.data); err != nil {
+		if err := publishClient.CreateParcel(invoice.Name(), p.SHA256, wrapper.data); err != nil {
 			return errors.Wrapf(err, "failed to CreateParcel for %s", wrapper.parcel.Label.Name)
 		}
 	}
