@@ -28,7 +28,11 @@ type deployData struct {
 	StorageClassName string
 }
 
-const proxyDefaultPort int = 80
+const (
+	proxyDefaultPort   int = 80
+	dockerTemplateName     = "scn-docker"
+	k8sTemplateName        = "scn-k8s"
+)
 
 // ComputeDeployCoreCommand returns the compute deploy command.
 func ComputeDeployCoreCommand() *cobra.Command {
@@ -96,7 +100,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 					EnvToken:   envToken,
 				}
 
-				templateName := "scc-docker"
+				templateName := dockerTemplateName
 
 				if !localInstall {
 					data.BuilderDomain, err = getBuilderDomain()
@@ -109,7 +113,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 						return errors.Wrap(err, "🚫 failed to getStorageClass")
 					}
 
-					templateName = "scc-k8s"
+					templateName = k8sTemplateName
 				}
 
 				if err := template.ExecTmplDir(bctx.Cwd, "", templatesPath, templateName, data); err != nil {
