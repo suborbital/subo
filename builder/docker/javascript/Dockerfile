@@ -1,4 +1,4 @@
-FROM ghcr.io/suborbital/javy:v0.2.0 as javy
+FROM ghcr.io/suborbital/javy:v0.3.0 as javy
 FROM suborbital/subo:dev as subo
 
 FROM node:16-bullseye-slim
