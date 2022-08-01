@@ -1,7 +1,7 @@
 version: '3'
 services:
-  scn-control-plane:
-    image: suborbital/scn-control-plane:{{ .SCNVersion }}
+  scn-controlplane:
+    image: suborbital/scn-controlplane:{{ .SCNVersion }}
     command: controlplane
     volumes:
       - ./:/home/scn
