@@ -7,7 +7,7 @@ RUN apt-get update && apt-get -y install wget
 WORKDIR /usr/local
 
 # update TinyGo version here!
-ARG TINYGO_VERSION=0.24.0
+ARG TINYGO_VERSION=0.25.0
 ARG TARGETARCH
 
 RUN wget -O tinygo.tar.gz \
