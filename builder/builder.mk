@@ -1,5 +1,5 @@
 # all paths are relative to project root
-ver = $(shell cat ./builder/.image-ver)
+ver = $(shell cat ./builder/.image-ver | tr -d '\n')
 
 builder/docker: subo/docker builder/docker/rust builder/docker/swift builder/docker/as builder/docker/tinygo builder/docker/grain builder/docker/javascript builder/docker/wat
 
