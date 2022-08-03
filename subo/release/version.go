@@ -2,7 +2,7 @@ package release
 
 // SuboDotVersion represents the dot version for subo
 // it is also the image tag used for builders.
-var SuboDotVersion = "0.5.3"
+var SuboDotVersion = "0.5.4"
 
 // FFIVersion is the FFI version used by this version of subo.
 var FFIVersion = "0.15.1"
