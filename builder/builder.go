@@ -157,7 +157,11 @@ func (b *Builder) dockerBuildForLang(lang string) (*BuildResult, error) {
 
 	result := &BuildResult{}
 
-	outputLog, err := b.Config.CommandRunner.Run(fmt.Sprintf("docker run --rm --mount type=bind,source=%s,target=/root/runnable %s subo build %s --native --langs %s", b.Context.MountPath, img, b.Context.RelDockerPath, lang))
+	// Run the Docker toolchain as the current user
+	uid := os.Getuid()
+	gid := os.Getgid()
+
+	outputLog, err := b.Config.CommandRunner.Run(fmt.Sprintf("docker run --rm --mount type=bind,source=%s,target=/usr/src/runnable -u %d:%d %s subo build %s --native --langs %s", b.Context.MountPath, uid, gid, img, b.Context.RelDockerPath, lang))
 
 	result.OutputLog = outputLog
 
