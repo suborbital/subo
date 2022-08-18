@@ -1,70 +1,72 @@
 package command
 
-import (
-	"fmt"
-	"os"
+// TODO: turn this into `create workflow`
 
-	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
+// import (
+// 	"fmt"
+// 	"os"
 
-	"github.com/suborbital/atmo/directive"
-	"github.com/suborbital/subo/project"
-	"github.com/suborbital/subo/subo/util"
-)
+// 	"github.com/pkg/errors"
+// 	"github.com/spf13/cobra"
 
-func CreateHandlerCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "handler <resource>",
-		Short: "create a new handler",
-		Long:  `create a new handler in Directive.yaml`,
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			resource := args[0]
+// 	"github.com/suborbital/atmo/directive"
+// 	"github.com/suborbital/subo/project"
+// 	"github.com/suborbital/subo/subo/util"
+// )
 
-			handlerType, _ := cmd.Flags().GetString(typeFlag)
-			method, _ := cmd.Flags().GetString(methodFlag)
+// func CreateHandlerCmd() *cobra.Command {
+// 	cmd := &cobra.Command{
+// 		Use:   "handler <resource>",
+// 		Short: "create a new handler",
+// 		Long:  `create a new handler in Directive.yaml`,
+// 		Args:  cobra.ExactArgs(1),
+// 		RunE: func(cmd *cobra.Command, args []string) error {
+// 			resource := args[0]
 
-			util.LogStart(fmt.Sprintf("creating handler for %s", resource))
+// 			handlerType, _ := cmd.Flags().GetString(typeFlag)
+// 			method, _ := cmd.Flags().GetString(methodFlag)
 
-			cwd, err := os.Getwd()
-			if err != nil {
-				return errors.Wrap(err, "failed to Getwd")
-			}
+// 			util.LogStart(fmt.Sprintf("creating handler for %s", resource))
 
-			bctx, err := project.ForDirectory(cwd)
-			if err != nil {
-				return errors.Wrap(err, "🚫 failed to project.ForDirectory")
-			}
+// 			cwd, err := os.Getwd()
+// 			if err != nil {
+// 				return errors.Wrap(err, "failed to Getwd")
+// 			}
 
-			if bctx.Directive == nil {
-				return errors.New("cannot create handler, Directive.yaml not found")
-			}
+// 			bctx, err := project.ForDirectory(cwd)
+// 			if err != nil {
+// 				return errors.Wrap(err, "🚫 failed to project.ForDirectory")
+// 			}
 
-			// Create a new handler object.
-			handler := directive.Handler{
-				Input: directive.Input{
-					Type:     handlerType,
-					Resource: resource,
-					Method:   method,
-				},
-			}
+// 			if bctx.Directive == nil {
+// 				return errors.New("cannot create handler, Directive.yaml not found")
+// 			}
 
-			// Add the handler object to the directive file.
-			bctx.Directive.Handlers = append(bctx.Directive.Handlers, handler)
+// 			// Create a new handler object.
+// 			handler := directive.Handler{
+// 				Input: directive.Input{
+// 					Type:     handlerType,
+// 					Resource: resource,
+// 					Method:   method,
+// 				},
+// 			}
 
-			// Write Directive File which overwrites the entire file.
-			if err := project.WriteDirectiveFile(bctx.Cwd, bctx.Directive); err != nil {
-				return errors.Wrap(err, "failed to WriteDirectiveFile")
-			}
+// 			// Add the handler object to the directive file.
+// 			bctx.Directive.Handlers = append(bctx.Directive.Handlers, handler)
 
-			util.LogDone(fmt.Sprintf("handler for %s created", resource))
+// 			// Write Directive File which overwrites the entire file.
+// 			if err := project.WriteDirectiveFile(bctx.Cwd, bctx.Directive); err != nil {
+// 				return errors.Wrap(err, "failed to WriteDirectiveFile")
+// 			}
 
-			return nil
-		},
-	}
+// 			util.LogDone(fmt.Sprintf("handler for %s created", resource))
 
-	cmd.Flags().String(typeFlag, "request", "the handler's input type")
-	cmd.Flags().String(methodFlag, "GET", "the HTTP method for 'request' handlers")
+// 			return nil
+// 		},
+// 	}
 
-	return cmd
-}
+// 	cmd.Flags().String(typeFlag, "request", "the handler's input type")
+// 	cmd.Flags().String(methodFlag, "GET", "the HTTP method for 'request' handlers")
+
+// 	return cmd
+// }

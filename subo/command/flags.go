@@ -11,7 +11,6 @@ const (
 	typeFlag            = "type"
 	environmentFlag     = "environment"
 	updateTemplatesFlag = "update-templates"
-	headlessFlag        = "headless"
 	preReleaseFlag      = "prerelease"
 	dryRunFlag          = "dryrun"
 	resetFlag           = "reset"

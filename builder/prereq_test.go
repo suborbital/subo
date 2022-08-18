@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/suborbital/atmo/directive"
+	"github.com/suborbital/appspec/tenant"
 	"github.com/suborbital/subo/project"
 )
 
@@ -13,7 +13,7 @@ func TestPrereq_GetCommand(t *testing.T) {
 	tests := []struct {
 		name    string
 		prereq  Prereq
-		r       project.RunnableDir
+		r       project.ModuleDir
 		want    string
 		wantErr assert.ErrorAssertionFunc
 	}{
@@ -21,10 +21,10 @@ func TestPrereq_GetCommand(t *testing.T) {
 			name: "successfully expands template",
 			prereq: Prereq{
 				File:    "_lib/_lib.tar.gz",
-				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .RunnableDir.Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
+				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .ModuleDir.Module.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
 			},
-			r: project.RunnableDir{
-				Runnable: &directive.Runnable{
+			r: project.ModuleDir{
+				Module: &tenant.Module{
 					APIVersion: "0.33.75",
 				},
 			},
@@ -35,10 +35,10 @@ func TestPrereq_GetCommand(t *testing.T) {
 			name: "errors due to missing data to expand with",
 			prereq: Prereq{
 				File:    "_lib/_lib.tar.gz",
-				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .RunnableDir.Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
+				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .ModuleDir.Module.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
 			},
-			r: project.RunnableDir{
-				Runnable: nil,
+			r: project.ModuleDir{
+				Module: nil,
 			},
 			want:    "",
 			wantErr: assert.Error,
@@ -49,8 +49,8 @@ func TestPrereq_GetCommand(t *testing.T) {
 				File:    "_lib/_lib.tar.gz",
 				Command: "curl -L https://github.com/suborbital/reactr/archive/v2.tar.gz -o _lib/_lib.tar.gz",
 			},
-			r: project.RunnableDir{
-				Runnable: &directive.Runnable{
+			r: project.ModuleDir{
+				Module: &tenant.Module{
 					APIVersion: "0.33.75",
 				},
 			},

@@ -28,7 +28,7 @@ func BuildCmd() *cobra.Command {
 				return errors.Wrap(err, "failed to builder.ForDirectory")
 			}
 
-			if len(bdr.Context.Runnables) == 0 {
+			if len(bdr.Context.Modules) == 0 {
 				return errors.New("🚫 no runnables found in current directory (no .runnable.yaml files found)")
 			}
 

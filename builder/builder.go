@@ -87,41 +87,41 @@ func (b *Builder) BuildWithToolchain(tcn Toolchain) error {
 	// launch the associated builder images which will do the building.
 	dockerLangs := map[string]bool{}
 
-	for _, r := range b.Context.Runnables {
-		if !b.Context.ShouldBuildLang(r.Runnable.Lang) {
+	for _, mod := range b.Context.Modules {
+		if !b.Context.ShouldBuildLang(mod.Module.Lang) {
 			continue
 		}
 
 		if tcn == ToolchainNative {
-			b.log.LogStart(fmt.Sprintf("building runnable: %s (%s)", r.Name, r.Runnable.Lang))
+			b.log.LogStart(fmt.Sprintf("building runnable: %s (%s)", mod.Name, mod.Module.Lang))
 
 			result := &BuildResult{}
 
-			if err := b.checkAndRunPreReqs(r, result); err != nil {
+			if err := b.checkAndRunPreReqs(mod, result); err != nil {
 				return errors.Wrap(err, "🚫 failed to checkAndRunPreReqs")
 			}
 
-			if flags, err := b.analyzeForCompilerFlags(r); err != nil {
+			if flags, err := b.analyzeForCompilerFlags(mod); err != nil {
 				return errors.Wrap(err, "🚫 failed to analyzeForCompilerFlags")
 			} else if flags != "" {
-				r.CompilerFlags = flags
+				mod.CompilerFlags = flags
 			}
 
-			err = b.doNativeBuildForRunnable(r, result)
+			err = b.doNativeBuildForModule(mod, result)
 
 			// Even if there was a failure, load the result into the builder
 			// since the logs of the failed build are useful.
 			b.results = append(b.results, *result)
 
 			if err != nil {
-				return errors.Wrapf(err, "🚫 failed to build %s", r.Name)
+				return errors.Wrapf(err, "🚫 failed to build %s", mod.Name)
 			}
 
-			fullWasmFilepath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
-			b.log.LogDone(fmt.Sprintf("%s was built -> %s", r.Name, fullWasmFilepath))
+			fullWasmFilepath := filepath.Join(mod.Fullpath, fmt.Sprintf("%s.wasm", mod.Name))
+			b.log.LogDone(fmt.Sprintf("%s was built -> %s", mod.Name, fullWasmFilepath))
 
 		} else {
-			dockerLangs[r.Runnable.Lang] = true
+			dockerLangs[mod.Module.Lang] = true
 		}
 	}
 
@@ -172,8 +172,8 @@ func (b *Builder) dockerBuildForLang(lang string) (*BuildResult, error) {
 }
 
 // results and resulting file are loaded into the BuildResult pointer.
-func (b *Builder) doNativeBuildForRunnable(r project.RunnableDir, result *BuildResult) error {
-	cmds, err := NativeBuildCommands(r.Runnable.Lang)
+func (b *Builder) doNativeBuildForModule(mod project.ModuleDir, result *BuildResult) error {
+	cmds, err := NativeBuildCommands(mod.Module.Lang)
 	if err != nil {
 		return errors.Wrap(err, "failed to NativeBuildCommands")
 	}
@@ -185,14 +185,14 @@ func (b *Builder) doNativeBuildForRunnable(r project.RunnableDir, result *BuildR
 		}
 
 		fullCmd := &strings.Builder{}
-		if err := cmdTmpl.Execute(fullCmd, r); err != nil {
+		if err := cmdTmpl.Execute(fullCmd, mod); err != nil {
 			return errors.Wrap(err, "failed to Execute command template")
 		}
 
 		cmdString := strings.TrimSpace(fullCmd.String())
 
 		// Even if the command fails, still load the output into the result object.
-		outputLog, err := b.Config.CommandRunner.RunInDir(cmdString, r.Fullpath)
+		outputLog, err := b.Config.CommandRunner.RunInDir(cmdString, mod.Fullpath)
 
 		result.OutputLog += outputLog + "\n"
 
@@ -217,15 +217,15 @@ func ImageForLang(lang, tag string) (string, error) {
 	return fmt.Sprintf("%s:%s", img, tag), nil
 }
 
-func (b *Builder) checkAndRunPreReqs(runnable project.RunnableDir, result *BuildResult) error {
+func (b *Builder) checkAndRunPreReqs(runnable project.ModuleDir, result *BuildResult) error {
 	preReqLangs, ok := PreRequisiteCommands[runtime.GOOS]
 	if !ok {
 		return fmt.Errorf("unsupported OS: %s", runtime.GOOS)
 	}
 
-	preReqs, ok := preReqLangs[runnable.Runnable.Lang]
+	preReqs, ok := preReqLangs[runnable.Module.Lang]
 	if !ok {
-		return fmt.Errorf("unsupported language: %s", runnable.Runnable.Lang)
+		return fmt.Errorf("unsupported language: %s", runnable.Module.Lang)
 	}
 
 	for _, p := range preReqs {
@@ -258,9 +258,9 @@ func (b *Builder) checkAndRunPreReqs(runnable project.RunnableDir, result *Build
 
 // analyzeForCompilerFlags looks at the Runnable and determines if any additional compiler flags are needed
 // this is initially added to support AS-JSON in AssemblyScript with its need for the --transform flag.
-func (b *Builder) analyzeForCompilerFlags(runnable project.RunnableDir) (string, error) {
-	if runnable.Runnable.Lang == "assemblyscript" {
-		packageJSONBytes, err := ioutil.ReadFile(filepath.Join(runnable.Fullpath, "package.json"))
+func (b *Builder) analyzeForCompilerFlags(md project.ModuleDir) (string, error) {
+	if md.Module.Lang == "assemblyscript" {
+		packageJSONBytes, err := ioutil.ReadFile(filepath.Join(md.Fullpath, "package.json"))
 		if err != nil {
 			return "", errors.Wrap(err, "failed to ReadFile package.json")
 		}

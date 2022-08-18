@@ -31,13 +31,13 @@ func CleanCmd() *cobra.Command {
 				return errors.Wrap(err, "failed to project.ForDirectory")
 			}
 
-			if len(bctx.Runnables) == 0 {
+			if len(bctx.Modules) == 0 {
 				return errors.New("🚫 no runnables found in current directory (no .runnable yaml files found)")
 			}
 
 			util.LogStart(fmt.Sprintf("cleaning in %s", bctx.Cwd))
 
-			for _, r := range bctx.Runnables {
+			for _, r := range bctx.Modules {
 				// Delete target or .build folder.
 				files, _ := ioutil.ReadDir(r.Fullpath)
 

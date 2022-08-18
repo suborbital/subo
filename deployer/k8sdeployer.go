@@ -27,7 +27,7 @@ type K8sDeployJob struct {
 
 type deploymentData struct {
 	Identifier string
-	AppVersion string
+	Version    int64
 	ImageName  string
 	Domain     string
 }
@@ -51,14 +51,14 @@ func (k *K8sDeployJob) Type() string {
 
 // Deploy executes the deployment.
 func (k *K8sDeployJob) Deploy(log util.FriendlyLogger, ctx *project.Context) error {
-	imageName, err := project.DockerNameFromDirective(ctx.Directive)
+	imageName, err := project.DockerNameFromConfig(ctx.TenantConfig)
 	if err != nil {
 		return errors.Wrap(err, "failed to DockerNameFromDirective")
 	}
 
 	data := deploymentData{
-		Identifier: strings.Replace(ctx.Directive.Identifier, ".", "-", -1),
-		AppVersion: ctx.Directive.AppVersion,
+		Identifier: strings.Replace(ctx.TenantConfig.Identifier, ".", "-", -1),
+		Version:    ctx.TenantConfig.TenantVersion,
 		ImageName:  imageName,
 		Domain:     k.domain,
 	}

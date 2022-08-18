@@ -12,7 +12,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/suborbital/atmo/directive"
+	"github.com/suborbital/appspec/tenant"
 	"github.com/suborbital/subo/subo/util"
 )
 
@@ -20,7 +20,7 @@ import (
 var ErrTemplateMissing = errors.New("template missing")
 
 type tmplData struct {
-	directive.Runnable
+	tenant.Module
 	NameCaps  string
 	NameCamel string
 }
@@ -86,9 +86,9 @@ func TemplatesExist(repo, branch string) (string, error) {
 	return tmplPath, nil
 }
 
-// ExecRunnableTmplStr executes a template string with the runnable's data.
-func ExecRunnableTmplStr(templateStr string, runnable *directive.Runnable) (string, error) {
-	templateData := makeTemplateData(runnable)
+// ExecRunnableTmplStr executes a template string with the module's data.
+func ExecRunnableTmplStr(templateStr string, module *tenant.Module) (string, error) {
+	templateData := makeTemplateData(module)
 
 	tmpl, err := template.New("tmpl").Parse(templateStr)
 	if err != nil {
@@ -104,10 +104,10 @@ func ExecRunnableTmplStr(templateStr string, runnable *directive.Runnable) (stri
 }
 
 // ExecRunnableTmpl copies a template.
-func ExecRunnableTmpl(cwd, name, templatesPath string, runnable *directive.Runnable) error {
-	templateData := makeTemplateData(runnable)
+func ExecRunnableTmpl(cwd, name, templatesPath string, module *tenant.Module) error {
+	templateData := makeTemplateData(module)
 
-	return ExecTmplDir(cwd, name, templatesPath, runnable.Lang, templateData)
+	return ExecTmplDir(cwd, name, templatesPath, module.Lang, templateData)
 }
 
 // ExecTmplDir copies a generic templated directory.
@@ -258,17 +258,17 @@ func extractZip(filePath, destPath, branchDirName string) (string, error) {
 }
 
 // makeTemplateData makes data to be used in templates.
-func makeTemplateData(runnable *directive.Runnable) tmplData {
+func makeTemplateData(module *tenant.Module) tmplData {
 	nameCamel := ""
-	nameParts := strings.Split(runnable.Name, "-")
+	nameParts := strings.Split(module.Name, "-")
 	for _, part := range nameParts {
 		nameCamel += strings.ToUpper(string(part[0]))
 		nameCamel += string(part[1:])
 	}
 
 	return tmplData{
-		Runnable:  *runnable,
-		NameCaps:  strings.ToUpper(strings.Replace(runnable.Name, "-", "", -1)),
+		Module:    *module,
+		NameCaps:  strings.ToUpper(strings.Replace(module.Name, "-", "", -1)),
 		NameCamel: nameCamel,
 	}
 }
