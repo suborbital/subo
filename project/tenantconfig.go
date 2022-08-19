@@ -140,7 +140,7 @@ func calculateModuleRef(mod *os.File) (string, error) {
 func getWorkflowModList(cfg *tenant.Config) []string {
 	modMap := map[string]bool{}
 
-	// collect all the workflows in all of the namespaces
+	// collect all the workflows in all of the namespaces.
 	workflows := []tenant.Workflow{}
 	workflows = append(workflows, cfg.DefaultNamespace.Workflows...)
 	for _, ns := range cfg.Namespaces {
