@@ -122,7 +122,7 @@ func AugmentAndValidateModules(cfg *tenant.Config, mods []ModuleDir) error {
 	return cfg.Validate()
 }
 
-// calculateModuleRef calculates the base64url-encoded sha256 hash of a module file
+// calculateModuleRef calculates the base64url-encoded sha256 hash of a module file.
 func calculateModuleRef(mod *os.File) (string, error) {
 	hasher := sha256.New()
 	if _, err := io.Copy(hasher, mod); err != nil {
