@@ -88,7 +88,7 @@ func AugmentAndValidateModules(cfg *tenant.Config, mods []ModuleDir) error {
 
 	dirModules := make([]tenant.Module, len(mods))
 
-	// for each module, calculate its ref (a.k.a. its hash), and then add it to the context
+	// for each module, calculate its ref (a.k.a. its hash), and then add it to the context.
 	for i := range mods {
 		mod := mods[i]
 		modFile, err := mod.WasmFile()
