@@ -27,7 +27,7 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 			},
 			Prereq{
 				File:    "_lib/_lib.tar.gz",
-				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .ModuleDir.Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
+				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .ModuleDir.Module.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
 			},
 			Prereq{
 				File:    "_lib/suborbital",
@@ -65,7 +65,7 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 			},
 			Prereq{
 				File:    "_lib/_lib.tar.gz",
-				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .ModuleDir.Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
+				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .ModuleDir.Module.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
 			},
 			Prereq{
 				File:    "_lib/suborbital",
