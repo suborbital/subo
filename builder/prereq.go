@@ -27,7 +27,7 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 			},
 			Prereq{
 				File:    "_lib/_lib.tar.gz",
-				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .RunnableDir.Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
+				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .ModuleDir.Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
 			},
 			Prereq{
 				File:    "_lib/suborbital",
@@ -65,7 +65,7 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 			},
 			Prereq{
 				File:    "_lib/_lib.tar.gz",
-				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .RunnableDir.Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
+				Command: "curl -L https://github.com/suborbital/reactr/archive/v{{ .ModuleDir.Runnable.APIVersion }}.tar.gz -o _lib/_lib.tar.gz",
 			},
 			Prereq{
 				File:    "_lib/suborbital",
@@ -95,7 +95,7 @@ var PreRequisiteCommands = map[string]map[string][]Prereq{
 	},
 }
 
-// GetCommand takes a RunnableDir, and returns an executed template command string.
+// GetCommand takes a ModuleDir, and returns an executed template command string.
 func (p Prereq) GetCommand(b BuildConfig, md project.ModuleDir) (string, error) {
 	cmdTmpl, err := template.New("cmd").Parse(p.Command)
 	if err != nil {
