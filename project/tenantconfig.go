@@ -2,7 +2,7 @@ package project
 
 import (
 	"crypto/sha256"
-	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -121,7 +121,7 @@ func CalculateModuleRefs(cfg *tenant.Config, mods []ModuleDir) error {
 	return cfg.Validate()
 }
 
-// calculateModuleRef calculates the base64url-encoded sha256 hash of a module file.
+// calculateModuleRef calculates the hex-encoded sha256 hash of a module file.
 func calculateModuleRef(mod *os.File) (string, error) {
 	hasher := sha256.New()
 	if _, err := io.Copy(hasher, mod); err != nil {
@@ -130,9 +130,7 @@ func calculateModuleRef(mod *os.File) (string, error) {
 
 	hashBytes := hasher.Sum(nil)
 
-	hashString := base64.URLEncoding.EncodeToString(hashBytes)
-
-	return hashString, nil
+	return hex.EncodeToString(hashBytes), nil
 }
 
 // getWorkflowModList gets a full list of all functions used in the config's workflows.
