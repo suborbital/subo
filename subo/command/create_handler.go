@@ -13,7 +13,7 @@ package command
 // 	"github.com/suborbital/atmo/directive"
 // 	"github.com/suborbital/subo/project"
 // 	"github.com/suborbital/subo/subo/util"
-// )
+// ).
 
 // func CreateHandlerCmd() *cobra.Command {
 // 	cmd := &cobra.Command{
@@ -70,4 +70,4 @@ package command
 // 	cmd.Flags().String(methodFlag, "GET", "the HTTP method for 'request' handlers")
 
 // 	return cmd
-// }
+// }.
