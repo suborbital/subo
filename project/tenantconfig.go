@@ -70,9 +70,8 @@ func readQueriesFile(cwd string) ([]tenant.DBQuery, error) {
 	return tenant.DefaultNamespace.Queries, nil
 }
 
-// AugmentAndValidateModules ensures that all modules referenced in a workflow exist
-// in the project and then adds the module list to the provided config.
-func AugmentAndValidateModules(cfg *tenant.Config, mods []ModuleDir) error {
+// CalculateModuleRefs calculates the hash refs for all modules and validates correctness of the config.
+func CalculateModuleRefs(cfg *tenant.Config, mods []ModuleDir) error {
 	modMap := map[string]bool{}
 	for _, fn := range mods {
 		modMap[fn.Name] = true

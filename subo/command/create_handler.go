@@ -1,6 +1,7 @@
 package command
 
 // TODO: turn this into `create workflow`
+// Ref: https://github.com/suborbital/subo/issues/347
 
 // import (
 // 	"fmt"

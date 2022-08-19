@@ -59,7 +59,7 @@ func (b *BundlePackageJob) Package(log util.FriendlyLogger, ctx *project.Context
 		return errors.Wrap(err, "failed to WriteTenantConfig")
 	}
 
-	if err := project.AugmentAndValidateModules(ctx.TenantConfig, ctx.Modules); err != nil {
+	if err := project.CalculateModuleRefs(ctx.TenantConfig, ctx.Modules); err != nil {
 		return errors.Wrap(err, "🚫 failed to AugmentAndValidateDirectiveFns")
 	}
 

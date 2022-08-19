@@ -196,8 +196,8 @@ jobs:
           load: true
           tags: suborbital/${{ matrix.image }}:dev
 
-      - name: Create runnable
-        run: subo create runnable ${{ matrix.language }}-test --lang ${{ matrix.language }} --repo ${{ needs.meta.outputs.repo }} --branch ${{ needs.meta.outputs.branch }}
+      - name: Create module
+        run: subo create module ${{ matrix.language }}-test --lang ${{ matrix.language }} --repo ${{ needs.meta.outputs.repo }} --branch ${{ needs.meta.outputs.branch }}
 
       - name: Run subo build
         run: subo build ${{ matrix.language }}-test --builder-tag dev
