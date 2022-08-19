@@ -197,7 +197,7 @@ jobs:
           tags: suborbital/${{ matrix.image }}:dev
 
       - name: Create module
-        run: subo create module ${{ matrix.language }}-test --lang ${{ matrix.language }} --repo ${{ needs.meta.outputs.repo }} --branch ${{ needs.meta.outputs.branch }}
+        run: subo create module ${{ matrix.language }}-test --lang ${{ matrix.language }}
 
       - name: Run subo build
         run: subo build ${{ matrix.language }}-test --builder-tag dev
