@@ -14,15 +14,15 @@ import (
 )
 
 const (
-	defaultRepo = "suborbital/subo"
+	defaultRepo   = "suborbital/runnable-templates"
+	defaultBranch = "vmain"
 )
 
 type projectData struct {
-	Name        string
-	Environment string
-	Headless    bool
-	APIVersion  string
-	AtmoVersion string
+	Name          string
+	Environment   string
+	APIVersion    string
+	DeltavVersion string
 }
 
 // CreateProjectCmd returns the build command.
@@ -30,7 +30,7 @@ func CreateProjectCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "project <name>",
 		Short: "create a new project",
-		Long:  `create a new project for Atmo or Reactr`,
+		Long:  `create a new project for DeltaV or Suborbital Extend`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0]
@@ -54,7 +54,6 @@ func CreateProjectCmd() *cobra.Command {
 
 			branch, _ := cmd.Flags().GetString(branchFlag)
 			environment, _ := cmd.Flags().GetString(environmentFlag)
-			headless, _ := cmd.Flags().GetBool(headlessFlag)
 
 			templatesPath, err := template.FullPath(defaultRepo, branch)
 			if err != nil {
@@ -69,11 +68,10 @@ func CreateProjectCmd() *cobra.Command {
 			}
 
 			data := projectData{
-				Name:        name,
-				Environment: environment,
-				APIVersion:  release.FFIVersion,
-				AtmoVersion: release.AtmoVersion,
-				Headless:    headless,
+				Name:          name,
+				Environment:   environment,
+				APIVersion:    release.FFIVersion,
+				DeltavVersion: release.DeltavVersion,
 			}
 
 			if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data); err != nil {
@@ -102,9 +100,8 @@ func CreateProjectCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
+	cmd.Flags().String(branchFlag, defaultBranch, "git branch to download templates from")
 	cmd.Flags().String(environmentFlag, "com.suborbital", "project environment name (your company's reverse domain")
-	cmd.Flags().Bool(headlessFlag, false, "use 'headless mode' for this project")
 	cmd.Flags().Bool(updateTemplatesFlag, false, "update with the newest templates")
 
 	return cmd

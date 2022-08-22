@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
-	"github.com/suborbital/atmo/directive"
+	"github.com/suborbital/appspec/tenant"
 	"github.com/suborbital/subo/builder/template"
 	"github.com/suborbital/subo/project"
 	"github.com/suborbital/subo/subo/release"
@@ -36,7 +36,7 @@ type CreateRunnableError struct {
 // NewCreateRunnableError cleans up and returns CreateRunnableError for CreateRunnableCmd() failures.
 func NewCreateRunnableError(path string, err error) CreateRunnableError {
 	if cleanupErr := os.RemoveAll(path); cleanupErr != nil {
-		err = errors.Wrap(err, "failed to clean up runnable outputs")
+		err = errors.Wrap(err, "failed to clean up module outputs")
 	}
 	return CreateRunnableError{Path: path, error: err}
 }
@@ -44,9 +44,9 @@ func NewCreateRunnableError(path string, err error) CreateRunnableError {
 // CreateRunnableCmd returns the build command.
 func CreateRunnableCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "runnable <name>",
-		Short: "create a new Runnable",
-		Long:  `create a new Runnable to be used with Atmo or Reactr`,
+		Use:   "module <name>",
+		Short: "create a new plugin module",
+		Long:  `create a new module to be used with DeltaV or Suborbital Extend`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0]
@@ -62,18 +62,18 @@ func CreateRunnableCmd() *cobra.Command {
 				return errors.Wrap(err, "🚫 failed to project.ForDirectory")
 			}
 
-			if bctx.RunnableExists(name) {
-				return fmt.Errorf("🚫 runnable %s already exists", name)
+			if bctx.ModuleExists(name) {
+				return fmt.Errorf("🚫 module %s already exists", name)
 			}
 
-			util.LogStart(fmt.Sprintf("creating runnable %s", name))
+			util.LogStart(fmt.Sprintf("creating module %s", name))
 
 			path, err := util.Mkdir(bctx.Cwd, name)
 			if err != nil {
 				return errors.Wrap(err, "🚫 failed to Mkdir")
 			}
 
-			runnable, err := writeDotRunnable(bctx.Cwd, name, lang, namespace)
+			module, err := writeDotModule(bctx.Cwd, name, lang, namespace)
 			if err != nil {
 				return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to writeDotRunnable")
 			}
@@ -90,7 +90,7 @@ func CreateRunnableCmd() *cobra.Command {
 				}
 			}
 
-			if err := template.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, runnable); err != nil {
+			if err := template.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, module); err != nil {
 				// if the templates are missing, try updating them and exec again.
 				if err == template.ErrTemplateMissing {
 					templatesPath, err = template.UpdateTemplates(repo, branch)
@@ -98,7 +98,7 @@ func CreateRunnableCmd() *cobra.Command {
 						return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to UpdateTemplates")
 					}
 
-					if err := template.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, runnable); err != nil {
+					if err := template.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, module); err != nil {
 						return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to ExecTmplDir")
 					}
 				} else {
@@ -117,17 +117,17 @@ func CreateRunnableCmd() *cobra.Command {
 		cwd = "$HOME"
 	}
 
-	cmd.Flags().String(dirFlag, cwd, "the directory to put the new runnable in")
-	cmd.Flags().String(langFlag, "rust", "the language of the new runnable")
-	cmd.Flags().String(namespaceFlag, "default", "the namespace for the new runnable")
-	cmd.Flags().String(repoFlag, "suborbital/subo", "git repo to download templates from")
-	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
-	cmd.Flags().Bool(updateTemplatesFlag, false, "update with the newest runnable templates")
+	cmd.Flags().String(dirFlag, cwd, "the directory to put the new module in")
+	cmd.Flags().String(langFlag, "rust", "the language of the new module")
+	cmd.Flags().String(namespaceFlag, "default", "the namespace for the new module")
+	cmd.Flags().String(repoFlag, defaultRepo, "git repo to download templates from")
+	cmd.Flags().String(branchFlag, defaultBranch, "git branch to download templates from")
+	cmd.Flags().Bool(updateTemplatesFlag, false, "update with the newest module templates")
 
 	return cmd
 }
 
-func writeDotRunnable(cwd, name, lang, namespace string) (*directive.Runnable, error) {
+func writeDotModule(cwd, name, lang, namespace string) (*tenant.Module, error) {
 	if actual, exists := langAliases[lang]; exists {
 		lang = actual
 	}
@@ -136,23 +136,23 @@ func writeDotRunnable(cwd, name, lang, namespace string) (*directive.Runnable, e
 		return nil, fmt.Errorf("%s is not an available language", lang)
 	}
 
-	runnable := &directive.Runnable{
+	module := &tenant.Module{
 		Name:       name,
 		Lang:       lang,
 		Namespace:  namespace,
 		APIVersion: release.FFIVersion,
 	}
 
-	bytes, err := yaml.Marshal(runnable)
+	bytes, err := yaml.Marshal(module)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to Marshal runnable")
+		return nil, errors.Wrap(err, "failed to Marshal module")
 	}
 
-	path := filepath.Join(cwd, name, ".runnable.yaml")
+	path := filepath.Join(cwd, name, ".module.yaml")
 
 	if err := ioutil.WriteFile(path, bytes, util.PermFilePrivate); err != nil {
-		return nil, errors.Wrap(err, "failed to WriteFile runnable")
+		return nil, errors.Wrap(err, "failed to WriteFile module")
 	}
 
-	return runnable, nil
+	return module, nil
 }

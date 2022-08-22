@@ -29,17 +29,17 @@ func (b *DockerPublishJob) Type() string {
 
 // Publish publishes the application.
 func (b *DockerPublishJob) Publish(log util.FriendlyLogger, ctx *project.Context) error {
-	if ctx.Directive == nil {
-		return errors.New("cannot publish without Directive.yaml")
+	if ctx.TenantConfig == nil {
+		return errors.New("cannot publish without tenant.json")
 	}
 
 	if !ctx.Bundle.Exists {
 		return errors.New("cannot publish without runnables.wasm.zip, run `subo build` first")
 	}
 
-	imageName, err := project.DockerNameFromDirective(ctx.Directive)
+	imageName, err := project.DockerNameFromConfig(ctx.TenantConfig)
 	if err != nil {
-		return errors.Wrap(err, "failed to dockerNameFromDirective")
+		return errors.Wrap(err, "failed to DockerNameFromConfig")
 	}
 
 	if _, err := util.Command.Run(fmt.Sprintf("docker buildx build . --platform linux/amd64,linux/arm64 -t %s --push", imageName)); err != nil {

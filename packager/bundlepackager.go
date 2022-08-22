@@ -3,16 +3,13 @@ package packager
 import (
 	"fmt"
 	"path/filepath"
-	"strconv"
-	"strings"
 
 	"github.com/pkg/errors"
-	"golang.org/x/mod/semver"
 
-	"github.com/suborbital/atmo/bundle"
-	"github.com/suborbital/atmo/directive"
+	"github.com/suborbital/appspec/bundle"
+	"github.com/suborbital/appspec/capabilities"
+	"github.com/suborbital/appspec/tenant"
 	"github.com/suborbital/subo/project"
-	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
 )
 
@@ -33,40 +30,40 @@ func (b *BundlePackageJob) Type() string {
 
 // Package packages the application.
 func (b *BundlePackageJob) Package(log util.FriendlyLogger, ctx *project.Context) error {
-	for _, r := range ctx.Runnables {
-		if err := r.HasModule(); err != nil {
-			return errors.Wrap(err, "missing built module")
+	for _, r := range ctx.Modules {
+		if err := r.HasWasmFile(); err != nil {
+			return errors.Wrap(err, "missing built Wasm module")
 		}
 	}
 
-	if ctx.Directive == nil {
-		ctx.Directive = &directive.Directive{
-			Identifier:  "com.suborbital.app",
-			AppVersion:  "v0.0.1",
-			AtmoVersion: fmt.Sprintf("v%s", release.AtmoVersion),
-		}
-	} else if ctx.Directive.Headless {
-		log.LogInfo("updating Directive")
+	if ctx.TenantConfig == nil {
+		defaultCaps := capabilities.DefaultCapabilityConfig()
 
-		// Bump the appVersion since we're in headless mode.
-		majorStr := strings.TrimPrefix(semver.Major(ctx.Directive.AppVersion), "v")
-		major, err := strconv.Atoi(majorStr)
-		if err != nil {
-			return errors.Wrap(err, "failed to Atoi major version")
+		ctx.TenantConfig = &tenant.Config{
+			Identifier:    "com.suborbital.app",
+			SpecVersion:   1,
+			TenantVersion: 1,
+			DefaultNamespace: tenant.NamespaceConfig{
+				Name:         "default",
+				Capabilities: &defaultCaps,
+			},
+			Namespaces: []tenant.NamespaceConfig{},
 		}
+	} else {
+		log.LogInfo("updating tenant version")
 
-		ctx.Directive.AppVersion = fmt.Sprintf("v%d.0.0", major+1)
-
-		if err := project.WriteDirectiveFile(ctx.Cwd, ctx.Directive); err != nil {
-			return errors.Wrap(err, "failed to WriteDirectiveFile")
-		}
+		ctx.TenantConfig.TenantVersion++
 	}
 
-	if err := project.AugmentAndValidateDirectiveFns(ctx.Directive, ctx.Runnables); err != nil {
+	if err := project.WriteTenantConfig(ctx.Cwd, ctx.TenantConfig); err != nil {
+		return errors.Wrap(err, "failed to WriteTenantConfig")
+	}
+
+	if err := project.CalculateModuleRefs(ctx.TenantConfig, ctx.Modules); err != nil {
 		return errors.Wrap(err, "🚫 failed to AugmentAndValidateDirectiveFns")
 	}
 
-	if err := ctx.Directive.Validate(); err != nil {
+	if err := ctx.TenantConfig.Validate(); err != nil {
 		return errors.Wrap(err, "🚫 failed to Validate Directive")
 	}
 
@@ -79,21 +76,21 @@ func (b *BundlePackageJob) Package(log util.FriendlyLogger, ctx *project.Context
 		log.LogInfo("adding static files to bundle")
 	}
 
-	directiveBytes, err := ctx.Directive.Marshal()
+	configBytes, err := ctx.TenantConfig.Marshal()
 	if err != nil {
 		return errors.Wrap(err, "failed to Directive.Marshal")
 	}
 
-	modules, err := ctx.Modules()
+	moduleFiles, err := ctx.ModuleFiles()
 	if err != nil {
 		return errors.Wrap(err, "failed to Modules for build")
 	}
 
-	for i := range modules {
-		defer modules[i].Close()
+	for i := range moduleFiles {
+		defer moduleFiles[i].Close()
 	}
 
-	if err := bundle.Write(directiveBytes, modules, static, ctx.Bundle.Fullpath); err != nil {
+	if err := bundle.Write(configBytes, moduleFiles, static, ctx.Bundle.Fullpath); err != nil {
 		return errors.Wrap(err, "🚫 failed to WriteBundle")
 	}
 
@@ -104,7 +101,7 @@ func (b *BundlePackageJob) Package(log util.FriendlyLogger, ctx *project.Context
 
 	ctx.Bundle = bundleRef
 
-	log.LogDone(fmt.Sprintf("bundle was created -> %s @ %s", ctx.Bundle.Fullpath, ctx.Directive.AppVersion))
+	log.LogDone(fmt.Sprintf("bundle was created -> %s @ v%d", ctx.Bundle.Fullpath, ctx.TenantConfig.TenantVersion))
 
 	return nil
 }

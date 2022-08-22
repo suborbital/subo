@@ -46,17 +46,17 @@ func (b *BindlePublishJob) Type() string {
 
 // Publish publishes the application.
 func (b *BindlePublishJob) Publish(log util.FriendlyLogger, ctx *project.Context) error {
-	if ctx.Directive == nil {
-		return errors.New("🚫 cannot push without Directive.yaml file")
+	if ctx.TenantConfig == nil {
+		return errors.New("🚫 cannot push without tenant.json file")
 	}
 
-	log.LogStart(fmt.Sprintf("pushing %s@%s", ctx.Directive.Identifier, ctx.Directive.AppVersion))
+	log.LogStart(fmt.Sprintf("pushing %s@%d", ctx.TenantConfig.Identifier, ctx.TenantConfig.TenantVersion))
 
 	invoice := &types.Invoice{
 		BindleVersion: "1.0.0",
 		Bindle: types.BindleSpec{
-			Name:    ctx.Directive.Identifier,
-			Version: strings.TrimPrefix(ctx.Directive.AppVersion, "v"),
+			Name:    ctx.TenantConfig.Identifier,
+			Version: fmt.Sprintf("%d", ctx.TenantConfig.TenantVersion),
 			Authors: []string{
 				suboAuthor,
 			},
@@ -67,25 +67,25 @@ func (b *BindlePublishJob) Publish(log util.FriendlyLogger, ctx *project.Context
 	parcelsBySHA := map[string]parcelWrapper{}
 
 	// add the Directive as a parcel.
-	directiveBytes, err := yaml.Marshal(ctx.Directive)
+	configBytes, err := yaml.Marshal(ctx.TenantConfig)
 	if err != nil {
 		return errors.Wrap(err, "failed to Marshal Directive")
 	}
 
-	directiveParcel := parcelForData("Directive.yaml", "application/yaml", directiveBytes)
+	tenantParcel := parcelForData("tenant.yaml", "application/yaml", configBytes)
 
-	invoice.Parcel = append(invoice.Parcel, directiveParcel)
+	invoice.Parcel = append(invoice.Parcel, tenantParcel)
 
-	parcelsBySHA[directiveParcel.Label.SHA256] = parcelWrapper{
-		parcel: directiveParcel,
-		data:   directiveBytes,
+	parcelsBySHA[tenantParcel.Label.SHA256] = parcelWrapper{
+		parcel: tenantParcel,
+		data:   configBytes,
 	}
 
-	// add each Runnable as a parcel.
-	for _, r := range ctx.Runnables {
-		files, err := ioutil.ReadDir(r.Fullpath)
+	// add each module as a parcel.
+	for _, mod := range ctx.Modules {
+		files, err := ioutil.ReadDir(mod.Fullpath)
 		if err != nil {
-			return errors.Wrapf(err, "failed to ReadDir for %s", r.Fullpath)
+			return errors.Wrapf(err, "failed to ReadDir for %s", mod.Fullpath)
 		}
 
 		for _, file := range files {
@@ -93,7 +93,7 @@ func (b *BindlePublishJob) Publish(log util.FriendlyLogger, ctx *project.Context
 				continue
 			}
 
-			fullPath := filepath.Join(r.Fullpath, file.Name())
+			fullPath := filepath.Join(mod.Fullpath, file.Name())
 
 			fileBytes, err := os.ReadFile(fullPath)
 			if err != nil {

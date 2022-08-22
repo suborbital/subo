@@ -2,6 +2,7 @@ package project
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -10,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
-	"github.com/suborbital/atmo/directive"
+	"github.com/suborbital/appspec/tenant"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
 )
@@ -31,22 +32,22 @@ var validLangs = map[string]struct{}{
 type Context struct {
 	Cwd           string
 	CwdIsRunnable bool
-	Runnables     []RunnableDir
+	Modules       []ModuleDir
 	Bundle        BundleRef
-	Directive     *directive.Directive
-	AtmoVersion   string
+	TenantConfig  *tenant.Config
+	DeltavVersion string
 	Langs         []string
 	MountPath     string
 	RelDockerPath string
 	BuilderTag    string
 }
 
-// RunnableDir represents a directory containing a Runnable.
-type RunnableDir struct {
+// ModuleDir represents a directory containing a Runnable.
+type ModuleDir struct {
 	Name           string
 	UnderscoreName string
 	Fullpath       string
-	Runnable       *directive.Runnable
+	Module         *tenant.Module
 	CompilerFlags  string
 }
 
@@ -63,7 +64,7 @@ func ForDirectory(dir string) (*Context, error) {
 		return nil, errors.Wrap(err, "failed to get Abs path")
 	}
 
-	runnables, cwdIsRunnable, err := getRunnableDirs(fullDir)
+	modules, cwdIsRunnable, err := getModuleDirs(fullDir)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to getRunnableDirs")
 	}
@@ -73,7 +74,7 @@ func ForDirectory(dir string) (*Context, error) {
 		return nil, errors.Wrap(err, "failed to bundleIfExists")
 	}
 
-	directive, err := readDirectiveFile(fullDir)
+	config, err := readTenantConfig(fullDir)
 	if err != nil {
 		if !os.IsNotExist(errors.Cause(err)) {
 			return nil, errors.Wrap(err, "failed to readDirectiveFile")
@@ -84,31 +85,27 @@ func ForDirectory(dir string) (*Context, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to readQueriesFile")
 	} else if len(queries) > 0 {
-		directive.Queries = queries
+		config.DefaultNamespace.Queries = queries
 	}
 
 	bctx := &Context{
 		Cwd:           fullDir,
 		CwdIsRunnable: cwdIsRunnable,
-		Runnables:     runnables,
+		Modules:       modules,
 		Bundle:        *bundle,
-		Directive:     directive,
+		TenantConfig:  config,
 		Langs:         []string{},
 		MountPath:     fullDir,
 		RelDockerPath: ".",
 		BuilderTag:    fmt.Sprintf("v%s", release.SuboDotVersion),
 	}
 
-	if directive != nil {
-		bctx.AtmoVersion = directive.AtmoVersion
-	}
-
 	return bctx, nil
 }
 
-// RunnableExists returns true if the context contains a runnable with name <name>.
-func (b *Context) RunnableExists(name string) bool {
-	for _, r := range b.Runnables {
+// ModuleExists returns true if the context contains a module with name <name>.
+func (b *Context) ModuleExists(name string) bool {
+	for _, r := range b.Modules {
 		if r.Name == name {
 			return true
 		}
@@ -132,10 +129,10 @@ func (b *Context) ShouldBuildLang(lang string) bool {
 	return false
 }
 
-func (b *Context) Modules() ([]os.File, error) {
+func (b *Context) ModuleFiles() ([]os.File, error) {
 	modules := []os.File{}
 
-	for _, r := range b.Runnables {
+	for _, r := range b.Modules {
 		wasmPath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
 
 		file, err := os.Open(wasmPath)
@@ -160,19 +157,31 @@ func (b *Context) HasDockerfile() error {
 	return nil
 }
 
-// HasModule returns a nil error if the Runnable's .wasm file exists.
-func (r *RunnableDir) HasModule() error {
-	runnablePath := filepath.Join(r.Fullpath, fmt.Sprintf("%s.wasm", r.Name))
+// WasmFile returns a file object for the .wasm file. It is the caller's responsibility to close the file.
+func (m *ModuleDir) WasmFile() (io.ReadCloser, error) {
+	modulePath := filepath.Join(m.Fullpath, fmt.Sprintf("%s.wasm", m.Name))
 
-	if _, err := os.Stat(runnablePath); err != nil {
-		return errors.Wrapf(err, "failed to Stat %s", runnablePath)
+	wasmFile, err := os.Open(modulePath)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to Open %s", modulePath)
+	}
+
+	return wasmFile, nil
+}
+
+// HasWasmFile returns a nil error if the module's .wasm file exists.
+func (m *ModuleDir) HasWasmFile() error {
+	modulePath := filepath.Join(m.Fullpath, fmt.Sprintf("%s.wasm", m.Name))
+
+	if _, err := os.Stat(modulePath); err != nil {
+		return errors.Wrapf(err, "failed to Stat %s", modulePath)
 	}
 
 	return nil
 }
 
-func getRunnableDirs(cwd string) ([]RunnableDir, bool, error) {
-	runnables := []RunnableDir{}
+func getModuleDirs(cwd string) ([]ModuleDir, bool, error) {
+	modules := []ModuleDir{}
 
 	// Go through all of the dirs in the current dir.
 	topLvlFiles, err := ioutil.ReadDir(cwd)
@@ -182,12 +191,12 @@ func getRunnableDirs(cwd string) ([]RunnableDir, bool, error) {
 
 	// Check to see if we're running from within a Runnable directory
 	// and return true if so.
-	runnableDir, err := getRunnableFromFiles(cwd, topLvlFiles)
+	moduleDir, err := getModuleFromFiles(cwd, topLvlFiles)
 	if err != nil {
 		return nil, false, errors.Wrap(err, "failed to getRunnableFromFiles")
-	} else if runnableDir != nil {
-		runnables = append(runnables, *runnableDir)
-		return runnables, true, nil
+	} else if moduleDir != nil {
+		modules = append(modules, *moduleDir)
+		return modules, true, nil
 	}
 
 	for _, tf := range topLvlFiles {
@@ -197,30 +206,30 @@ func getRunnableDirs(cwd string) ([]RunnableDir, bool, error) {
 
 		dirPath := filepath.Join(cwd, tf.Name())
 
-		// Determine if a .runnable file exists in that dir.
+		// Determine if a .module file exists in that dir.
 		innerFiles, err := ioutil.ReadDir(dirPath)
 		if err != nil {
 			util.LogWarn(fmt.Sprintf("couldn't read files in %v", dirPath))
 			continue
 		}
 
-		runnableDir, err := getRunnableFromFiles(dirPath, innerFiles)
+		moduleDir, err := getModuleFromFiles(dirPath, innerFiles)
 		if err != nil {
 			return nil, false, errors.Wrap(err, "failed to getRunnableFromFiles")
-		} else if runnableDir == nil {
+		} else if moduleDir == nil {
 			continue
 		}
 
-		runnables = append(runnables, *runnableDir)
+		modules = append(modules, *moduleDir)
 	}
 
-	return runnables, false, nil
+	return modules, false, nil
 }
 
-// ContainsRunnableYaml finds any .runnable file in a list of files.
-func ContainsRunnableYaml(files []os.FileInfo) (string, bool) {
+// ContainsModuleYaml finds any .module file in a list of files.
+func ContainsModuleYaml(files []os.FileInfo) (string, bool) {
 	for _, f := range files {
-		if strings.HasPrefix(f.Name(), ".runnable.") {
+		if strings.HasPrefix(f.Name(), ".module.") {
 			return f.Name(), true
 		}
 	}
@@ -235,32 +244,32 @@ func IsValidLang(lang string) bool {
 	return exists
 }
 
-func getRunnableFromFiles(wd string, files []os.FileInfo) (*RunnableDir, error) {
-	filename, exists := ContainsRunnableYaml(files)
+func getModuleFromFiles(wd string, files []os.FileInfo) (*ModuleDir, error) {
+	filename, exists := ContainsModuleYaml(files)
 	if !exists {
 		return nil, nil
 	}
 
-	runnableBytes, err := ioutil.ReadFile(filepath.Join(wd, filename))
+	moduleBytes, err := ioutil.ReadFile(filepath.Join(wd, filename))
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to ReadFile .runnable yaml")
+		return nil, errors.Wrap(err, "failed to ReadFile .module yaml")
 	}
 
-	runnable := directive.Runnable{}
-	if err := yaml.Unmarshal(runnableBytes, &runnable); err != nil {
-		return nil, errors.Wrap(err, "failed to Unmarshal .runnable yaml")
+	module := &tenant.Module{}
+	if err := yaml.Unmarshal(moduleBytes, &module); err != nil {
+		return nil, errors.Wrap(err, "failed to Unmarshal .module yaml")
 	}
 
-	if runnable.Name == "" {
-		runnable.Name = filepath.Base(wd)
+	if module.Name == "" {
+		module.Name = filepath.Base(wd)
 	}
 
-	if runnable.Namespace == "" {
-		runnable.Namespace = "default"
+	if module.Namespace == "" {
+		module.Namespace = "default"
 	}
 
-	if ok := IsValidLang(runnable.Lang); !ok {
-		return nil, fmt.Errorf("(%s) %s is not a valid lang", runnable.Name, runnable.Lang)
+	if ok := IsValidLang(module.Lang); !ok {
+		return nil, fmt.Errorf("(%s) %s is not a valid lang", module.Name, module.Lang)
 	}
 
 	absolutePath, err := filepath.Abs(wd)
@@ -268,18 +277,18 @@ func getRunnableFromFiles(wd string, files []os.FileInfo) (*RunnableDir, error) 
 		return nil, errors.Wrap(err, "failed to get Abs filepath")
 	}
 
-	runnableDir := &RunnableDir{
-		Name:           runnable.Name,
-		UnderscoreName: strings.Replace(runnable.Name, "-", "_", -1),
+	moduleDir := &ModuleDir{
+		Name:           module.Name,
+		UnderscoreName: strings.Replace(module.Name, "-", "_", -1),
 		Fullpath:       absolutePath,
-		Runnable:       &runnable,
+		Module:         module,
 	}
 
-	return runnableDir, nil
+	return moduleDir, nil
 }
 
 func bundleTargetPath(cwd string) (*BundleRef, error) {
-	path := filepath.Join(cwd, "runnables.wasm.zip")
+	path := filepath.Join(cwd, "modules.wasm.zip")
 
 	b := &BundleRef{
 		Fullpath: path,

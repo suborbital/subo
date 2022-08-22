@@ -39,7 +39,7 @@ func (b *DockerImagePackageJob) Package(log util.FriendlyLogger, ctx *project.Co
 		util.LogWarn("DOCKER_BUILDKIT=0 could not be set, Docker build may be problematic on M1 Macs.")
 	}
 
-	imageName, err := project.DockerNameFromDirective(ctx.Directive)
+	imageName, err := project.DockerNameFromConfig(ctx.TenantConfig)
 	if err != nil {
 		return errors.Wrap(err, "failed to dockerNameFromDirective")
 	}

@@ -36,7 +36,9 @@ including building WebAssembly Runnables and Atmo projects.`,
 
 	create.AddCommand(command.CreateProjectCmd())
 	create.AddCommand(command.CreateRunnableCmd())
-	create.AddCommand(command.CreateHandlerCmd())
+	// TODO: turn into create workflow command
+	// Ref: https://github.com/suborbital/subo/issues/347
+	// create.AddCommand(command.CreateHandlerCmd()).
 
 	// compute network related commands.
 	cmd.AddCommand(computeCommand())
