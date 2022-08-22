@@ -2,6 +2,7 @@ package project
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -157,7 +158,7 @@ func (b *Context) HasDockerfile() error {
 }
 
 // WasmFile returns a file object for the .wasm file. It is the caller's responsibility to close the file.
-func (m *ModuleDir) WasmFile() (*os.File, error) {
+func (m *ModuleDir) WasmFile() (io.ReadCloser, error) {
 	modulePath := filepath.Join(m.Fullpath, fmt.Sprintf("%s.wasm", m.Name))
 
 	wasmFile, err := os.Open(modulePath)

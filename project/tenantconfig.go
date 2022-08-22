@@ -122,7 +122,7 @@ func CalculateModuleRefs(cfg *tenant.Config, mods []ModuleDir) error {
 }
 
 // calculateModuleRef calculates the hex-encoded sha256 hash of a module file.
-func calculateModuleRef(mod *os.File) (string, error) {
+func calculateModuleRef(mod io.Reader) (string, error) {
 	hasher := sha256.New()
 	if _, err := io.Copy(hasher, mod); err != nil {
 		return "", errors.Wrap(err, "failed to Copy module contents")
