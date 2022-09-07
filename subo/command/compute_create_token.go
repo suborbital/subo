@@ -48,7 +48,9 @@ func ComputeCreateTokenCommand() *cobra.Command {
 
 // getVerifierCode gets the 6-character code from stdin.
 func getVerifierCode() (string, error) {
-	fmt.Print("A verification code was sent to your email address. Enter the code to continue: ")
+	fmt.Print("A verification code was sent to your email address. " +
+		"Enter the code to continue, " +
+		"and your environment token will print below (keep it safe!): ")
 	code, err := input.ReadStdinString()
 	if err != nil {
 		return "", errors.Wrap(err, "failed to ReadStdinString")
