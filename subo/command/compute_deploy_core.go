@@ -129,11 +129,12 @@ func ComputeDeployCoreCommand() *cobra.Command {
 			util.LogStart("installing...")
 
 			if localInstall {
-				if _, err := util.Command.Run("docker-compose up -d"); err != nil {
-					return errors.Wrap(err, "🚫 failed to docker-compose up")
+				if _, err := util.Command.Run("docker compose up -d"); err != nil {
+					util.LogInfo("Is Docker Compose installed? https://docs.docker.com/compose/install/")
+					return errors.Wrap(err, "🚫 failed to run `docker compose up`")
 				}
 
-				util.LogInfo("use `docker ps` and `docker-compose logs` to check deployment status")
+				util.LogInfo("use `docker ps` and `docker compose logs` to check deployment status")
 
 				proxyPortStr := strconv.Itoa(proxyPort)
 				proxy := localproxy.New("editor.suborbital.network", proxyPortStr)
@@ -179,7 +180,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
 	cmd.Flags().String(versionFlag, release.SCCTag, "Docker tag to use for control plane images")
 	cmd.Flags().Int(proxyPortFlag, proxyDefaultPort, "port that the Editor proxy listens on")
-	cmd.Flags().Bool(localFlag, false, "deploy locally using docker-compose")
+	cmd.Flags().Bool(localFlag, false, "deploy locally using docker compose")
 	cmd.Flags().Bool(dryRunFlag, false, "prepare the deployment in the .suborbital directory, but do not apply it")
 	cmd.Flags().Bool(resetFlag, false, "reset the deployment to default (replaces docker-compose.yaml and/or Kubernetes manifests)")
 
