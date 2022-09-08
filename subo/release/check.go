@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/google/go-github/v41/github"
+	"github.com/hashicorp/go-version"
 	"github.com/pkg/errors"
 
 	"github.com/suborbital/subo/subo/util"
