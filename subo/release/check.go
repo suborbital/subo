@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/google/go-github/v41/github"
-	"github.com/hashicorp/go-version"
 	"github.com/pkg/errors"
 
 	"github.com/suborbital/subo/subo/util"
@@ -154,7 +153,12 @@ func CheckForLatestVersion(ctx context.Context) (string, error) {
 	} else if cmdVersion, err := version.NewVersion(SuboDotVersion); err != nil {
 		return "", errors.Wrap(err, "failed to parse current subo version")
 	} else if cmdVersion.LessThan(latestCmdVersion) {
-		return fmt.Sprintf("An upgrade for subo is available: %s → %s", cmdVersion, latestCmdVersion), nil
+		return fmt.Sprintf("An upgrade for Subo is available: %s → %s. "+
+			"The method for upgrading depends on the method used for"+
+			" installation (see https://github."+
+			"com/suborbital/subo for details). As always, "+
+			"feel free to ping us on Discord if you run into any snags! https://chat.suborbital.dev/",
+			cmdVersion, latestCmdVersion), nil
 	}
 
 	return "", nil
