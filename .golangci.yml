@@ -10,14 +10,14 @@ output:
 linters:
   disable-all: true
   enable:
-    - deadcode
     - gci
-    - godot
-    - unparam
     - unused
 
 linters-settings:
   gci:
-    local-prefixes: github.com/suborbital
-  godot:
-    scope: all
+    no-inline-comments: true
+    no-prefix-comments: true
+    sections:
+      - standard
+      - default
+      - prefix(github.com/suborbital)
