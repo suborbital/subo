@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -129,7 +130,22 @@ func ComputeDeployCoreCommand() *cobra.Command {
 			util.LogStart("installing...")
 
 			if localInstall {
-				if _, err := util.Command.Run("docker compose up -d"); err != nil {
+				var compose string
+				if _, err := util.Command.Run("docker compose version 2>&1 >/dev/null"); err == nil {
+					// Use Compose v2 if we're positive we have it
+					compose = "docker compose"
+				} else if _, err := exec.LookPath("docker-compose"); err == nil {
+					// Fall back to legacy compose if available.
+					compose = "docker-compose"
+				} else {
+					// YOLO. Try Compose V2 anyway. Works with containerd/nerdctl.
+					// See: https://github.com/containerd/nerdctl/issues/1368
+					compose = "docker compose"
+				}
+
+				command := fmt.Sprintf("%s up -d", compose)
+
+				if _, err := util.Command.Run(command); err != nil {
 					util.LogInfo("Is Docker Compose installed? https://docs.docker.com/compose/install/")
 					return errors.Wrap(err, "🚫 failed to run `docker compose up`")
 				}
