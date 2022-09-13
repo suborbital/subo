@@ -27,11 +27,11 @@ subo create project "$TEST_PROJECT"
 pushd "$TEST_PROJECT" > /dev/null
 
 # create a runnable for each supported language
-subo create runnable rs-test --lang rust
-subo create runnable swift-test --lang swift
-subo create runnable as-test --lang assemblyscript
-subo create runnable tinygo-test --lang tinygo
-subo create runnable js-test --lang javascript
+subo create module rs-test --lang rust
+subo create module swift-test --lang swift
+subo create module as-test --lang assemblyscript
+subo create module tinygo-test --lang tinygo
+subo create module js-test --lang javascript
 
 # build project bundle
 subo build .
