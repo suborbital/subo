@@ -10,7 +10,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.8.0
-	github.com/suborbital/appspec v0.0.1
+	github.com/suborbital/appspec v0.0.2
 	github.com/suborbital/atmo v0.4.7
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3
 	gopkg.in/yaml.v2 v2.4.0
@@ -48,5 +48,3 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/suborbital/appspec => /Users/cohix-14/Workspaces/suborbital/appspec
