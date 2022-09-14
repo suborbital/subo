@@ -12,6 +12,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/suborbital/appspec/fqmn"
 	"github.com/suborbital/appspec/tenant"
 	"github.com/suborbital/subo/subo/util"
 )
@@ -72,19 +73,6 @@ func readQueriesFile(cwd string) ([]tenant.DBQuery, error) {
 
 // CalculateModuleRefs calculates the hash refs for all modules and validates correctness of the config.
 func CalculateModuleRefs(cfg *tenant.Config, mods []ModuleDir) error {
-	modMap := map[string]bool{}
-	for _, fn := range mods {
-		modMap[fn.Name] = true
-	}
-
-	workflowMods := getWorkflowModList(cfg)
-
-	for _, fn := range workflowMods {
-		if good, exists := modMap[fn]; !good || !exists {
-			return fmt.Errorf("project does not contain function %s listed in Directive", fn)
-		}
-	}
-
 	dirModules := make([]tenant.Module, len(mods))
 
 	// for each module, calculate its ref (a.k.a. its hash), and then add it to the context.
@@ -113,7 +101,44 @@ func CalculateModuleRefs(cfg *tenant.Config, mods []ModuleDir) error {
 			mod.Module.Revisions = append(mod.Module.Revisions, rev)
 		}
 
+		FQMN, err := fqmn.FromParts(cfg.Identifier, mod.Module.Namespace, mod.Module.Name, hash)
+		if err != nil {
+			return errors.Wrap(err, "failed to fqmn.FromParts")
+		}
+
+		mod.Module.FQMN = FQMN
+
 		dirModules[i] = *mod.Module
+	}
+
+	// now that refs are calculated, ensure that all modules referenced
+	// in the tenant's workflows are present in the tenant's module list
+	workflowMods := getWorkflowFQMNList(cfg)
+
+	missing := []string{}
+
+	for _, modFQMN := range workflowMods {
+		FQMN, err := fqmn.Parse(modFQMN)
+		if err != nil {
+			return errors.Wrapf(err, "failed to parse FQMN %s", modFQMN)
+		}
+
+		found := false
+
+		for _, dirMod := range dirModules {
+			if dirMod.Name == FQMN.Name && dirMod.Namespace == FQMN.Namespace {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			missing = append(missing, modFQMN)
+		}
+	}
+
+	if len(missing) > 0 {
+		return fmt.Errorf("the following modules referenced in workflows were not found: %s", strings.Join(missing, ", "))
 	}
 
 	cfg.Modules = dirModules
@@ -133,8 +158,8 @@ func calculateModuleRef(mod io.Reader) (string, error) {
 	return hex.EncodeToString(hashBytes), nil
 }
 
-// getWorkflowModList gets a full list of all functions used in the config's workflows.
-func getWorkflowModList(cfg *tenant.Config) []string {
+// getWorkflowFQMNList gets a full list of all functions used in the config's workflows.
+func getWorkflowFQMNList(cfg *tenant.Config) []string {
 	modMap := map[string]bool{}
 
 	// collect all the workflows in all of the namespaces.
