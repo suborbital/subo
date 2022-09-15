@@ -34,8 +34,9 @@ func (r *Repl) Run() error {
 	}
 
 	for {
-		fmt.Println("\n\n1. Create/edit a function")
-		fmt.Print("\nChoose an option: ")
+		fmt.Println("\n\n1. Press 1 to enter the editor. " +
+			"A 'hello world' function will populate for you to edit or" +
+			" discard.")
 
 		opt, err := input.ReadStdinString()
 		if err != nil {
