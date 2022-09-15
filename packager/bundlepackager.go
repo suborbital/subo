@@ -60,7 +60,7 @@ func (b *BundlePackageJob) Package(log util.FriendlyLogger, ctx *project.Context
 	}
 
 	if err := project.CalculateModuleRefs(ctx.TenantConfig, ctx.Modules); err != nil {
-		return errors.Wrap(err, "🚫 failed to AugmentAndValidateDirectiveFns")
+		return errors.Wrap(err, "🚫 failed to CalculateModuleRefs")
 	}
 
 	if err := ctx.TenantConfig.Validate(); err != nil {

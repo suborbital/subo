@@ -193,7 +193,7 @@ func ComputeDeployCoreCommand() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(branchFlag, "main", "git branch to download templates from")
+	cmd.Flags().String(branchFlag, defaultBranch, "git branch to download templates from")
 	cmd.Flags().String(versionFlag, release.SCCTag, "Docker tag to use for control plane images")
 	cmd.Flags().Int(proxyPortFlag, proxyDefaultPort, "port that the Editor proxy listens on")
 	cmd.Flags().Bool(localFlag, false, "deploy locally using Docker Compose")
