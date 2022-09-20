@@ -19,10 +19,10 @@ const (
 )
 
 type projectData struct {
-	Name          string
-	Environment   string
-	APIVersion    string
-	DeltavVersion string
+	Name           string
+	Environment    string
+	APIVersion     string
+	RuntimeVersion string
 }
 
 // CreateProjectCmd returns the build command.
@@ -68,10 +68,10 @@ func CreateProjectCmd() *cobra.Command {
 			}
 
 			data := projectData{
-				Name:          name,
-				Environment:   environment,
-				APIVersion:    release.FFIVersion,
-				DeltavVersion: release.DeltavVersion,
+				Name:           name,
+				Environment:    environment,
+				APIVersion:     release.FFIVersion,
+				RuntimeVersion: release.RuntimeVersion,
 			}
 
 			if err := template.ExecTmplDir(bctx.Cwd, name, templatesPath, "project", data); err != nil {
