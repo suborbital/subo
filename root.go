@@ -26,8 +26,8 @@ including building WebAssembly Runnables and Atmo projects.`,
 	// create commands.
 	create := &cobra.Command{
 		Use:   "create",
-		Short: "create a runnable, project, or handler",
-		Long:  `create a new Atmo project, WebAssembly runnable or handler`,
+		Short: "create a module, project, or handler",
+		Long:  `create a new DeltaV project, WebAssembly module or handler`,
 	}
 
 	if features.EnableReleaseCommands {

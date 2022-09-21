@@ -66,7 +66,7 @@ func ForDirectory(dir string) (*Context, error) {
 
 	modules, cwdIsRunnable, err := getModuleDirs(fullDir)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to getRunnableDirs")
+		return nil, errors.Wrap(err, "failed to getModuleDirs")
 	}
 
 	bundle, err := bundleTargetPath(fullDir)
@@ -189,11 +189,11 @@ func getModuleDirs(cwd string) ([]ModuleDir, bool, error) {
 		return nil, false, errors.Wrap(err, "failed to list directory")
 	}
 
-	// Check to see if we're running from within a Runnable directory
+	// Check to see if we're running from within a Module directory
 	// and return true if so.
 	moduleDir, err := getModuleFromFiles(cwd, topLvlFiles)
 	if err != nil {
-		return nil, false, errors.Wrap(err, "failed to getRunnableFromFiles")
+		return nil, false, errors.Wrap(err, "failed to getModuleFromFiles")
 	} else if moduleDir != nil {
 		modules = append(modules, *moduleDir)
 		return modules, true, nil
@@ -215,7 +215,7 @@ func getModuleDirs(cwd string) ([]ModuleDir, bool, error) {
 
 		moduleDir, err := getModuleFromFiles(dirPath, innerFiles)
 		if err != nil {
-			return nil, false, errors.Wrap(err, "failed to getRunnableFromFiles")
+			return nil, false, errors.Wrap(err, "failed to getModuleFromFiles")
 		} else if moduleDir == nil {
 			continue
 		}
