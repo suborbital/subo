@@ -43,7 +43,7 @@ func DevCmd() *cobra.Command {
 				util.LogInfo("Running DeltaV with debug logging")
 			}
 
-			dockerCmd := fmt.Sprintf("docker run -v=%s:/home/atmo -e=DELTAV_HTTP_PORT=%s %s -p=%s:%s suborbital/deltav:%s deltav start", bctx.Cwd, port, envvar, port, port, release.DeltavVersion)
+			dockerCmd := fmt.Sprintf("docker run -v=%s:/home/atmo -e=DELTAV_HTTP_PORT=%s %s -p=%s:%s suborbital/deltav:%s deltav start", bctx.Cwd, port, envvar, port, port, release.RuntimeVersion)
 
 			_, err = util.Command.Run(dockerCmd)
 			if err != nil {

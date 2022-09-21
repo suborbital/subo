@@ -30,16 +30,16 @@ var validLangs = map[string]struct{}{
 
 // Context describes the context under which the tool is being run.
 type Context struct {
-	Cwd           string
-	CwdIsRunnable bool
-	Modules       []ModuleDir
-	Bundle        BundleRef
-	TenantConfig  *tenant.Config
-	DeltavVersion string
-	Langs         []string
-	MountPath     string
-	RelDockerPath string
-	BuilderTag    string
+	Cwd            string
+	CwdIsRunnable  bool
+	Modules        []ModuleDir
+	Bundle         BundleRef
+	TenantConfig   *tenant.Config
+	RuntimeVersion string
+	Langs          []string
+	MountPath      string
+	RelDockerPath  string
+	BuilderTag     string
 }
 
 // ModuleDir represents a directory containing a Runnable.
