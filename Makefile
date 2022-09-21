@@ -21,6 +21,9 @@ subo/docker/publish:
 subo/smoketest: subo
 	./scripts/smoketest.sh
 
+subo/toolchaintest: subo/docker
+	./scripts/toolchaintest.sh
+
 mod/replace/atmo:
 	go mod edit -replace github.com/suborbital/atmo=$(HOME)/Workspaces/suborbital/atmo
 
