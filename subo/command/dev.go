@@ -16,8 +16,8 @@ import (
 func DevCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "dev",
-		Short: "run a development  server using Docker",
-		Long:  `run a development  server using Docker`,
+		Short: "run a development server using Docker",
+		Long:  `run a development server using Docker`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cwd, err := os.Getwd()
 			if err != nil {
@@ -54,8 +54,7 @@ func DevCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String("port", "8080",
-		"set the port on which to serve the project")
+	cmd.Flags().String("port", "8080", "set the port on which to serve the project")
 	cmd.Flags().BoolP("verbose", "v", false, "run with debug level logging")
 	cmd.Flags().Lookup("verbose").NoOptDefVal = "true"
 
