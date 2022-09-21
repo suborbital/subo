@@ -13,8 +13,8 @@ func rootCommand() *cobra.Command {
 		Use:     "subo",
 		Short:   "Suborbital Development Platform CLI",
 		Version: release.Version(),
-		Long: `Subo is the full toolchain for using and managing Suborbital Development Platform tools,
-including building WebAssembly Runnables and Atmo projects.`,
+		Long: `Subo is the full toolchain for using and managing Suborbital
+Development Platform tools.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cmd.Help()
 			return nil
