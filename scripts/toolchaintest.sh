@@ -50,4 +50,4 @@ subo create module tinygo-test --lang tinygo
 subo create module js-test --lang javascript
 
 # build project bundle
-subo build . --builder-tag dev
+subo build . --builder-tag dev --verbose
