@@ -21,7 +21,7 @@ subo/docker/publish:
 subo/smoketest: subo
 	./scripts/smoketest.sh
 
-subo/toolchaintest: subo/docker
+subo/toolchaintest: subo subo/docker
 	./scripts/toolchaintest.sh
 
 mod/replace/atmo:
