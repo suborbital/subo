@@ -29,7 +29,7 @@ func BuildCmd() *cobra.Command {
 			}
 
 			if len(bdr.Context.Modules) == 0 {
-				return errors.New("🚫 build found no modules in current directory (no .module.yaml files found)")
+				return errors.New(fmt.Sprintf("🚫 build found no modules in %s (no .module.yaml files found)", bdr.Context.Cwd))
 			}
 
 			if bdr.Context.CwdIsRunnable {
@@ -67,6 +67,11 @@ func BuildCmd() *cobra.Command {
 			builderTag, _ := cmd.Flags().GetString("builder-tag")
 			if builderTag != "" {
 				bdr.Context.BuilderTag = builderTag
+			}
+
+			verbose, _ := cmd.Flags().GetBool("verbose")
+			if verbose {
+				bdr.Context.LogLevel = "verbose"
 			}
 
 			if makeTarget != "" {
@@ -117,6 +122,9 @@ func BuildCmd() *cobra.Command {
 	cmd.Flags().String("mountpath", "", "if passed, the Docker builders will mount their volumes at the provided path")
 	cmd.Flags().String("relpath", "", "if passed, the Docker builders will run `subo build` using the provided path, relative to '--mountpath'")
 	cmd.Flags().String("builder-tag", "", "use the provided tag for builder images")
+
+	cmd.Flags().BoolP("verbose", "v", false, "enable verbose logging")
+	cmd.Flags().Lookup("verbose").NoOptDefVal = "true"
 
 	return cmd
 }

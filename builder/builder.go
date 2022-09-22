@@ -161,7 +161,14 @@ func (b *Builder) dockerBuildForLang(lang string) (*BuildResult, error) {
 	uid := os.Getuid()
 	gid := os.Getgid()
 
-	outputLog, err := b.Config.CommandRunner.Run(fmt.Sprintf("docker run --rm --mount type=bind,source=%s,target=/usr/src/runnable -u %d:%d %s subo build %s --native --langs %s", b.Context.MountPath, uid, gid, img, b.Context.RelDockerPath, lang))
+	toolchainCmd := fmt.Sprintf("docker run --rm --mount type=bind,source=%s,target=/usr/src/runnable -u %d:%d %s subo build %s --native --langs %s", b.Context.MountPath, uid, gid, img, b.Context.RelDockerPath, lang)
+
+	// Show the toolchain command being run
+	if b.Context.LogLevel == "verbose" {
+		util.LogInfo(fmt.Sprintf("🐳 %s", toolchainCmd))
+	}
+
+	outputLog, err := b.Config.CommandRunner.Run(toolchainCmd)
 
 	result.OutputLog = outputLog
 

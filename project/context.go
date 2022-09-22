@@ -40,6 +40,7 @@ type Context struct {
 	MountPath      string
 	RelDockerPath  string
 	BuilderTag     string
+	LogLevel       string
 }
 
 // ModuleDir represents a directory containing a Runnable.
