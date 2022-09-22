@@ -18,7 +18,7 @@ RUN wget -O tinygo.tar.gz \
     rm -rf tinygo/src/examples && \
     rm -rf tinygo.tar.gz 
 
-WORKDIR /root/runnable
+WORKDIR /usr/src/runnable
 
 COPY --from=go /usr/local/go /usr/local/
 COPY --from=subo /go/bin/subo /usr/local/bin
