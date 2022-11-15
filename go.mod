@@ -11,6 +11,7 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
 	github.com/suborbital/atmo v0.4.7
+	github.com/suborbital/systemspec v0.0.4
 	golang.org/x/mod v0.7.0
 	gopkg.in/yaml.v2 v2.4.0
 )
