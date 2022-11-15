@@ -13,7 +13,7 @@ func rootCommand() *cobra.Command {
 		Use:     "subo",
 		Short:   "Suborbital Development Platform CLI",
 		Version: release.Version(),
-		Long:    `Subo is the full toolchain for using and managing Suborbital Extension Engine tools.`,
+		Long:    `Subo is the full toolchain for using and managing Suborbital Extension Engine (SE2) tools.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cmd.Help()
 			return nil
@@ -39,8 +39,8 @@ func rootCommand() *cobra.Command {
 	// Ref: https://github.com/suborbital/subo/issues/347
 	// create.AddCommand(command.CreateHandlerCmd()).
 
-	// compute network related commands.
-	cmd.AddCommand(computeCommand())
+	// se2 related commands.
+	cmd.AddCommand(se2Command())
 
 	// docs related commands.
 	cmd.AddCommand(docsCommand())
@@ -61,32 +61,25 @@ func rootCommand() *cobra.Command {
 	return cmd
 }
 
-func computeCommand() *cobra.Command {
-	compute := &cobra.Command{
-		Use:   "compute",
-		Short: "compute network related resources",
-		Long:  `manage Suborbital Compute Network resources`,
+func se2Command() *cobra.Command {
+	se2 := &cobra.Command{
+		Use:   "se2",
+		Short: "SE2 related resources",
+		Long:  `manage Suborbital Extension Engine (SE2) resources`,
 	}
 
 	create := &cobra.Command{
 		Use:   "create",
-		Short: "create compute network resources",
-		Long:  `create Suborbital Compute Network resources`,
+		Short: "create SE2 resources",
+		Long:  `create Suborbital Extension Engine (SE2) resources`,
 	}
 
-	create.AddCommand(command.ComputeCreateTokenCommand())
-	compute.AddCommand(create)
+	create.AddCommand(command.SE2CreateTokenCommand())
 
-	deploy := &cobra.Command{
-		Use:   "deploy",
-		Short: "deploy compute network resources",
-		Long:  `deploy Suborbital Compute Network resources`,
-	}
+	se2.AddCommand(create)
+	se2.AddCommand(command.SE2DeployCommand())
 
-	deploy.AddCommand(command.ComputeDeployCoreCommand())
-	compute.AddCommand(deploy)
-
-	return compute
+	return se2
 }
 
 func docsCommand() *cobra.Command {
