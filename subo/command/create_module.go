@@ -10,11 +10,11 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
-	"github.com/suborbital/appspec/tenant"
 	"github.com/suborbital/subo/builder/template"
 	"github.com/suborbital/subo/project"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/systemspec/tenant"
 )
 
 // langAliases are aliases for languages.

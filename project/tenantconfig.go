@@ -12,9 +12,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/suborbital/appspec/fqmn"
-	"github.com/suborbital/appspec/tenant"
 	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/systemspec/fqmn"
+	"github.com/suborbital/systemspec/tenant"
 )
 
 // WriteTenantConfig writes a tenant config to disk.
@@ -64,11 +64,32 @@ func readQueriesFile(cwd string) ([]tenant.DBQuery, error) {
 	}
 
 	tenant := &tenant.Config{}
-	if err := tenant.Unmarshal(configBytes); err != nil {
+	if err := tenant.UnmarshalYaml(configBytes); err != nil {
 		return nil, errors.Wrap(err, "failed to Unmarshal Directive")
 	}
 
 	return tenant.DefaultNamespace.Queries, nil
+}
+
+// readConnectionsFile finds a queries.yaml from disk.
+func readConnectionsFile(cwd string) ([]tenant.Connection, error) {
+	filePath := filepath.Join(cwd, "Connections.yaml")
+
+	configBytes, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, nil
+		}
+
+		return nil, errors.Wrap(err, "failed to ReadFile for Queries.yaml")
+	}
+
+	tenant := &tenant.Config{}
+	if err := tenant.UnmarshalYaml(configBytes); err != nil {
+		return nil, errors.Wrap(err, "failed to Unmarshal Directive")
+	}
+
+	return tenant.DefaultNamespace.Connections, nil
 }
 
 // CalculateModuleRefs calculates the hash refs for all modules and validates correctness of the config.
