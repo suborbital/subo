@@ -6,7 +6,7 @@ RUN apt-get update && apt-get -y install wget
 
 WORKDIR /usr/local
 
-# update TinyGo version here!
+# renovate: datasource=github-releases depName=tinygo-org/tinygo
 ARG TINYGO_VERSION=0.25.0
 ARG TARGETARCH
 
@@ -16,7 +16,7 @@ RUN wget -O tinygo.tar.gz \
     bash -c "rm -rf tinygo/src/device/{sam,stm32,nxp,nrf,avr,esp,rp}" && \
     bash -c "rm -rf tinygo/lib/{nrfx,mingw-w64,macos-minimal-sdk}" && \
     rm -rf tinygo/src/examples && \
-    rm -rf tinygo.tar.gz 
+    rm -rf tinygo.tar.gz
 
 WORKDIR /root/runnable
 

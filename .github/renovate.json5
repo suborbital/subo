@@ -1,7 +1,20 @@
 {
-  enabledManagers: ["github-actions", "gomod"],
-  postUpdateOptions: [
-    "gomodTidy", // go mod tidy
-    "gomodUpdateImportPaths",
+  enabledManagers: ["github-actions", "gomod", "regex"],
+  postUpdateOptions: ["gomodTidy", "gomodUpdateImportPaths"],
+  regexManagers: [
+    {
+      fileMatch: ["Dockerfile$"],
+      matchStrings: [
+        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\n.*_VERSION=(?<currentValue>.*)",
+      ],
+      versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
+    },
+  ],
+  packageRules: [
+    {
+      packagePatterns: [".*"],
+      managers: ["regex"],
+      extractVersion: "^(v)?(?<version>.*)$",
+    },
   ],
 }
