@@ -7,7 +7,7 @@ RUN apt-get update && apt-get -y install wget
 WORKDIR /usr/local
 
 # renovate: datasource=github-releases depName=tinygo-org/tinygo
-ARG TINYGO_VERSION=0.25.0
+ARG TINYGO_VERSION=0.26.0
 ARG TARGETARCH
 
 RUN wget -O tinygo.tar.gz \
