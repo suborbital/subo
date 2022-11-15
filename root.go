@@ -47,7 +47,10 @@ func rootCommand() *cobra.Command {
 
 	cmd.AddCommand(create)
 	cmd.AddCommand(command.BuildCmd())
-	cmd.AddCommand(command.DevCmd())
+
+	// TODO: Re-enable when dev is updated to work with e2core
+	// cmd.AddCommand(command.DevCmd())
+
 	cmd.AddCommand(command.CleanCmd())
 
 	if features.EnableRegistryCommands {
