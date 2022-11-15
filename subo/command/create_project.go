@@ -30,7 +30,7 @@ func CreateProjectCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "project <name>",
 		Short: "create a new project",
-		Long:  `create a new project for DeltaV or Suborbital Extend`,
+		Long:  `create a new project for E2Core or Suborbital Extension Engine (SE2)`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0]

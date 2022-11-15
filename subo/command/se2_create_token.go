@@ -14,12 +14,12 @@ const (
 	scnEndpointEnvKey = "SUBO_SCN_ENDPOINT"
 )
 
-// ComputeCreateTokenCommand returns the dev command.
-func ComputeCreateTokenCommand() *cobra.Command {
+// SE2CreateTokenCommand returns the dev command.
+func SE2CreateTokenCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "token [email]",
-		Short: "create a Compute Network token",
-		Long:  `create a Compute Network token`,
+		Short: "create an SE2 token",
+		Long:  `create a Suborbital Extension Engine (SE2) token`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			email := args[0]

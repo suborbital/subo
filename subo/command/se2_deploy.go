@@ -31,12 +31,12 @@ type deployData struct {
 
 const proxyDefaultPort int = 80
 
-// ComputeDeployCoreCommand returns the compute deploy command.
-func ComputeDeployCoreCommand() *cobra.Command {
+// SE2DeployCommand returns the SE2 deploy command.
+func SE2DeployCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "core",
-		Short: "deploy the Suborbital Compute Core",
-		Long:  `deploy the Suborbital Compute Core using Kubernetes or Docker Compose`,
+		Use:   "deploy",
+		Short: "deploy SE2",
+		Long:  `deploy Suborbital Extension Engine (SE2) using Kubernetes or Docker Compose`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			localInstall := cmd.Flags().Changed(localFlag)
 			shouldReset := cmd.Flags().Changed(resetFlag)
@@ -205,10 +205,10 @@ func ComputeDeployCoreCommand() *cobra.Command {
 
 func introAcceptance() error {
 	fmt.Print(`
-Suborbital Compute Core Installer
+Suborbital Extension Engine (SE2) Installer
 
 BEFORE YOU CONTINUE:
-	- You must first run "subo compute create token <email>" to get an environment token
+	- You must first run "subo se2 create token <email>" to get an environment token
 
 	- You must have kubectl installed in PATH, and it must be connected to the cluster you'd like to use
 
@@ -217,7 +217,7 @@ BEFORE YOU CONTINUE:
 
 	- Subo will attempt to determine the default storage class for your Kubernetes cluster,
 	  but if is unable to do so you will need to provide one
-			- See the Compute documentation for more details
+			- See the SE2 documentation for more details
 
 	- Subo will install the KEDA autoscaler into your cluster. It will not affect any existing deployments.
 

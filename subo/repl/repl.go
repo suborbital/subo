@@ -12,7 +12,7 @@ import (
 	"github.com/suborbital/subo/subo/input"
 )
 
-// Repl is a 'local proxy repl' that allows the user to perform simple actions against their local install of Compute.
+// Repl is a 'local proxy repl' that allows the user to perform simple actions against their local install of SE2.
 type Repl struct {
 	proxyPort string
 }
@@ -27,7 +27,7 @@ func New(proxyPort string) *Repl {
 }
 
 func (r *Repl) Run() error {
-	fmt.Print("\n\nPress enter to launch the local Compute REPL...")
+	fmt.Print("\n\nPress enter to launch the local SE2 REPL...")
 
 	if _, err := input.ReadStdinString(); err != nil {
 		return errors.Wrap(err, "failed to ReadStdinString")

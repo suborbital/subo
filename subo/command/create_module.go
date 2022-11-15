@@ -46,7 +46,7 @@ func CreateRunnableCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "module <name>",
 		Short: "create a new plugin module",
-		Long:  `create a new module to be used with DeltaV or Suborbital Extend`,
+		Long:  `create a new module to be used with E2Core or Suborbital Extension Engine (SE2)`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0]
