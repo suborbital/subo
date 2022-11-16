@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/suborbital/appspec/tenant"
 	"github.com/suborbital/subo/project"
+	"github.com/suborbital/systemspec/tenant"
 )
 
 func TestPrereq_GetCommand(t *testing.T) {

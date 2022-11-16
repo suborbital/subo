@@ -11,9 +11,9 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
-	"github.com/suborbital/appspec/tenant"
 	"github.com/suborbital/subo/subo/release"
 	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/systemspec/tenant"
 )
 
 // validLangs are the available languages.
@@ -86,6 +86,13 @@ func ForDirectory(dir string) (*Context, error) {
 		return nil, errors.Wrap(err, "failed to readQueriesFile")
 	} else if len(queries) > 0 {
 		config.DefaultNamespace.Queries = queries
+	}
+
+	connections, err := readConnectionsFile(dir)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to readConnectionsFile")
+	} else if len(connections) > 0 {
+		config.DefaultNamespace.Connections = connections
 	}
 
 	bctx := &Context{

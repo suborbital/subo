@@ -6,11 +6,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/suborbital/appspec/bundle"
-	"github.com/suborbital/appspec/capabilities"
-	"github.com/suborbital/appspec/tenant"
 	"github.com/suborbital/subo/project"
 	"github.com/suborbital/subo/subo/util"
+	"github.com/suborbital/systemspec/bundle"
+	"github.com/suborbital/systemspec/capabilities"
+	"github.com/suborbital/systemspec/tenant"
 )
 
 const bundlePackageJobType = "bundle"
