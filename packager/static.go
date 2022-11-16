@@ -7,7 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/suborbital/atmo/bundle"
+	"github.com/suborbital/systemspec/bundle"
 )
 
 // CollectStaticFiles collects all of the files in the `static/` directory relative to cwd
