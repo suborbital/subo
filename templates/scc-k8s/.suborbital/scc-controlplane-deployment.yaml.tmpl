@@ -31,23 +31,23 @@ spec:
           env:
             - name: SCC_HTTP_PORT
               value: "8081"
-            
+
             - name: SCC_LOG_LEVEL
               value: "info"
-            
+
             - name: SCC_HEADLESS
               value: "true"
 
             - name: SCC_ENV_TOKEN
               value: {{ .EnvToken }}
-          
+
           volumeMounts:
             - name: controlplane-storage
               mountPath: "/home/scn"
             - name: controlplane-config
               mountPath: "/home/scn/config"
               readOnly: true
-        
+
         - name: builder
           image: suborbital/scc-builder:{{ .SCCVersion }}
           command: ["builder"]
@@ -62,16 +62,20 @@ spec:
 
             - name: SCC_TLS_PORT
               value: "8443"
-            
+
             - name: SCC_LOG_LEVEL
               value: "info"
 
             - name: SCC_CONTROL_PLANE
               value: "scc-controlplane-service:8081"
-          
+
           volumeMounts:
-            - mountPath: "/home/scn"
-              name: controlplane-storage
+            - name: controlplane-storage
+              mountPath: "/home/scn"
+            - name: controlplane-config
+              mountPath: "/home/scn/config"
+              readOnly: true
+
       initContainers:
         - name: scc-init
           image: busybox
@@ -79,7 +83,7 @@ spec:
           volumeMounts:
           - name: controlplane-storage
             mountPath: /data
-      
+
       volumes:
         - name: controlplane-storage
           persistentVolumeClaim:
