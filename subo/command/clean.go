@@ -14,7 +14,7 @@ import (
 	"github.com/suborbital/subo/subo/util"
 )
 
-//CleanCmd  removes all of the target/.build folders for Runnables and deletes the .wasm files.
+// CleanCmd  removes all of the target/.build folders for Runnables and deletes the .wasm files.
 func CleanCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "clean",

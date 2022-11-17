@@ -17,7 +17,7 @@ var validPublishTypes = map[string]bool{
 	"docker": true,
 }
 
-//PushCmd packages the current project into a Bindle and pushes it to a Bindle server.
+// PushCmd packages the current project into a Bindle and pushes it to a Bindle server.
 func PushCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "push",
