@@ -107,7 +107,7 @@ func CreateReleaseCmd() *cobra.Command {
 				return errors.Wrap(err, "failed to Run git push")
 			}
 
-			ghCommand := fmt.Sprintf("gh release create %s --title=%s --target=%s --notes-file=%s", newVersion, releaseName, branch, changelogFilePath)
+			ghCommand := fmt.Sprintf("gh release create %s --title=\"%s\" --target=%s --notes-file=%s", newVersion, releaseName, branch, changelogFilePath)
 			if preRelease, _ := cmd.Flags().GetBool(preReleaseFlag); preRelease {
 				ghCommand += " --prerelease"
 			}
