@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	defaultRepo   = "suborbital/runnable-templates"
-	defaultBranch = "vmain"
+	defaultRepo   = "suborbital/templates"
+	defaultBranch = "main"
 )
 
 type projectData struct {
