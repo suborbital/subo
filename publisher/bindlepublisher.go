@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/deislabs/go-bindle/client"
+	bclient "github.com/deislabs/go-bindle/client"
 	"github.com/deislabs/go-bindle/keyring"
 	"github.com/deislabs/go-bindle/types"
 	"github.com/pelletier/go-toml"
@@ -120,7 +120,7 @@ func (b *BindlePublishJob) Publish(log util.FriendlyLogger, ctx *project.Context
 		return errors.Wrap(err, "failed to GenerateCreatorSignaure")
 	}
 
-	client, err := client.New("http://127.0.0.1:8080/v1", nil)
+	client, err := bclient.New("http://127.0.0.1:8080/v1", nil)
 	if err != nil {
 		return errors.Wrap(err, "failed to client.New")
 	}

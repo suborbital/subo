@@ -42,12 +42,12 @@ func readTenantConfig(cwd string) (*tenant.Config, error) {
 		return nil, errors.Wrap(err, "failed to ReadFile for Directive")
 	}
 
-	tenant := &tenant.Config{}
-	if err := tenant.Unmarshal(tenantBytes); err != nil {
+	t := &tenant.Config{}
+	if err := t.Unmarshal(tenantBytes); err != nil {
 		return nil, errors.Wrap(err, "failed to Unmarshal Directive")
 	}
 
-	return tenant, nil
+	return t, nil
 }
 
 // readQueriesFile finds a queries.yaml from disk.
@@ -63,12 +63,12 @@ func readQueriesFile(cwd string) ([]tenant.DBQuery, error) {
 		return nil, errors.Wrap(err, "failed to ReadFile for Queries.yaml")
 	}
 
-	tenant := &tenant.Config{}
-	if err := tenant.UnmarshalYaml(configBytes); err != nil {
+	t := &tenant.Config{}
+	if err := t.UnmarshalYaml(configBytes); err != nil {
 		return nil, errors.Wrap(err, "failed to Unmarshal Directive")
 	}
 
-	return tenant.DefaultNamespace.Queries, nil
+	return t.DefaultNamespace.Queries, nil
 }
 
 // readConnectionsFile finds a queries.yaml from disk.
@@ -84,12 +84,12 @@ func readConnectionsFile(cwd string) ([]tenant.Connection, error) {
 		return nil, errors.Wrap(err, "failed to ReadFile for Queries.yaml")
 	}
 
-	tenant := &tenant.Config{}
-	if err := tenant.UnmarshalYaml(configBytes); err != nil {
+	t := &tenant.Config{}
+	if err := t.UnmarshalYaml(configBytes); err != nil {
 		return nil, errors.Wrap(err, "failed to Unmarshal Directive")
 	}
 
-	return tenant.DefaultNamespace.Connections, nil
+	return t.DefaultNamespace.Connections, nil
 }
 
 // CalculateModuleRefs calculates the hash refs for all modules and validates correctness of the config.
