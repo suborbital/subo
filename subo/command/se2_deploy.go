@@ -23,7 +23,7 @@ import (
 )
 
 type deployData struct {
-	SCCVersion       string
+	SE2Version       string
 	EnvToken         string
 	BuilderDomain    string
 	StorageClassName string
@@ -93,11 +93,11 @@ func SE2DeployCommand() *cobra.Command {
 				}
 
 				data := deployData{
-					SCCVersion: tag,
+					SE2Version: tag,
 					EnvToken:   envToken,
 				}
 
-				templateName := "scc-docker"
+				templateName := "se2-docker"
 
 				if !localInstall {
 					data.BuilderDomain, err = getBuilderDomain()
@@ -110,7 +110,7 @@ func SE2DeployCommand() *cobra.Command {
 						return errors.Wrap(err, "🚫 failed to getStorageClass")
 					}
 
-					templateName = "scc-k8s"
+					templateName = "se2-k8s"
 				}
 
 				if err := template.ExecTmplDir(bctx.Cwd, "", templatesPath, templateName, data); err != nil {
@@ -194,7 +194,7 @@ func SE2DeployCommand() *cobra.Command {
 	}
 
 	cmd.Flags().String(branchFlag, defaultBranch, "git branch to download templates from")
-	cmd.Flags().String(versionFlag, release.SCCTag, "Docker tag to use for control plane images")
+	cmd.Flags().String(versionFlag, release.SE2Tag, "Docker tag to use for control plane images")
 	cmd.Flags().Int(proxyPortFlag, proxyDefaultPort, "port that the Editor proxy listens on")
 	cmd.Flags().Bool(localFlag, false, "deploy locally using Docker Compose")
 	cmd.Flags().Bool(dryRunFlag, false, "prepare the deployment in the .suborbital directory, but do not apply it")
@@ -322,15 +322,15 @@ func detectStorageClass() (string, error) {
 }
 
 func createConfigMap(cwd string) error {
-	configFilepath := filepath.Join(cwd, "config", "scc-config.yaml")
+	configFilepath := filepath.Join(cwd, "config", "se2-config.yaml")
 
 	_, err := os.Stat(configFilepath)
 	if err != nil {
-		return errors.Wrap(err, "failed to Stat scc-config.yaml")
+		return errors.Wrap(err, "failed to Stat se2-config.yaml")
 	}
 
-	if _, err := util.Command.Run(fmt.Sprintf("kubectl create configmap scc-config --from-file=scc-config.yaml=%s -n suborbital", configFilepath)); err != nil {
-		return errors.Wrap(err, "failed to create configmap (you may need to run `kubectl delete configmap scc-config -n suborbital`)")
+	if _, err := util.Command.Run(fmt.Sprintf("kubectl create configmap se2-config --from-file=se2-config.yaml=%s -n suborbital", configFilepath)); err != nil {
+		return errors.Wrap(err, "failed to create configmap (you may need to run `kubectl delete configmap se2-config -n suborbital`)")
 	}
 
 	return nil
