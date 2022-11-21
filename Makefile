@@ -21,9 +21,6 @@ subo/docker/publish:
 subo/smoketest: subo
 	./scripts/smoketest.sh
 
-mod/replace/atmo:
-	go mod edit -replace github.com/suborbital/atmo=$(HOME)/Workspaces/suborbital/atmo
-
 tidy:
 	go mod tidy && go mod download
 
@@ -33,4 +30,4 @@ lint:
 test:
 	go test ./...
 
-.PHONY: subo subo/dev subo/docker-bin subo/docker subo/docker/publish subo/smoketest mod/replace/atmo tidy lint test
+.PHONY: subo subo/dev subo/docker-bin subo/docker subo/docker/publish subo/smoketest tidy lint test

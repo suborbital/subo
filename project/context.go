@@ -31,7 +31,7 @@ var validLangs = map[string]struct{}{
 // Context describes the context under which the tool is being run.
 type Context struct {
 	Cwd            string
-	CwdIsRunnable  bool
+	CwdIsModule    bool
 	Modules        []ModuleDir
 	Bundle         BundleRef
 	TenantConfig   *tenant.Config
@@ -42,7 +42,7 @@ type Context struct {
 	BuilderTag     string
 }
 
-// ModuleDir represents a directory containing a Runnable.
+// ModuleDir represents a directory containing a module.
 type ModuleDir struct {
 	Name           string
 	UnderscoreName string
@@ -64,9 +64,9 @@ func ForDirectory(dir string) (*Context, error) {
 		return nil, errors.Wrap(err, "failed to get Abs path")
 	}
 
-	modules, cwdIsRunnable, err := getModuleDirs(fullDir)
+	modules, cwdIsModule, err := getModuleDirs(fullDir)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to getRunnableDirs")
+		return nil, errors.Wrap(err, "failed to getModuleDirs")
 	}
 
 	bundle, err := bundleTargetPath(fullDir)
@@ -97,7 +97,7 @@ func ForDirectory(dir string) (*Context, error) {
 
 	bctx := &Context{
 		Cwd:           fullDir,
-		CwdIsRunnable: cwdIsRunnable,
+		CwdIsModule:   cwdIsModule,
 		Modules:       modules,
 		Bundle:        *bundle,
 		TenantConfig:  config,
@@ -196,11 +196,11 @@ func getModuleDirs(cwd string) ([]ModuleDir, bool, error) {
 		return nil, false, errors.Wrap(err, "failed to list directory")
 	}
 
-	// Check to see if we're running from within a Runnable directory
+	// Check to see if we're running from within a Module directory
 	// and return true if so.
 	moduleDir, err := getModuleFromFiles(cwd, topLvlFiles)
 	if err != nil {
-		return nil, false, errors.Wrap(err, "failed to getRunnableFromFiles")
+		return nil, false, errors.Wrap(err, "failed to getModuleFromFiles")
 	} else if moduleDir != nil {
 		modules = append(modules, *moduleDir)
 		return modules, true, nil
@@ -222,7 +222,7 @@ func getModuleDirs(cwd string) ([]ModuleDir, bool, error) {
 
 		moduleDir, err := getModuleFromFiles(dirPath, innerFiles)
 		if err != nil {
-			return nil, false, errors.Wrap(err, "failed to getRunnableFromFiles")
+			return nil, false, errors.Wrap(err, "failed to getModuleFromFiles")
 		} else if moduleDir == nil {
 			continue
 		}

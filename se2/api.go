@@ -1,4 +1,4 @@
-package scn
+package se2
 
 import (
 	"bytes"
@@ -11,7 +11,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/suborbital/subo/scn/types"
+	"github.com/suborbital/subo/se2/types"
 )
 
 const (
@@ -30,7 +30,7 @@ type VerifiedAPI struct {
 	verifier *types.RequestVerifier
 }
 
-// EnvironmentAPI is an API authenticated to a particular SCN environment.
+// EnvironmentAPI is an API authenticated to a particular SE2 environment.
 type EnvironmentAPI struct {
 	api   *API
 	token string

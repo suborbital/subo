@@ -25,8 +25,8 @@ func rootCommand() *cobra.Command {
 	// create commands.
 	create := &cobra.Command{
 		Use:   "create",
-		Short: "create a runnable, project, or handler",
-		Long:  `create a new Atmo project, WebAssembly runnable or handler`,
+		Short: "create a module, project, or handler",
+		Long:  `create a new E2Core project, WebAssembly module or handler`,
 	}
 
 	if features.EnableReleaseCommands {
@@ -34,7 +34,7 @@ func rootCommand() *cobra.Command {
 	}
 
 	create.AddCommand(command.CreateProjectCmd())
-	create.AddCommand(command.CreateRunnableCmd())
+	create.AddCommand(command.CreateModuleCmd())
 	// TODO: turn into create workflow command
 	// Ref: https://github.com/suborbital/subo/issues/347
 	// create.AddCommand(command.CreateHandlerCmd()).

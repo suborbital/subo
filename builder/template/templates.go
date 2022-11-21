@@ -86,8 +86,8 @@ func TemplatesExist(repo, branch string) (string, error) {
 	return tmplPath, nil
 }
 
-// ExecRunnableTmplStr executes a template string with the module's data.
-func ExecRunnableTmplStr(templateStr string, module *tenant.Module) (string, error) {
+// ExecModuleTmplStr executes a template string with the module's data.
+func ExecModuleTmplStr(templateStr string, module *tenant.Module) (string, error) {
 	templateData := makeTemplateData(module)
 
 	tmpl, err := template.New("tmpl").Parse(templateStr)
@@ -103,8 +103,8 @@ func ExecRunnableTmplStr(templateStr string, module *tenant.Module) (string, err
 	return builder.String(), nil
 }
 
-// ExecRunnableTmpl copies a template.
-func ExecRunnableTmpl(cwd, name, templatesPath string, module *tenant.Module) error {
+// ExecModuleTmpl copies a template.
+func ExecModuleTmpl(cwd, name, templatesPath string, module *tenant.Module) error {
 	templateData := makeTemplateData(module)
 
 	return ExecTmplDir(cwd, name, templatesPath, module.Lang, templateData)

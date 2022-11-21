@@ -34,7 +34,7 @@ func (b *DockerPublishJob) Publish(log util.FriendlyLogger, ctx *project.Context
 	}
 
 	if !ctx.Bundle.Exists {
-		return errors.New("cannot publish without runnables.wasm.zip, run `subo build` first")
+		return errors.New("cannot publish without modules.wasm.zip, run `subo build` first")
 	}
 
 	imageName, err := project.DockerNameFromConfig(ctx.TenantConfig)
