@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -32,7 +31,7 @@ func getTimestampCache() (time.Time, error) {
 	} else if err != nil {
 		return time.Time{}, errors.Wrap(err, "failed to Stat")
 	} else {
-		data, err := ioutil.ReadFile(filePath)
+		data, err := os.ReadFile(filePath)
 		if err != nil {
 			return time.Time{}, errors.Wrap(err, "failed to ReadFile")
 		}
@@ -57,7 +56,7 @@ func cacheTimestamp(timestamp time.Time) error {
 
 	filePath := filepath.Join(cachePath, lastCheckedFilename)
 	data := []byte(timestamp.Format(time.RFC3339))
-	if err := ioutil.WriteFile(filePath, data, util.PermFile); err != nil {
+	if err := os.WriteFile(filePath, data, util.PermFile); err != nil {
 		return errors.Wrap(err, "failed to WriteFile")
 	}
 
@@ -88,7 +87,7 @@ func getLatestReleaseCache() (*github.RepositoryRelease, error) {
 	} else if err != nil {
 		return nil, errors.Wrap(err, "faild to Stat")
 	} else {
-		data, err := ioutil.ReadFile(filePath)
+		data, err := os.ReadFile(filePath)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to ReadFile")
 		}
@@ -119,7 +118,7 @@ func cacheLatestRelease(latestRepoRelease *github.RepositoryRelease) error {
 	encoder := gob.NewEncoder(&buffer)
 	if err = encoder.Encode(latestRepoRelease); err != nil {
 		return errors.Wrap(err, "failed to Encode RepositoryRelease")
-	} else if err := ioutil.WriteFile(filepath.Join(cachePath, latestReleaseFilename), buffer.Bytes(), util.PermFile); err != nil {
+	} else if err := os.WriteFile(filepath.Join(cachePath, latestReleaseFilename), buffer.Bytes(), util.PermFile); err != nil {
 		return errors.Wrap(err, "failed to WriteFile")
 	}
 
