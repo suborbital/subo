@@ -27,22 +27,22 @@ var langAliases = map[string]string{
 	"js": "javascript",
 }
 
-// CreateRunnableError wraps errors for CreateRunnableCmd() failures.
-type CreateRunnableError struct {
-	Path  string // The ouput directory for build command CreateRunnableCmd().
+// CreateModuleError wraps errors for CreateModuleCmd() failures.
+type CreateModuleError struct {
+	Path  string // The ouput directory for build command CreateModuleCmd().
 	error        // The original error.
 }
 
-// NewCreateRunnableError cleans up and returns CreateRunnableError for CreateRunnableCmd() failures.
-func NewCreateRunnableError(path string, err error) CreateRunnableError {
+// NewCreateModuleError cleans up and returns CreateModuleError for CreateModuleCmd() failures.
+func NewCreateModuleError(path string, err error) CreateModuleError {
 	if cleanupErr := os.RemoveAll(path); cleanupErr != nil {
 		err = errors.Wrap(err, "failed to clean up module outputs")
 	}
-	return CreateRunnableError{Path: path, error: err}
+	return CreateModuleError{Path: path, error: err}
 }
 
-// CreateRunnableCmd returns the build command.
-func CreateRunnableCmd() *cobra.Command {
+// CreateModuleCmd returns the build command.
+func CreateModuleCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "module <name>",
 		Short: "create a new plugin module",
@@ -75,34 +75,34 @@ func CreateRunnableCmd() *cobra.Command {
 
 			module, err := writeDotModule(bctx.Cwd, name, lang, namespace)
 			if err != nil {
-				return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to writeDotRunnable")
+				return errors.Wrap(NewCreateModuleError(path, err), "🚫 failed to writeDotModule")
 			}
 
 			templatesPath, err := template.FullPath(repo, branch)
 			if err != nil {
-				return errors.Wrap(NewCreateRunnableError(path, err), "failed to template.FullPath")
+				return errors.Wrap(NewCreateModuleError(path, err), "failed to template.FullPath")
 			}
 
 			if update, _ := cmd.Flags().GetBool(updateTemplatesFlag); update {
 				templatesPath, err = template.UpdateTemplates(repo, branch)
 				if err != nil {
-					return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to UpdateTemplates")
+					return errors.Wrap(NewCreateModuleError(path, err), "🚫 failed to UpdateTemplates")
 				}
 			}
 
-			if err := template.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, module); err != nil {
+			if err := template.ExecModuleTmpl(bctx.Cwd, name, templatesPath, module); err != nil {
 				// if the templates are missing, try updating them and exec again.
 				if err == template.ErrTemplateMissing {
 					templatesPath, err = template.UpdateTemplates(repo, branch)
 					if err != nil {
-						return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to UpdateTemplates")
+						return errors.Wrap(NewCreateModuleError(path, err), "🚫 failed to UpdateTemplates")
 					}
 
-					if err := template.ExecRunnableTmpl(bctx.Cwd, name, templatesPath, module); err != nil {
-						return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to ExecTmplDir")
+					if err := template.ExecModuleTmpl(bctx.Cwd, name, templatesPath, module); err != nil {
+						return errors.Wrap(NewCreateModuleError(path, err), "🚫 failed to ExecTmplDir")
 					}
 				} else {
-					return errors.Wrap(NewCreateRunnableError(path, err), "🚫 failed to ExecTmplDir")
+					return errors.Wrap(NewCreateModuleError(path, err), "🚫 failed to ExecTmplDir")
 				}
 			}
 

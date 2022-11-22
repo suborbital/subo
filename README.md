@@ -1,40 +1,51 @@
 # Subo, the Suborbital CLI
 
-Subo is the command-line helper for working with the Suborbital Development Platform. Subo is used to build Wasm Runnables, generate new projects and config files, and more over time.
+Subo is the command-line helper for working with the Suborbital Development Platform. Subo is used to build Wasm modules, generate new projects and config files, and more over time.
 
-**You do not need to install language-specific tools to get started with WebAssembly and Subo!** A Docker toolchain is supported (see below) that can build your Runnables without needing to install language toolchains.
+**You do not need to install language-specific tools to get started with WebAssembly and Subo!** A Docker toolchain is supported (see below) that can build your modules without needing to install language toolchains.
 
 ## Installing
+
 ### macOS (Homebrew)
+
 If you're on Mac (M1 or Intel), the easiest way to install is via `brew`:
-```
+
+```console
 brew tap suborbital/subo
 brew install subo
 ```
 
 ### Install from source (requires Go)
+
 If you use Linux or otherwise prefer to build from source, simply clone this repository or download a [source code release](https://github.com/suborbital/subo/releases/latest) archive and run:
-```
+
+```console
 make subo
 ```
+
 This will install `subo` into your GOPATH (`$HOME/go/bin/subo` by default) which you may need to add to your shell's `$PATH` variable.
 
 Subo does not have official support for Windows.
 
 ## Verify installation
+
 Verify subo was installed:
-```
+
+```console
 subo --help
 ```
 
 
 ## Getting started
+
 **To get started with Subo, visit the [Get started guide](./docs/get-started.md).**
 
 ## Builders
-This repo contains builders for the various languages supported by Wasm Runnables. A builder is a Docker image that can build Runnables into Wasm modules, and is used internally by `subo` to build your code! See the [builders](./builder/docker) directory for more.
+
+This repo contains builders for the various languages supported by Wasm modules. A builder is a Docker image that can build code into Wasm modules, and is used internally by `subo` to build your code! See the [builders](./builder/docker) directory for more.
 
 ## Platforms
+
 The `subo` tool supports the following platforms and operating systems:
 |  | x86_64 | arm64
 | --- | --- | --- |
@@ -43,7 +54,7 @@ The `subo` tool supports the following platforms and operating systems:
 | Windows* | — | — |
 
 _*On Windows you can use WSL._
- 
+
 The language toolchains used by `subo` support the following platforms:
 | | x86_64 | arm64 | Docker |
 | --- | --- | --- | --- |

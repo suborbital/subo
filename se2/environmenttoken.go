@@ -1,11 +1,11 @@
-package scn
+package se2
 
 import (
 	"net/http"
 
 	"github.com/pkg/errors"
 
-	"github.com/suborbital/subo/scn/types"
+	"github.com/suborbital/subo/se2/types"
 )
 
 // CreateEnvironmentToken creates an environment token.

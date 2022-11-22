@@ -12,7 +12,7 @@ RUN apt-get update && \
     cmake --build .
 
 FROM debian:bullseye-slim
-WORKDIR /root/runnable
+WORKDIR /root/module
 
 COPY --from=builder /wabt/bin/wat2wasm /usr/local/bin
 COPY --from=subo /go/bin/subo /usr/local/bin

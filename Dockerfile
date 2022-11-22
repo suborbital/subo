@@ -10,7 +10,7 @@ COPY deployer ./deployer
 COPY packager ./packager
 COPY publisher ./publisher
 COPY project ./project
-COPY scn ./scn
+COPY se2 ./se2
 COPY *.go ./
 COPY Makefile .
 RUN make subo/docker-bin

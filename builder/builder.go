@@ -93,7 +93,7 @@ func (b *Builder) BuildWithToolchain(tcn Toolchain) error {
 		}
 
 		if tcn == ToolchainNative {
-			b.log.LogStart(fmt.Sprintf("building runnable: %s (%s)", mod.Name, mod.Module.Lang))
+			b.log.LogStart(fmt.Sprintf("building module: %s (%s)", mod.Name, mod.Module.Lang))
 
 			result := &BuildResult{}
 
@@ -157,7 +157,7 @@ func (b *Builder) dockerBuildForLang(lang string) (*BuildResult, error) {
 
 	result := &BuildResult{}
 
-	outputLog, err := b.Config.CommandRunner.Run(fmt.Sprintf("docker run --rm --mount type=bind,source=%s,target=/root/runnable %s subo build %s --native --langs %s", b.Context.MountPath, img, b.Context.RelDockerPath, lang))
+	outputLog, err := b.Config.CommandRunner.Run(fmt.Sprintf("docker run --rm --mount type=bind,source=%s,target=/root/module %s subo build %s --native --langs %s", b.Context.MountPath, img, b.Context.RelDockerPath, lang))
 
 	result.OutputLog = outputLog
 
@@ -217,31 +217,31 @@ func ImageForLang(lang, tag string) (string, error) {
 	return fmt.Sprintf("%s:%s", img, tag), nil
 }
 
-func (b *Builder) checkAndRunPreReqs(runnable project.ModuleDir, result *BuildResult) error {
+func (b *Builder) checkAndRunPreReqs(module project.ModuleDir, result *BuildResult) error {
 	preReqLangs, ok := PreRequisiteCommands[runtime.GOOS]
 	if !ok {
 		return fmt.Errorf("unsupported OS: %s", runtime.GOOS)
 	}
 
-	preReqs, ok := preReqLangs[runnable.Module.Lang]
+	preReqs, ok := preReqLangs[module.Module.Lang]
 	if !ok {
-		return fmt.Errorf("unsupported language: %s", runnable.Module.Lang)
+		return fmt.Errorf("unsupported language: %s", module.Module.Lang)
 	}
 
 	for _, p := range preReqs {
 
-		filepathVar := filepath.Join(runnable.Fullpath, p.File)
+		filepathVar := filepath.Join(module.Fullpath, p.File)
 
 		if _, err := os.Stat(filepathVar); err != nil {
 			if errors.Is(err, os.ErrNotExist) {
 				b.log.LogStart(fmt.Sprintf("missing %s, fixing...", p.File))
 
-				fullCmd, err := p.GetCommand(*b.Config, runnable)
+				fullCmd, err := p.GetCommand(*b.Config, module)
 				if err != nil {
 					return errors.Wrap(err, "prereq.GetCommand")
 				}
 
-				outputLog, err := b.Config.CommandRunner.RunInDir(fullCmd, runnable.Fullpath)
+				outputLog, err := b.Config.CommandRunner.RunInDir(fullCmd, module.Fullpath)
 				if err != nil {
 					return errors.Wrapf(err, "commandRunner.RunInDir: %s", fullCmd)
 				}
@@ -256,7 +256,7 @@ func (b *Builder) checkAndRunPreReqs(runnable project.ModuleDir, result *BuildRe
 	return nil
 }
 
-// analyzeForCompilerFlags looks at the Runnable and determines if any additional compiler flags are needed
+// analyzeForCompilerFlags looks at the module and determines if any additional compiler flags are needed
 // this is initially added to support AS-JSON in AssemblyScript with its need for the --transform flag.
 func (b *Builder) analyzeForCompilerFlags(md project.ModuleDir) (string, error) {
 	if md.Module.Lang == "assemblyscript" {

@@ -14,7 +14,7 @@ import (
 	"github.com/suborbital/subo/subo/util"
 )
 
-// CleanCmd  removes all of the target/.build folders for Runnables and deletes the .wasm files.
+// CleanCmd  removes all of the target/.build folders for modules and deletes the .wasm files.
 func CleanCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "clean",
@@ -32,7 +32,7 @@ func CleanCmd() *cobra.Command {
 			}
 
 			if len(bctx.Modules) == 0 {
-				return errors.New("🚫 no runnables found in current directory (no .runnable yaml files found)")
+				return errors.New("🚫 no modules found in current directory (no .module.yaml files found)")
 			}
 
 			util.LogStart(fmt.Sprintf("cleaning in %s", bctx.Cwd))

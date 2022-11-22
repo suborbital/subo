@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	scnEndpointEnvKey = "SUBO_SCN_ENDPOINT"
+	se2EndpointEnvKey = "SUBO_SE2_ENDPOINT"
 )
 
 // SE2CreateTokenCommand returns the dev command.
@@ -24,7 +24,7 @@ func SE2CreateTokenCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			email := args[0]
 
-			vapi, err := scnAPI().ForVerifiedEmail(email, getVerifierCode)
+			vapi, err := se2API().ForVerifiedEmail(email, getVerifierCode)
 			if err != nil {
 				return errors.Wrap(err, "failed to ForVerifiedEmail")
 			}

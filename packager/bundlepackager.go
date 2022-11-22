@@ -96,7 +96,7 @@ func (b *BundlePackageJob) Package(log util.FriendlyLogger, ctx *project.Context
 
 	bundleRef := project.BundleRef{
 		Exists:   true,
-		Fullpath: filepath.Join(ctx.Cwd, "runnables.wasm.zip"),
+		Fullpath: filepath.Join(ctx.Cwd, "modules.wasm.zip"),
 	}
 
 	ctx.Bundle = bundleRef

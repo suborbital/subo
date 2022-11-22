@@ -115,7 +115,7 @@ func (p Prereq) GetCommand(b BuildConfig, md project.ModuleDir) (string, error) 
 	var fullCmd strings.Builder
 	err = cmdTmpl.Execute(&fullCmd, data)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to execute prerequisite Command string with runnableDir")
+		return "", errors.Wrap(err, "failed to execute prerequisite Command string with moduleDir")
 	}
 
 	return fullCmd.String(), nil

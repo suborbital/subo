@@ -1,7 +1,7 @@
 FROM suborbital/subo:dev as subo
 
 FROM rust:1.56.1-slim-buster
-WORKDIR /root/runnable
+WORKDIR /root/module
 COPY --from=subo /go/bin/subo /usr/local/bin
 
 # install the wasm target and then install something that
