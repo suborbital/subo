@@ -146,11 +146,11 @@ func getLatestVersion(ctx context.Context) (*version.Version, error) {
 	return latestVersion, nil
 }
 
-// CheckForLatestVersion returns an error if SuboDotVersion does not match the latest GitHub release or if the check fails.
+// CheckForLatestVersion returns an error if SuboVersion does not match the latest GitHub release or if the check fails.
 func CheckForLatestVersion(ctx context.Context) (string, error) {
 	if latestCmdVersion, err := getLatestVersion(ctx); err != nil {
 		return "", errors.Wrap(err, "failed to getLatestVersion")
-	} else if cmdVersion, err := version.NewVersion(SuboDotVersion); err != nil {
+	} else if cmdVersion, err := version.NewVersion(SuboVersion); err != nil {
 		return "", errors.Wrap(err, "failed to parse current subo version")
 	} else if cmdVersion.LessThan(latestCmdVersion) {
 		return fmt.Sprintf("An upgrade for Subo is available: %s → %s. "+

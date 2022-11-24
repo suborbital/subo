@@ -70,7 +70,7 @@ func CreateProjectCmd() *cobra.Command {
 			data := projectData{
 				Name:           name,
 				Environment:    environment,
-				APIVersion:     release.FFIVersion,
+				APIVersion:     release.SDKVersion,
 				RuntimeVersion: release.RuntimeVersion,
 			}
 
