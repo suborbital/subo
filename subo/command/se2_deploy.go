@@ -23,7 +23,10 @@ import (
 )
 
 type deployData struct {
-	SE2Version       string
+	SE2Version string // TODO: remove me after Beta-6 release
+
+	SE2Tag           string
+	E2CoreTag        string
 	EnvToken         string
 	BuilderDomain    string
 	StorageClassName string
@@ -93,7 +96,9 @@ func SE2DeployCommand() *cobra.Command {
 				}
 
 				data := deployData{
+					SE2Tag:     tag,
 					SE2Version: tag,
+					E2CoreTag:  "v" + release.RuntimeVersion,
 					EnvToken:   envToken,
 				}
 
@@ -194,7 +199,7 @@ func SE2DeployCommand() *cobra.Command {
 	}
 
 	cmd.Flags().String(branchFlag, defaultBranch, "git branch to download templates from")
-	cmd.Flags().String(versionFlag, release.SE2Tag, "Docker tag to use for control plane images")
+	cmd.Flags().String(versionFlag, "v"+release.SE2Version, "Docker tag to use for control plane images")
 	cmd.Flags().Int(proxyPortFlag, proxyDefaultPort, "port that the Editor proxy listens on")
 	cmd.Flags().Bool(localFlag, false, "deploy locally using Docker Compose")
 	cmd.Flags().Bool(dryRunFlag, false, "prepare the deployment in the .suborbital directory, but do not apply it")

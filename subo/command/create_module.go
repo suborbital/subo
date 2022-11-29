@@ -140,7 +140,7 @@ func writeDotModule(cwd, name, lang, namespace string) (*tenant.Module, error) {
 		Name:       name,
 		Lang:       lang,
 		Namespace:  namespace,
-		APIVersion: release.FFIVersion,
+		APIVersion: release.SDKVersion,
 	}
 
 	bytes, err := yaml.Marshal(module)

@@ -8,7 +8,7 @@ var BuildTime = ""
 
 func Version() string {
 	if CommitHash != "" && BuildTime != "" {
-		return fmt.Sprintf(`%s %s (Built at %s)`, SuboDotVersion, CommitHash, BuildTime)
+		return fmt.Sprintf(`%s %s (Built at %s)`, SuboVersion, CommitHash, BuildTime)
 	}
-	return SuboDotVersion
+	return SuboVersion
 }

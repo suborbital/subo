@@ -104,7 +104,7 @@ func ForDirectory(dir string) (*Context, error) {
 		Langs:         []string{},
 		MountPath:     fullDir,
 		RelDockerPath: ".",
-		BuilderTag:    fmt.Sprintf("v%s", release.SuboDotVersion),
+		BuilderTag:    fmt.Sprintf("v%s", release.SuboVersion),
 	}
 
 	return bctx, nil
