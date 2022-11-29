@@ -7,7 +7,7 @@ const SuboVersion = "0.5.4"
 const SDKVersion = "0.15.1"
 
 // RuntimeVersion is the default version of E2Core that will be used for new projects.
-const RuntimeVersion = "0.4.7"
+const RuntimeVersion = "0.5.0"
 
 // SE2Version is the docker tag used for creating new SE2 deployments.
-const SE2Version = "0.4.1"
+const SE2Version = "0.4.2"
