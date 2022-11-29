@@ -43,6 +43,7 @@ func SE2DeployCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			localInstall := cmd.Flags().Changed(localFlag)
 			shouldReset := cmd.Flags().Changed(resetFlag)
+			updateTemplates := cmd.Flags().Changed(updateTemplatesFlag)
 			branch, _ := cmd.Flags().GetString(branchFlag)
 			tag, _ := cmd.Flags().GetString(versionFlag)
 
@@ -67,6 +68,13 @@ func SE2DeployCommand() *cobra.Command {
 				return errors.Wrap(err, "🚫 failed to project.ForDirectory")
 			}
 
+			if updateTemplates {
+				_, err = template.UpdateTemplates(defaultRepo, branch)
+				if err != nil {
+					return errors.Wrap(err, "🚫 failed to UpdateTemplates")
+				}
+			}
+
 			// if the --reset flag was passed or there's no existing manifests
 			// then we need to 'build the world' from scratch.
 			if shouldReset || !manifestsExist(bctx) {
@@ -83,6 +91,7 @@ func SE2DeployCommand() *cobra.Command {
 				}
 
 				templatesPath, err := template.TemplatesExist(defaultRepo, branch)
+				// Fetch templates if they don't exist
 				if err != nil {
 					templatesPath, err = template.UpdateTemplates(defaultRepo, branch)
 					if err != nil {
@@ -204,6 +213,7 @@ func SE2DeployCommand() *cobra.Command {
 	cmd.Flags().Bool(localFlag, false, "deploy locally using Docker Compose")
 	cmd.Flags().Bool(dryRunFlag, false, "prepare the deployment in the .suborbital directory, but do not apply it")
 	cmd.Flags().Bool(resetFlag, false, "reset the deployment to default (replaces docker-compose.yaml and/or Kubernetes manifests)")
+	cmd.Flags().Bool(updateTemplatesFlag, false, "update with the newest module templates")
 
 	return cmd
 }
