@@ -16,7 +16,7 @@ impl runnable::Runnable for Example {
 }
 ```
 
-subo will package your module into a Wasm module that can be used by E2Core and run just like any other module! You can see examples of modules in the [E2Core repository](https://github.com/suborbital/e2core/tree/main/sat/engine/testdata).
+subo will package your plugin into a Wasm module that can be used by E2Core and run just like any other module! You can see examples of modules in the [E2Core repository](https://github.com/suborbital/e2core/tree/main/sat/engine/testdata).
 
 ## Create a project
 
@@ -35,21 +35,21 @@ Flags:
       --update-templates     update with the newest templates
 ```
 
-## Create a module
+## Create a plugin
 
-To create a new module, use the create module command:
+To create a new plugin, use the create plugin command:
 
 ```console
-> subo create module <name>
+> subo create plugin <name>
 ```
 
-Rust is chosen by default, but if you prefer Swift, just pass `--lang=swift`! You can now use the module API to build your extension. A directory is created for each module, and each contains a `.module.yaml` file that includes some metadata.
+Rust is chosen by default, but if you prefer Swift, just pass `--lang=swift`! You can now use the module API to build your plugin. A directory is created for each module, and each contains a `.module.yaml` file that includes some metadata.
 
-The full options for `create module`:
+The full options for `create plugin`:
 
 ```console
 Usage:
-  subo create module <name> [flags]
+  subo create plugin <name> [flags]
 
 Flags:
       --branch string      git branch to download templates from (default "main")

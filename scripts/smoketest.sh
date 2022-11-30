@@ -27,11 +27,11 @@ subo create project "$TEST_PROJECT"
 pushd "$TEST_PROJECT" > /dev/null
 
 # create a module for each supported language
-subo create module rs-test --lang rust
-subo create module swift-test --lang swift
-subo create module as-test --lang assemblyscript
-subo create module tinygo-test --lang tinygo
-subo create module js-test --lang javascript
+subo create plugin rs-test --lang rust
+subo create plugin swift-test --lang swift
+subo create plugin as-test --lang assemblyscript
+subo create plugin tinygo-test --lang tinygo
+subo create plugin js-test --lang javascript
 
 # build project bundle
 subo build .

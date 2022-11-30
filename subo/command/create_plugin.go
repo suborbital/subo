@@ -27,26 +27,26 @@ var langAliases = map[string]string{
 	"js": "javascript",
 }
 
-// CreateModuleError wraps errors for CreateModuleCmd() failures.
-type CreateModuleError struct {
-	Path  string // The ouput directory for build command CreateModuleCmd().
+// CreatePluginError wraps errors for CreatePluginCmd() failures.
+type CreatePluginError struct {
+	Path  string // The ouput directory for build command CreatePluginCmd().
 	error        // The original error.
 }
 
-// NewCreateModuleError cleans up and returns CreateModuleError for CreateModuleCmd() failures.
-func NewCreateModuleError(path string, err error) CreateModuleError {
+// NewCreatePluginError cleans up and returns CreatePluginError for CreatePluginCmd() failures.
+func NewCreatePluginError(path string, err error) CreatePluginError {
 	if cleanupErr := os.RemoveAll(path); cleanupErr != nil {
-		err = errors.Wrap(err, "failed to clean up module outputs")
+		err = errors.Wrap(err, "failed to clean up plugin outputs")
 	}
-	return CreateModuleError{Path: path, error: err}
+	return CreatePluginError{Path: path, error: err}
 }
 
-// CreateModuleCmd returns the build command.
-func CreateModuleCmd() *cobra.Command {
+// CreatePluginCmd returns the build command.
+func CreatePluginCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "module <name>",
-		Short: "create a new plugin module",
-		Long:  `create a new module to be used with E2Core or Suborbital Extension Engine (SE2)`,
+		Use:   "plugin <name>",
+		Short: "create a new plugin",
+		Long:  `create a new plugin to be used with E2Core or Suborbital Extension Engine (SE2)`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0]
@@ -63,10 +63,10 @@ func CreateModuleCmd() *cobra.Command {
 			}
 
 			if bctx.ModuleExists(name) {
-				return fmt.Errorf("🚫 module %s already exists", name)
+				return fmt.Errorf("🚫 plugin %s already exists", name)
 			}
 
-			util.LogStart(fmt.Sprintf("creating module %s", name))
+			util.LogStart(fmt.Sprintf("creating plugin %s", name))
 
 			path, err := util.Mkdir(bctx.Cwd, name)
 			if err != nil {
@@ -75,18 +75,18 @@ func CreateModuleCmd() *cobra.Command {
 
 			module, err := writeDotModule(bctx.Cwd, name, lang, namespace)
 			if err != nil {
-				return errors.Wrap(NewCreateModuleError(path, err), "🚫 failed to writeDotModule")
+				return errors.Wrap(NewCreatePluginError(path, err), "🚫 failed to writeDotModule")
 			}
 
 			templatesPath, err := template.FullPath(repo, branch)
 			if err != nil {
-				return errors.Wrap(NewCreateModuleError(path, err), "failed to template.FullPath")
+				return errors.Wrap(NewCreatePluginError(path, err), "failed to template.FullPath")
 			}
 
 			if update, _ := cmd.Flags().GetBool(updateTemplatesFlag); update {
 				templatesPath, err = template.UpdateTemplates(repo, branch)
 				if err != nil {
-					return errors.Wrap(NewCreateModuleError(path, err), "🚫 failed to UpdateTemplates")
+					return errors.Wrap(NewCreatePluginError(path, err), "🚫 failed to UpdateTemplates")
 				}
 			}
 
@@ -95,14 +95,14 @@ func CreateModuleCmd() *cobra.Command {
 				if err == template.ErrTemplateMissing {
 					templatesPath, err = template.UpdateTemplates(repo, branch)
 					if err != nil {
-						return errors.Wrap(NewCreateModuleError(path, err), "🚫 failed to UpdateTemplates")
+						return errors.Wrap(NewCreatePluginError(path, err), "🚫 failed to UpdateTemplates")
 					}
 
 					if err := template.ExecModuleTmpl(bctx.Cwd, name, templatesPath, module); err != nil {
-						return errors.Wrap(NewCreateModuleError(path, err), "🚫 failed to ExecTmplDir")
+						return errors.Wrap(NewCreatePluginError(path, err), "🚫 failed to ExecTmplDir")
 					}
 				} else {
-					return errors.Wrap(NewCreateModuleError(path, err), "🚫 failed to ExecTmplDir")
+					return errors.Wrap(NewCreatePluginError(path, err), "🚫 failed to ExecTmplDir")
 				}
 			}
 

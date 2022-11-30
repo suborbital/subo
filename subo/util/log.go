@@ -13,7 +13,7 @@ type FriendlyLogger interface {
 	LogWarn(string)
 }
 
-// PrintLogger is a struct wrapper around the logging extensions used by Subo.
+// PrintLogger is a struct wrapper around the logging plugins used by Subo.
 type PrintLogger struct{}
 
 func (p *PrintLogger) LogInfo(msg string)  { LogInfo(msg) }
