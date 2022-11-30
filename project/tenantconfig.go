@@ -179,7 +179,7 @@ func calculateModuleRef(mod io.Reader) (string, error) {
 	return hex.EncodeToString(hashBytes), nil
 }
 
-// getWorkflowFQMNList gets a full list of all modules used in the config's workflows.
+// getWorkflowFQMNList gets a full list of all extensions used in the config's workflows.
 func getWorkflowFQMNList(cfg *tenant.Config) []string {
 	modMap := map[string]bool{}
 
