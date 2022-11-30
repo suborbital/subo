@@ -43,7 +43,7 @@ To create a new module, use the create module command:
 > subo create module <name>
 ```
 
-Rust is chosen by default, but if you prefer Swift, just pass `--lang=swift`! You can now use the module API to build your function. A directory is created for each module, and each contains a `.module.yaml` file that includes some metadata.
+Rust is chosen by default, but if you prefer Swift, just pass `--lang=swift`! You can now use the module API to build your extension. A directory is created for each module, and each contains a `.module.yaml` file that includes some metadata.
 
 The full options for `create module`:
 
