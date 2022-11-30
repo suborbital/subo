@@ -188,8 +188,8 @@ jobs:
           load: true
           tags: suborbital/${{ matrix.image }}:dev
 
-      - name: Create module
-        run: subo create module ${{ matrix.language }}-test --lang ${{ matrix.language }}
+      - name: Create plugin
+        run: subo create plugin ${{ matrix.language }}-test --lang ${{ matrix.language }}
 
       - name: Run subo build
         run: subo build ${{ matrix.language }}-test --builder-tag dev

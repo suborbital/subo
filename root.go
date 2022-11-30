@@ -25,8 +25,8 @@ func rootCommand() *cobra.Command {
 	// create commands.
 	create := &cobra.Command{
 		Use:   "create",
-		Short: "create a module, project, or handler",
-		Long:  `create a new E2Core project, WebAssembly module or handler`,
+		Short: "create a plugin, project, or handler",
+		Long:  `create a new E2Core project, WebAssembly plugin or handler`,
 	}
 
 	if features.EnableReleaseCommands {
@@ -34,7 +34,7 @@ func rootCommand() *cobra.Command {
 	}
 
 	create.AddCommand(command.CreateProjectCmd())
-	create.AddCommand(command.CreateModuleCmd())
+	create.AddCommand(command.CreatePluginCmd())
 	// TODO: turn into create workflow command
 	// Ref: https://github.com/suborbital/subo/issues/347
 	// create.AddCommand(command.CreateHandlerCmd()).

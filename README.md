@@ -2,7 +2,7 @@
 
 Subo is the command-line helper for working with the Suborbital Development Platform. Subo is used to build Wasm modules, generate new projects and config files, and more over time.
 
-**You do not need to install language-specific tools to get started with WebAssembly and Subo!** A Docker toolchain is supported (see below) that can build your modules without needing to install language toolchains.
+**You do not need to install language-specific tools to get started with WebAssembly and Subo!** A Docker toolchain is supported (see below) that can build your plugins without needing to install language toolchains.
 
 ## Installing
 
@@ -34,7 +34,6 @@ Verify subo was installed:
 ```console
 subo --help
 ```
-
 
 ## Getting started
 

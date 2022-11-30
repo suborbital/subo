@@ -34,7 +34,7 @@ func (r *Repl) Run() error {
 	}
 
 	for {
-		fmt.Println("\n\n1. Create/edit an extension")
+		fmt.Println("\n\n1. Create/edit an plugin")
 		fmt.Print("\nChoose an option: ")
 
 		opt, err := input.ReadStdinString()
@@ -46,7 +46,7 @@ func (r *Repl) Run() error {
 
 		switch opt {
 		case "1":
-			replErr = r.editExtension()
+			replErr = r.editPlugin()
 		default:
 			fmt.Println("invalid, choose again.")
 		}
@@ -57,8 +57,8 @@ func (r *Repl) Run() error {
 	}
 }
 
-func (r *Repl) editExtension() error {
-	fmt.Print("\n\nTo create or edit an extension, enter its name (or FQMN): ")
+func (r *Repl) editPlugin() error {
+	fmt.Print("\n\nTo create or edit an plugin, enter its name (or FQMN): ")
 	name, err := input.ReadStdinString()
 	if err != nil {
 		return errors.Wrap(err, "failed to ReadStdinString")
