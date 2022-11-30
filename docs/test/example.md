@@ -9,10 +9,10 @@
 <!-- {{ Snippet "greetings:doNotDoThis"}} -->
 
 
-## Existing Function Examples
+## Existing Extension Examples
 
 <!-- {{ Snippet "greetings/Hello" }} -->
 
-## Existing Function Example doThis
+## Existing Extension Example doThis
 
 <!-- {{ Snippet "greetings/Hello:doThis" }} -->
