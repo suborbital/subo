@@ -1,7 +1,7 @@
 package release
 
 // SuboVersion represents the version for subo and builders.
-const SuboVersion = "0.5.4"
+const SuboVersion = "0.6.0"
 
 // SDKVersion is the SDK version used by this version of subo.
 const SDKVersion = "0.15.1"
