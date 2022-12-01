@@ -1,5 +1,5 @@
 FROM suborbital/subo:dev as subo
-FROM golang:1.18-bullseye as go
+FROM golang:1.19-bullseye as go
 
 FROM debian:bullseye-slim
 RUN apt-get update && apt-get -y install wget
