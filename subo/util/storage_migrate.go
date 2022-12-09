@@ -88,7 +88,7 @@ func MapFileStorageV0(recorder art.Tree, storageRoot string) error {
 			return nil
 		}
 
-		// map recorder
+		// map draft
 		if !d.IsDir() && d.Name() == libFile(runnable.Lang) {
 			recorder.Insert(canonicalize(&runnable, "src", version(path)), path)
 			return nil

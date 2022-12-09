@@ -1,6 +1,6 @@
 module github.com/suborbital/subo
 
-go 1.18
+go 1.19
 
 require (
 	github.com/deislabs/go-bindle v0.1.1-0.20220201013943-612c59d27f42
