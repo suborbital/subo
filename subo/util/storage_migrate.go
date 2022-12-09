@@ -46,25 +46,6 @@ type Runnable struct {
 	FQFN         string `yaml:"fqfn" json:"fqfn"`
 }
 
-func main() {
-	ctx := context.Background()
-
-	root := "/Users/ryanpridgeon/Workspaces/scn/tests/migration/old/local"
-
-	if err := FileStoreMigration(root); err != nil {
-		panic(err)
-	}
-
-	os.Setenv("AWS_ACCESS_KEY_ID", "minioadmin")
-	os.Setenv("AWS_SECRET_ACCESS_KEY", "minioadmin")
-	os.Setenv("AWS_DEFAULT_REGION", "us-east-1")
-
-	root = "s3://mybucket?endpoint=127.0.0.1:9000&disableSSL=true&s3ForcePathStyle=true"
-	if err := BlobStoreMigration(ctx, root); err != nil {
-		panic(err)
-	}
-}
-
 func FileStoreMigration(storageRoot string) error {
 	recorder := art.New()
 
