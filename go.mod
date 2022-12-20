@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/deislabs/go-bindle v0.1.1-0.20220201013943-612c59d27f42
-	github.com/google/go-github/v41 v41.0.0
+	github.com/google/go-github/v48 v48.2.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/pelletier/go-toml v1.9.5
 	github.com/pkg/errors v0.9.1
@@ -49,7 +49,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/go-cmp v0.5.8 // indirect
+	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/google/wire v0.5.0 // indirect
