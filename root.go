@@ -78,6 +78,7 @@ func se2Command() *cobra.Command {
 
 	se2.AddCommand(create)
 	se2.AddCommand(command.SE2DeployCommand())
+	se2.AddCommand(command.SE2MigrateStorageCommand())
 
 	return se2
 }
