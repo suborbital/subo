@@ -43,7 +43,7 @@ brews:
 
     tap:
       owner: suborbital
-      name: homebrew-subo
+      name: homebrew-tap
       token: '{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}'
 
     commit_author:
