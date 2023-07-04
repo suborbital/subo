@@ -13,7 +13,7 @@ require (
 	github.com/stretchr/testify v1.8.1
 	github.com/suborbital/systemspec v0.0.4
 	gocloud.dev v0.27.0
-	golang.org/x/mod v0.7.0
+	golang.org/x/mod v0.12.0
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
 )
