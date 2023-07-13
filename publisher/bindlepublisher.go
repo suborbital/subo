@@ -12,7 +12,7 @@ import (
 	bclient "github.com/deislabs/go-bindle/client"
 	"github.com/deislabs/go-bindle/keyring"
 	"github.com/deislabs/go-bindle/types"
-	"github.com/pelletier/go-toml"
+	"github.com/pelletier/go-toml/v2"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 

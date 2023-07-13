@@ -6,11 +6,11 @@ require (
 	github.com/deislabs/go-bindle v0.1.1-0.20220201013943-612c59d27f42
 	github.com/google/go-github/v41 v41.0.0
 	github.com/hashicorp/go-version v1.6.0
-	github.com/pelletier/go-toml v1.9.5
+	github.com/pelletier/go-toml/v2 v2.0.9
 	github.com/pkg/errors v0.9.1
 	github.com/plar/go-adaptive-radix-tree v1.0.5
 	github.com/spf13/cobra v1.6.1
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.4
 	github.com/suborbital/systemspec v0.0.4
 	gocloud.dev v0.27.0
 	golang.org/x/mod v0.7.0
@@ -68,6 +68,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/jmoiron/sqlx v1.3.5 // indirect
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
+	github.com/pelletier/go-toml v1.9.3 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sethvargo/go-envconfig v0.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
